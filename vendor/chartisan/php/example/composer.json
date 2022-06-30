@@ -1,0 +1,17 @@
+{
+    "type": "project",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Chartisan\\PHP\\": "../src"
+        }
+    }
+}

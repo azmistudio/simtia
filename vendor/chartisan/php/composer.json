@@ -1,0 +1,21 @@
+{
+    "name": "chartisan/php",
+    "description": "Chartisan's PHP backend",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Èrik Campobadal Forés",
+            "email": "soc@erik.cat"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chartisan\\PHP\\": "src/"
+        }
+    }
+}

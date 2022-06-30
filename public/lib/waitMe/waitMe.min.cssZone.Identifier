@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://github.com/vadimsva/waitMe/releases
+HostUrl=https://github-releases.githubusercontent.com/19270114/d419753a-be33-11e7-8f94-0cf3d32926ee?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20210531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210531T090522Z&X-Amz-Expires=300&X-Amz-Signature=3fa995db56719a7e1bb675f2a064051b88c6a60316bdfc9959af4a9079620cdd&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=19270114&response-content-disposition=attachment%3B%20filename%3DwaitMe.min.css&response-content-type=application%2Foctet-stream

@@ -1,0 +1,46 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('academic.presence_daily_students', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('presence_id')
+                ->constrained('academic.presence_dailies')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->foreignId('student_id')
+                ->constrained('academic.students')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->tinyInteger('present');
+            $table->tinyInteger('permit');
+            $table->tinyInteger('sick');
+            $table->tinyInteger('absent');
+            $table->tinyInteger('leave');
+            $table->string('remark')->nullable();
+            $table->string('logged');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('academic.presence_daily_students');
+    }
+};
