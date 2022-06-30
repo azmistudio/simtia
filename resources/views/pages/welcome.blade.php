@@ -1,5 +1,6 @@
 @extends($ajax == false ? 'layouts.app' : 'layouts.empty') 
 @if ($ajax == false) @section('content') @endif
+<a class="github-fork-ribbon" href="https://github.com/azmistudio/simtia" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a> 
 <header class="app-bar" data-role="appbar" style="background-color:#2b579a;height: 222px;padding-top: 20px;align-items: flex-start;">
     <div class="container">
         <div class="row justify-content-between">
@@ -61,6 +62,30 @@
                             <span style="font-size:12px;">Dikembangkan oleh <a href="https://github.com/azmistudio/simtia" target="_blank">Azmi Studio</a> &copy 2021 - {{ date('Y') }}</span><br/>
                         </div>
                     </div>
+                </div>
+                <div class="well mt-2">
+                    <h6>Akun Akses Demo (<i><small>Data akan direset setiap pekan</small></i>)</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Sandi</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>admin@simtia.org</td>
+                                <td>123456</td>
+                                <td>Administrator</td>
+                            </tr>
+                            <tr>
+                                <td>kepsek@simtia.org</td>
+                                <td>123456</td>
+                                <td>Kepala Sekolah</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

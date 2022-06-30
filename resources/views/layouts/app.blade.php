@@ -37,6 +37,7 @@
     <link href="{{ asset('lib/dropzone/basic.css') }}" rel="stylesheet">
     <link href="{{ asset('lib/dropzone/dropzone.css') }}" rel="stylesheet">
     <link href="{{ asset('css/minimal.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" rel="stylesheet" />
 
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/simtia16.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/simtia32.png') }}">
