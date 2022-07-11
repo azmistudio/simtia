@@ -48,6 +48,7 @@ class AdmissionProspectGroupController extends Controller
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
         //
+        $data['departments'] = $this->listDepartment(); 
         return view('academic::pages.admissions.admission_prospect_group', $data);
     }
 
@@ -96,7 +97,12 @@ class AdmissionProspectGroupController extends Controller
      */
     public function show($id)
     {
-        return response()->json(AdmissionProspectGroup::find($id));
+        $query = AdmissionProspectGroup::where('id', $id)->get()->map(function($model){
+                        $model['department'] = $model->getAdmission->getDepartment->name;
+                        $model['occupied'] = count($model->getAdmissionProspect);
+                        return $model;
+                    })[0];
+        return response()->json($query);
     }
 
     /**

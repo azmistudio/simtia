@@ -45,7 +45,7 @@ class ProspectEloquent implements ProspectRepository
 
 	public function showIn($params)
 	{
-       	return AdmissionProspect::whereIn('id', $params)->get()->map(function ($model) {
+       	return AdmissionProspect::whereIn('id', $params)->orderBy('registration_no')->get()->map(function ($model) {
 		            $model['department_id'] = $model->getProspectGroup->getAdmission->getDepartment->id;
 		            $model['department'] = $model->getProspectGroup->getAdmission->getDepartment->name;
 		            $model['admission_name'] = $model->getProspectGroup->getAdmission->name;

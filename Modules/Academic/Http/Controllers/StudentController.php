@@ -287,7 +287,7 @@ class StudentController extends Controller
         $sheet->mergeCells('AX4:AX5');
         //
         $sheet->setCellValue('A1', Str::upper($request->session()->get('institute')));
-        $sheet->setCellValue('A2', 'DATA SANTRI - SIMAK');
+        $sheet->setCellValue('A2', 'DATA SANTRI - ' . config('app.name'));
         $sheet->setCellValue('A4', 'NO.');
         $sheet->setCellValue('B4', 'DEPARTEMEN');
         $sheet->setCellValue('C4', 'TAHUN AJARAN');
@@ -362,7 +362,7 @@ class StudentController extends Controller
                 $c++;
             }
         } else {
-            $range = 'A4:BN5';
+            $range = 'A4:AX5';
         }
         //
         $baris = 6;
@@ -506,7 +506,7 @@ class StudentController extends Controller
             $index_col = $sheet->getColumnDimensionByColumn($total_col + 50)->getColumnIndex();
             $row = 6;
             $range = $start_col.$row.':'.$index_col;
-            $sheet->getStyle($range.$baris)->applyFromArray($styleBodyCenter);
+            $sheet->getStyle($range.$baris)->applyFromArray($this->PHPExcelCommonStyle()['bodyCenter']);
         }
         //
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake();

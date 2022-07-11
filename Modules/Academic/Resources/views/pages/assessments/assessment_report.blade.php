@@ -1,7 +1,7 @@
 @php
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
-    $GridHeight = $InnerHeight - 301 . "px";
+    $GridHeight = $InnerHeight - 327 . "px";
     $SubGridHeight = $InnerHeight - 356 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
@@ -17,6 +17,19 @@
         <div class="p-1">
             <form id="ff-assessment-report" method="post" class="mb-1">
             @csrf
+                <div class="mb-1">
+                    @if (auth()->user()->getDepartment->is_all != 1)
+                        <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Departemen:',readonly:true,labelWidth:100" />
+                        <input type="hidden" id="fdept-assessment-report" value="{{ auth()->user()->department_id }}" />
+                    @else 
+                        <select id="fdept-assessment-report" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125,valueField:'id',textField:'name'">
+                            <option value="">---</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
                 <div class="mb-1">
                     <select id="fclass-assessment-report" class="easyui-combogrid" style="width:285px;height:22px;" data-options="
                         label:'Kelas:',
@@ -60,19 +73,16 @@
                     </select>
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
-                    <a class="easyui-linkbutton small-btn flist-box" onclick="filterAssessmentReport({fclass: $('#fclass-assessment-report').combobox('getValue'),flesson: $('#flesson-assessment-report').combobox('getValue')})">Cari</a>
+                    <a class="easyui-linkbutton small-btn flist-box" onclick="filterAssessmentReport({fdept: $('#fdept-assessment-report').val(),fclass: $('#fclass-assessment-report').combobox('getValue'),flesson: $('#flesson-assessment-report').combobox('getValue')})">Cari</a>
                     <a class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-assessment-report').form('reset');filterAssessmentReport({})">Batal</a>
                 </div>
             </form>
             <table id="tb-assessment-report" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department',width:80,resizeable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'class',width:80,resizeable:true,sortable:true">Kelas</th>
+                        <th data-options="field:'class',width:75,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'lesson',width:100,resizeable:true">Pelajaran</th>
-                        <th data-options="field:'score_aspect',width:100,resizeable:true">Aspek Nilai</th>
+                        <th data-options="field:'score_aspect',width:130,resizeable:true">Aspek Nilai</th>
                     </tr>
                 </thead>
             </table>

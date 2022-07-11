@@ -50,6 +50,7 @@ class LessonGradingController extends Controller
         $data['ViewType'] = $request->t;
         //
         $data['scores'] = ScoreAspect::select('id','basis','remark')->get();
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.lessons.lesson_grading', $data);
     }
 

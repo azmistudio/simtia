@@ -89,7 +89,7 @@ class AdmissionProspectController extends Controller
                 'student_no' => '-',
                 'name' => Str::lower($request->name),
                 'surname' => Str::lower($request->surname),
-                'dob' => Carbon::createFromFormat('d/m/Y', $request->dob)->format('Y-m-d'),
+                'dob' => $this->formatDate($request->dob,'sys'),
                 'child_brother' => $request->child_brother ?: 0,
                 'child_brother_sum' => $request->child_brother_sum ?: 0,
                 'child_step_sum' => $request->child_step_sum ?: 0,
@@ -97,8 +97,8 @@ class AdmissionProspectController extends Controller
                 'height' => $request->height ?: 0,
                 'distance' => $request->distance ?: 0,
                 'email' => Str::lower($request->email),
-                'father_dob' => Carbon::createFromFormat('d/m/Y', $request->father_dob)->format('Y-m-d'),
-                'mother_dob' => Carbon::createFromFormat('d/m/Y', $request->mother_dob)->format('Y-m-d'),
+                'father_dob' => $this->formatDate($request->father_dob,'sys'),
+                'mother_dob' => $this->formatDate($request->mother_dob,'sys'),
                 'father_income' => isset($request->father_income) ? Str::remove('Rp', Str::remove(',', $request->father_income)) : 0.00,
                 'mother_income' => isset($request->mother_income) ? Str::remove('Rp', Str::remove(',', $request->mother_income)) : 0.00,
                 'donation_1' => isset($request->donation_1) ? Str::remove('Rp', Str::remove(',', $request->donation_1)) : 0.00,
@@ -147,8 +147,14 @@ class AdmissionProspectController extends Controller
                         'photo' => $imageName
                     ]);
                 }
-                $this->columnProspectEloquent->destroy($request->id, $this->subject);
-                $this->columnProspectEloquent->create($request, $request->id);
+                $is_col_exist = ColumnProspectStudent::where('prospect_student_id', $request->id)->first();
+                if (isset($is_col_exist))
+                {
+                    $this->columnProspectEloquent->destroy($request->id, $this->subject);
+                    $this->columnProspectEloquent->create($request, $request->id);
+                } else {
+                    $this->columnProspectEloquent->create($request, $request->id);
+                }
                 $this->prospectEloquent->update($request, $this->subject);
                 $response = $this->getResponse('store', '', $this->subject);
             }
@@ -185,10 +191,11 @@ class AdmissionProspectController extends Controller
     {
         try 
         {
+            $this->columnProspectEloquent->destroy($id, $this->subject);
             $this->prospectEloquent->destroy($id, $this->subject);
             $response = $this->getResponse('destroy', '', $this->subject);
         } catch (\Throwable $e) {
-            $response = $this->getResponse('error', $e->getMessage(), 'Tingkat');
+            $response = $this->getResponse('error', $e->getMessage(), 'Calon Santri');
         }
         return response()->json($response);
     }
@@ -523,7 +530,10 @@ class AdmissionProspectController extends Controller
                 for ($i = 0; $i < count($add_columns); $i++)
                 {
                     $query_col = ColumnProspectStudent::where('prospect_student_id', $q->id)->where('column_id',$add_columns[$i][0])->first();
-                    $sheet->setCellValueByColumnAndRow($i + 63, $baris, $query_col->type == 2 ? Str::upper(optional(optional($query_col)->getColumnOption)->name) : Str::upper($query_col->values));
+                    if (isset($query_col))
+                    {
+                        $sheet->setCellValueByColumnAndRow($i + 63, $baris, $query_col->type == 2 ? Str::upper(optional(optional($query_col)->getColumnOption)->name) : Str::upper($query_col->values));
+                    }
                 }
             }
             //

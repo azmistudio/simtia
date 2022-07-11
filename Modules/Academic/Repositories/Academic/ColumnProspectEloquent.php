@@ -46,24 +46,6 @@ class ColumnProspectEloquent implements ColumnProspectRepository
         return;
 	}
 
-	public function show($search, $is_one)
-	{
-        $query = ColumnProspectStudent::select('*');
-		foreach ($search as $val) 
-		{
-			switch ($val['action']) 
-			{
-				case 'like':
-					$query = $query->where($val['column'], 'like', '%'.Str::lower($val['query']).'%');
-					break;
-				default:
-					$query = $query->where($val['column'], $val['query']);
-					break;
-			}
-		}
-		return $is_one == true ? $query->first() : $query->get(); 
-	}
-
 	public function destroy($id, $subject)
 	{
 		$request = new Request();

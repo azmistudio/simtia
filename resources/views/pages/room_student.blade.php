@@ -1,7 +1,7 @@
 @php
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
-    $GridHeight = $InnerHeight - 275 . "px";
+    $GridHeight = $InnerHeight - 301 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
     <div class="row">
@@ -19,10 +19,22 @@
             <form id="ff-room-student" method="post" class="mb-1">
             @csrf
                 <div class="mb-1">
+                    @if (auth()->user()->getDepartment->is_all != 1)
+                        <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Departemen:',readonly:true,labelWidth:100" />
+                        <input type="hidden" id="fdept-room-student" value="{{ auth()->user()->department_id }}" />
+                    @else 
+                        <select id="fdept-room-student" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125,valueField:'id',textField:'name'">
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
+                <div class="mb-1">
                     <input id="fname-room-student" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Nama:',labelWidth:100">
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
-                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterRoomStudent({fname: $('#fname-room-student').val()})">Cari</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterRoomStudent({fdept: $('#fdept-room-student').val(),fname: $('#fname-room-student').val()})">Cari</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-room-student').form('reset');filterRoomStudent({})">Batal</a>
                 </div>
             </form>
@@ -30,11 +42,8 @@
                 data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department_id',width:100,resizeable:true,sortable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'name',width:90,resizeable:true,sortable:true">Nama</th>
-                        <th data-options="field:'capacity',width:80,resizeable:true,sortable:true">Kapasitas/Terisi</th>
+                        <th data-options="field:'name',width:150,resizeable:true,sortable:true">Nama</th>
+                        <th data-options="field:'capacity',width:100,resizeable:true,sortable:true">Kapasitas/Terisi</th>
                     </tr>
                 </thead>
             </table>

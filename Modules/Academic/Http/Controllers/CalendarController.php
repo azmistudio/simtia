@@ -169,6 +169,8 @@ class CalendarController extends Controller
                 $request->merge([
                     'calendar_id' => $calendars[0],
                     'description' => Str::lower($request->description),
+                    'start' => $this->formatDate($request->start,'sys'),
+                    'end' => $this->formatDate($request->end,'sys'),
                     'logged' => auth()->user()->email,
                 ]);
                 if ($request->id < 1) 
@@ -192,8 +194,7 @@ class CalendarController extends Controller
      */
     public function showActivity($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        return response()->json($this->calendarActivityEloquent->show($search, false)->map(function($model) {
+        return response()->json(CalendarActivity::where('id', $id)->get()->map(function($model) {
             $model['department'] = $model->getCalendar->getSchoolYear->getDepartment->name;
             $model['school_year'] = $model->getCalendar->getSchoolYear->school_year;
             $model['period'] = $model->getCalendar->getSchoolYear->start_date->format('d/m/Y') .' s.d '. $model->getCalendar->getSchoolYear->end_date->format('d/m/Y');

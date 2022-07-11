@@ -59,6 +59,11 @@ class AdmissionEloquent implements AdmissionRepository
 		} 
         $query = $query->groupBy('id','department_id','name');
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->where('department_id', $fdept);
+        }
         $name = isset($request->params['fname']) ? $request->params['fname'] : '';
         if ($name != '') 
         {

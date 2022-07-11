@@ -52,6 +52,7 @@ class LessonAssessmentController extends Controller
         //
         $data['scores'] = ScoreAspect::select('id','basis','remark')->get();
         $data['exams'] = LessonExam::select('id','subject')->get();
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.lessons.lesson_assesment', $data);
     }
 

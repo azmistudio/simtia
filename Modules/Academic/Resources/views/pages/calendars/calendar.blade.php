@@ -48,10 +48,7 @@
             <table id="tb-academic-calendar" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department',width:100,resizeable:true,sortable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'calendar',width:120,resizeable:true,sortable:false">Kalender</th>
+                        <th data-options="field:'calendar',width:155,resizeable:true,sortable:false">Kalender</th>
                         <th data-options="field:'activity',width:150,resizeable:true,sortable:false">Kegiatan</th>
                     </tr>
                 </thead>

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
 use App\Http\Traits\HelperTrait;
 use App\Http\Traits\ReferenceTrait;
+use App\Http\Traits\DepartmentTrait;
 use Modules\Academic\Entities\LessonGrading;
 use Modules\Academic\Entities\LessonAssessment;
 use Modules\Academic\Entities\Students;
@@ -34,6 +35,7 @@ class AssessmentReportController extends Controller
 
     use HelperTrait;
     use ReferenceTrait;
+    use DepartmentTrait;
 
     private $subject = 'Data Perhitungan Nilai Rapor';
 
@@ -63,6 +65,7 @@ class AssessmentReportController extends Controller
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
         //
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.assessments.assessment_report', $data);
     }
 
@@ -184,8 +187,7 @@ class AssessmentReportController extends Controller
      */
     public function show($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        return response()->json($this->examReportEloquent->show($search, false)->map(function($model) {
+        return response()->json(ExamReport::where('id', $id)->get()->map(function($model) {
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['grade'] = $model->getClass->getGrade->grade;
             $model['grade_id'] = $model->getClass->grade_id;
@@ -195,7 +197,7 @@ class AssessmentReportController extends Controller
             $model['lesson'] = $model->getLesson->name;
             $model['employee'] = $this->getEmployeeName($model->employee_id);
             $model['remark'] = $model->getScoreAspect->remark;
-            // $model['value'] = optional($model->getExamReportScoreInfo)->value;
+            // $model['value'] = isset($model->getExamReportScoreInfo) ? $model->getExamReportScoreInfo->value : '-';
             return $model;
         })[0]);
     }

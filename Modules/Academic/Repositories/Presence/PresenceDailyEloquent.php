@@ -51,6 +51,13 @@ class PresenceDailyEloquent implements PresenceDailyRepository
             });
         } 
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->whereHas('getSemester', function($qry) use ($fdept) {
+                $qry->where('department_id', $fdept);
+            });
+        }
         $class = isset($request->params['fclass']) ? $request->params['fclass'] : '';
         if ($class != '') 
         {

@@ -61,6 +61,13 @@ class ProspectGroupEloquent implements ProspectGroupRepository
 		} 
         $query = $query->groupBy('id','group','admission_id','capacity');
         // filter
+        $department_id = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($department_id != '')
+        {
+            $query = $query->whereHas('getAdmission.getDepartment', function($qry) use($department_id) {
+				$qry->where('department_id', $department_id);
+			});
+        }
         $group = isset($request->params['fgroup']) ? $request->params['fgroup'] : '';
         if ($group != '') 
         {

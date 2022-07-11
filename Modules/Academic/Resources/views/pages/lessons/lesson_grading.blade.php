@@ -1,7 +1,7 @@
 @php
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
-    $GridHeight = $InnerHeight - 301 . "px";
+    $GridHeight = $InnerHeight - 327 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
     <div class="row">
@@ -19,26 +19,36 @@
             <form id="ff-lesson-grading" method="post" class="mb-1">
             @csrf
                 <div class="mb-1">
+                    @if (auth()->user()->getDepartment->is_all != 1)
+                        <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelWidth:100,readonly:true" />
+                        <input type="hidden" id="fdept-lesson-grading" value="{{ auth()->user()->department_id }}" />
+                    @else 
+                        <select id="fdept-lesson-grading" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125">
+                            <option value="">---</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
+                <div class="mb-1">
                     <input id="fname-lesson-grading" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Guru:',labelWidth:100">
                 </div>
                 <div class="mb-1">
                     <input id="flesson-lesson-grading" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Pelajaran:',labelWidth:100">
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
-                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterLessonGrading({flesson: $('#flesson-lesson-grading').val(),fname: $('#fname-lesson-grading').val()})">Cari</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterLessonGrading({fdept: $('#fdept-lesson-grading').val(),flesson: $('#flesson-lesson-grading').val(),fname: $('#fname-lesson-grading').val()})">Cari</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-lesson-grading').form('reset');filterLessonGrading({})">Batal</a>
                 </div>
             </form>
             <table id="tb-lesson-grading" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department',width:80,resizeable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'grade_id',width:50,resizeable:true,sortable:true">Tingkat</th>
-                        <th data-options="field:'employee_id',width:80,resizeable:true,sortable:true">Guru</th>
-                        <th data-options="field:'lesson_id',width:80,resizeable:true,sortable:true">Pelajaran</th>
-                        <th data-options="field:'score_aspect_id',width:150,resizeable:true,sortable:true">Aspek Penilaian</th>
+                        <th data-options="field:'grade_id',width:40,resizeable:true,sortable:true">Tingkat</th>
+                        <th data-options="field:'employee_id',width:120,resizeable:true,sortable:true">Guru</th>
+                        <th data-options="field:'lesson_id',width:100,resizeable:true,sortable:true">Pelajaran</th>
+                        <th data-options="field:'score_aspect_id',width:140,resizeable:true,sortable:true">Aspek Penilaian</th>
                     </tr>
                 </thead>
             </table>

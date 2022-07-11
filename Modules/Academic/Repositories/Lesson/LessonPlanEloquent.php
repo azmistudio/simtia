@@ -57,6 +57,11 @@ class LessonPlanEloquent implements LessonPlanRepository
             $query = $query->where('department_id', auth()->user()->department_id);
         } 
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->where('department_id', $fdept);
+        }
         $code = isset($request->params['fcode']) ? $request->params['fcode'] : '';
         if ($code != '') 
         {

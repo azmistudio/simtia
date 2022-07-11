@@ -1,7 +1,7 @@
 @php
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
-    $GridHeight = $InnerHeight - 275 . "px";
+    $GridHeight = $InnerHeight - 301 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
     <div class="row">
@@ -19,10 +19,23 @@
             <form id="ff-admission" method="post" class="mb-1">
             @csrf
                 <div class="mb-1">
+                    @if (auth()->user()->getDepartment->is_all != 1)
+                        <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Departemen:',readonly:true,labelWidth:100" />
+                        <input type="hidden" id="fdept-admission" value="{{ auth()->user()->department_id }}" />
+                    @else 
+                        <select id="fdept-admission" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125,valueField:'id',textField:'name'">
+                            <option value="">---</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
+                <div class="mb-1">
                     <input id="fname-admission" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Nama:',labelWidth:100">
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
-                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterAdmission({fname: $('#fname-admission').val()})">Cari</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterAdmission({fdept: $('#fdept-admission').val(),fname: $('#fname-admission').val()})">Cari</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-admission').form('reset');filterAdmission({})">Batal</a>
                 </div>
             </form>
@@ -31,10 +44,7 @@
                     rowStyler:function (index, row) { if (row.is_active === 'Aktif') { return 'font-weight:600' } }">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department_id',width:100,resizeable:true,sortable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'name',width:90,resizeable:true,sortable:true">Nama</th>
+                        <th data-options="field:'name',width:180,resizeable:true,sortable:true">Nama</th>
                         <th data-options="field:'total_admission',width:80,resizeable:true,sortable:true">Jumlah</th>
                     </tr>
                 </thead>
@@ -64,8 +74,8 @@
                                     <input type="hidden" name="department_id" value="{{ auth()->user()->department_id }}" />
                                 @else 
                                     <select name="department_id" id="AdmissionDeptId" class="easyui-combobox" style="width:335px;height:22px;" data-options="label:'<b>*</b>Departemen:',labelWidth:'125px',labelPosition:'before',panelHeight:125">
-                                        @foreach ($depts as $dept)
-                                        <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                        @foreach ($departments as $department)
+                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>
                                 @endif

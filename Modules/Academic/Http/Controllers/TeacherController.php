@@ -48,6 +48,7 @@ class TeacherController extends Controller
         $data['ViewType'] = $request->t;
         //
         $data['status'] = Reference::where('category', 'hr_teacher_status')->get();
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.teachers.teacher', $data);
     }
 

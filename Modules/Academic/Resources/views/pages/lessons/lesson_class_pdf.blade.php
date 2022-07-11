@@ -11,28 +11,27 @@
         <span>Tanggal Cetak Laporan: {{ date('d/m/Y') . ' - ' . date('H:i:s') . ' WIB' }}</span>
         <hr/> 
         <br/> 
-        @php $payload = explode('-', $infos) @endphp
         <table class="table no-border" style="font-size: 13px;font-weight:700">
           <tbody>
             <tr>
               <td style="width:10%;">Departemen</td>
               <td style="width: 1%;text-align:center;">:</td>
-              <td>{{ $payload[1] }}</td>
+              <td>{{ $payloads->department }}</td>
             </tr>
             <tr>
               <td style="width:10%;">Tahun Ajaran</td>
               <td style="width: 1%;text-align:center;">:</td>
-              <td>{{ $payload[2] }}</td>
+              <td>{{ $payloads->school_year }}</td>
             </tr>
             <tr>
               <td style="width:10%;">Kelas</td>
               <td style="width: 1%;text-align:center;">:</td>
-              <td>{{ $payload[4] }}</td>
+              <td>{{ $payloads->class }}</td>
             </tr>
             <tr>
               <td style="width:10%;">Info Jadwal</td>
               <td style="width: 1%;text-align:center;">:</td>
-              <td>{{ $payload[3] }}</td>
+              <td>{{ $payloads->schedule }}</td>
             </tr>
           </tbody>
         </table>

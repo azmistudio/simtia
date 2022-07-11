@@ -73,9 +73,6 @@
             <table id="tb-assessment-lesson" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department',width:80,resizeable:true">Departemen</th>
-                        @endif
                         <th data-options="field:'class_id',width:70,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'lesson',width:100,resizeable:true,sortable:true">Pelajaran</th>
                         <th data-options="field:'code',width:80,resizeable:true">Kode Uji</th>
