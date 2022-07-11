@@ -28,7 +28,7 @@ Video tutorial penggunaan aplikasi: <a href="https://www.youtube.com/channel/UCd
 
 ### &raquo; Sistem Operasi Windows
 
--   Unduh installer untuk Windows 7,8,10,11 <a href="https://drive.google.com/file/d/1CpUX5iKgq9fInYpqd0ZdKJq2DrAy5qHa/view?usp=sharing" target="_blank">disini.</a>
+-   Unduh installer untuk Windows 7,8,10,11 <a href="" target="_blank">disini.</a>
 -   Akses aplikasi di http://localhost:8080
 -   Login Admin:
     -   Email: admin@simtia.org
@@ -69,6 +69,11 @@ Instalasi aplikasi:
         ```
         WKHTML_PATH="/usr/local/bin/wkhtmltopdf"
         ```
+
+-   Ubah hak akses folder storage:
+    ```
+    sudo chmod -R 777 /var/www/html/simtia/storage
+    ```
 
 -   Jalankan perintah - perintah berikut di dalam folder <b>/var/www/html/simtia</b>:
     ```

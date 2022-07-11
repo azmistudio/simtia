@@ -111,7 +111,8 @@ class UpdaterController extends Controller
             Artisan::call('down');
 
             // copy folder
-            File::copyDirectory(config('app.updater_path').'/'.$request->archive, base_path());
+            $archive = substr($request->archive,0, -4);
+            File::copyDirectory(config('app.updater_path').'/'.$archive, base_path());
 
             // call seeder
             Artisan::call('db:seed', ['--class' => 'DatabaseSeeder', '--force' => true]);
