@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use App\Http\Traits\HelperTrait;
 use App\Http\Traits\PdfTrait;
 use App\Http\Traits\ReferenceTrait;
+use App\Http\Traits\DepartmentTrait;
 use Modules\Academic\Entities\MemorizeCard;
 use Modules\Academic\Http\Requests\MemorizeCardRequest;
 use Modules\Academic\Repositories\Student\MemorizeCardEloquent;
@@ -26,6 +27,7 @@ class StudentMemorizeCardController extends Controller
     use HelperTrait;
     use PdfTrait;
     use ReferenceTrait;
+    use DepartmentTrait;
 
     private $subject = 'Kartu Setoran Santri';
 
@@ -53,6 +55,7 @@ class StudentMemorizeCardController extends Controller
             $model->surah = $model->id .' - '. $model->surah . ' (' . $model->total .' ayat)';
             return $model; 
         });
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.students.memorize_card', $data);
     }
 
@@ -142,7 +145,7 @@ class StudentMemorizeCardController extends Controller
         return response()->json(MemorizeCard::where('class_id', $class_id)->where('memorize_date', $date)->get()->map(function($model){
             $model['student_no'] = $model->getStudent->student_no;
             $model['name'] = $model->getStudent->name;
-            $model['department'] = $model->getClass->getSchoolYear->getDepartment->name;
+            $model['department'] = $model->getClass->getGrade->getDepartment->name;
             $model['school_year'] = $model->getClass->getSchoolYear->school_year;
             $model['grade'] = $model->getClass->getGrade->grade;
             $model['semester'] = $model->getClass->getGrade->getSemesterByDept->semester;

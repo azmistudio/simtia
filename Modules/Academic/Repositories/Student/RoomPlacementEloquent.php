@@ -26,7 +26,7 @@ class RoomPlacementEloquent implements RoomPlacementRepository
 	{
 		$param = $this->gridRequest($request,'asc','student_id');
         $query = DB::table('academic.room_placements')
-                    ->select('academic.room_placements.id','academic.students.student_no','academic.students.name')
+                    ->select('academic.room_placements.id','academic.students.student_no','academic.students.name','academic.room_placements.student_id')
         			->join('academic.students','academic.students.id','=','academic.room_placements.student_id')
         			->where('room_id', $request->room_id);
         // filter

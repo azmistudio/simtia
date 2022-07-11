@@ -13,6 +13,7 @@ use App\Models\Reference;
 use App\Http\Traits\HelperTrait;
 use App\Http\Traits\PdfTrait;
 use App\Http\Traits\ReferenceTrait;
+use App\Http\Traits\DepartmentTrait;
 use Modules\Academic\Entities\Classes;
 use Modules\Academic\Entities\Students;
 use Modules\Academic\Entities\Lesson;
@@ -36,6 +37,7 @@ class PresenceController extends Controller
     use HelperTrait;
     use PdfTrait;
     use ReferenceTrait;
+    use DepartmentTrait;
 
     private $subject_daily = 'Data Presensi Harian';
     private $subject_lesson = 'Data Presensi Pelajaran';
@@ -64,6 +66,7 @@ class PresenceController extends Controller
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
         //
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.presences.presence_daily', $data);
     }
 
@@ -77,14 +80,14 @@ class PresenceController extends Controller
         $validated = $request->validated();
         try 
         {
-            $start_date = $request->year . '-' . sprintf('%02d', $request->month) . '-' . sprintf('%02d', $request->start_date);
-            $end_date = $request->year . '-' . sprintf('%02d', $request->month) . '-' . sprintf('%02d', $request->end_date);
             // check period
-            if (strtotime($start_date) < strtotime($request->start))
+            if (strtotime($this->formatDate($request->start_date,'sys')) < strtotime($request->start))
             {
                 throw new Exception('Tanggal Awal tidak boleh lebih kecil dari Awal Periode.', 1);
-            } elseif (strtotime($end_date) > strtotime($request->end)) {
+            } elseif (strtotime($this->formatDate($request->end_date,'sys')) > strtotime($request->end)) {
                 throw new Exception('Tanggal Akhir tidak boleh lebih besar dari Akhir Periode.', 1);
+            } elseif (strtotime($this->formatDate($request->end_date,'sys')) < strtotime($this->formatDate($request->start_date,'sys'))) {
+                throw new Exception('Tanggal Akhir tidak boleh lebih kecil dari Tanggal Awal.', 1);
             } else {
                 // check presence
                 for ($i=0; $i < count($request->students); $i++) 
@@ -97,8 +100,8 @@ class PresenceController extends Controller
                 }
             }
             $request->merge([
-                'start_date' => $start_date,
-                'end_date' => $end_date,
+                'start_date' => $this->formatDate($request->start_date,'sys'),
+                'end_date' => $this->formatDate($request->end_date,'sys'),
                 'logged' => auth()->user()->email,
             ]);
             if ($request->id < 1) 
@@ -160,13 +163,14 @@ class PresenceController extends Controller
      */
     public function show($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        return response()->json($this->presenceDailyEloquent->show($search, false)->map(function($model){
+        return response()->json(PresenceDaily::where('id', $id)->get()->map(function($model){
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['grade'] = $model->getClass->getGrade->grade;
             $model['semester'] = $model->getSemester->semester;
             $model['school_year'] = $model->getClass->getSchoolYear->school_year;
             $model['period'] = $model->getClass->getSchoolYear->start_date->format('d/m/Y') .' s.d '. $model->getClass->getSchoolYear->end_date->format('d/m/Y');
+            $model['period_start'] = $model->getClass->getSchoolYear->start_date;
+            $model['period_end'] = $model->getClass->getSchoolYear->end_date;
             return $model;
         })[0]);
     }
@@ -266,6 +270,7 @@ class PresenceController extends Controller
         //
         $data['teacher_status'] = Reference::where('category','hr_teacher_status')->get();
         $data['lessons'] = Lesson::where('is_active',1)->get();
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.presences.presence_lesson', $data);
     }
 
@@ -383,8 +388,7 @@ class PresenceController extends Controller
      */
     public function showLesson($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        return response()->json($this->presenceLessonEloquent->show($search, false)->map(function($model){
+        return response()->json(PresenceLesson::where('id', $id)->get()->map(function($model){
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['department_id'] = $model->getSemester->getDepartment->id;
             $model['grade'] = $model->getClass->getGrade->grade;

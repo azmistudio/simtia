@@ -399,4 +399,32 @@ trait HelperTrait
             return date('Y-m-t', strtotime(date("Y-m-d", strtotime('-1 month',strtotime($param)))));
         }
     }
+
+    public function getDayName($value)
+    {
+        switch ($value) 
+        {
+            case 1:
+                return 'Senin';
+                break;
+            case 2:
+                return 'Selasa';
+                break;
+            case 3:
+                return 'Rabu';
+                break;
+            case 4:
+                return 'Kamis';
+                break;
+            case 5:
+                return 'Jum`at';
+                break;
+            case 6:
+                return 'Sabtu';
+                break;
+            default:
+                return 'Ahad';
+                break;
+        }
+    }
 }

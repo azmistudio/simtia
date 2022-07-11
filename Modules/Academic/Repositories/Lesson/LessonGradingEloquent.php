@@ -117,6 +117,13 @@ class LessonGradingEloquent implements LessonGradingRepository
         } 
         $query = $query->groupBy('employee_id','grade_id','lesson_id','score_aspect_id');
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->whereHas('getLesson', function($qry) use ($fdept) {
+                $qry->where('department_id', $fdept);
+            });
+        }
         $name = isset($request->params['fname']) ? $request->params['fname'] : '';
         if ($name != '')
         {

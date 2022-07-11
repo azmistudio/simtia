@@ -1,7 +1,7 @@
 @php
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
-    $GridHeight = $InnerHeight - 275 . "px";
+    $GridHeight = $InnerHeight - 301 . "px";
     $SubGridHeight = $InnerHeight - 352 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
@@ -19,6 +19,19 @@
         <div class="p-1">
             <form id="ff-memorize-card" method="post" class="mb-1">
             @csrf
+                <div class="mb-1">
+                    @if (auth()->user()->getDepartment->is_all != 1)
+                        <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelWidth:100,readonly:true" />
+                        <input type="hidden" id="fdept-memorize-card" value="{{ auth()->user()->department_id }}" />
+                    @else 
+                        <select id="fdept-memorize-card" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125">
+                            <option value="">---</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
                 <div class="mb-1">
                     <select id="fclass-memorize-card" class="easyui-combogrid" style="width:285px;height:22px;" data-options="
                         label:'Kelas:',
@@ -41,17 +54,14 @@
                     </select>
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
-                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterMemorizeCard({fclass: $('#fclass-memorize-card').combobox('getValue')})">Cari</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterMemorizeCard({fdept: $('#fdept-memorize-card').val(),fclass: $('#fclass-memorize-card').combobox('getValue')})">Cari</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-memorize-card').form('reset');filterMemorizeCard({})">Batal</a>
                 </div>
             </form>
             <table id="tb-memorize-card" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department_id',width:100,resizeable:true">Departemen</th>
-                        @endif
-                        <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
+                        <th data-options="field:'class_id',width:170,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'memorize_date',width:80,align:'center'">Tanggal</th>
                     </tr>
                 </thead>

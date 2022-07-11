@@ -47,7 +47,7 @@ class AdmissionController extends Controller
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
         //
-        $data['depts'] = $this->listDepartment();
+        $data['departments'] = $this->listDepartment();
         return view('academic::pages.admissions.admission', $data);
     }
 

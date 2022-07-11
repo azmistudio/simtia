@@ -54,6 +54,11 @@ class LessonDataEloquent implements LessonDataRepository
 			$query = $query->where('department_id', auth()->user()->getDepartment->id);
 		} 
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->where('department_id', $fdept);
+        }
         $code = isset($request->params['fcode']) ? $request->params['fcode'] : '';
         if ($code != '') 
         {

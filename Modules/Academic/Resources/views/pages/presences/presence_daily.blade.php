@@ -49,9 +49,6 @@
             <table id="tb-presence-daily" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department_id',width:100,resizeable:true,sortable:true">Departemen</th>
-                        @endif
                         <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'period',width:170,resizeable:true">Periode</th>
                     </tr>
@@ -114,30 +111,10 @@
                                 </select>
                             </div>
                             <div class="mb-1">
-                                <select name="month" id="PresenceDailyMonth" class="easyui-combobox" style="width:280px;height:22px;" data-options="label:'<b>*</b>Bulan/Tahun:',labelWidth:'170px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'">
-                                    <option value="1">Januari</option>
-                                    <option value="2">Pebruari</option>
-                                    <option value="3">Maret</option>
-                                    <option value="4">April</option>
-                                    <option value="5">Mei</option>
-                                    <option value="6">Juni</option>
-                                    <option value="7">Juli</option>
-                                    <option value="8">Agustus</option>
-                                    <option value="9">September</option>
-                                    <option value="10">Oktober</option>
-                                    <option value="11">Nopember</option>
-                                    <option value="12">Desember</option>
-                                </select>
-                                <span class="mr-2"></span>
-                                <select name="year" id="PresenceDailyYear" class="easyui-combobox" style="width:88px;height:22px;" data-options="panelHeight:46,valueField:'id',textField:'name'"></select>
+                                <input name="start_date" id="PresenceDailyStart" class="easyui-datebox" style="width:280px;height:22px;" data-options="label:'<b>*</b>Tanggal Awal:',labelWidth:'170px',formatter:dateFormatter,parser:dateParser" />
                             </div>
                             <div class="mb-1">
-                                <select name="start_date" id="PresenceDailyStart" class="easyui-combobox" style="width:230px;height:22px;" data-options="label:'<b>*</b>Tanggal Awal:',labelWidth:'170px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'"></select>
-                                <span class="mr-2"></span>
-                            </div>
-                            <div class="mb-1">
-                                <select name="end_date" id="PresenceDailyEnd" class="easyui-combobox" style="width:230px;height:22px;" data-options="label:'<b>*</b>Tanggal Akhir:',labelWidth:'170px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'"></select>
-                                <span class="mr-2"></span>
+                                <input name="end_date" id="PresenceDailyEnd" class="easyui-datebox" style="width:280px;height:22px;" data-options="label:'<b>*</b>Tanggal Akhir:',labelWidth:'170px',formatter:dateFormatter,parser:dateParser" />
                             </div>
                             <div class="mb-1">
                                 <select name="active_day" id="PresenceDailyDay" class="easyui-combobox" style="width:230px;height:22px;" data-options="label:'<b>*</b>Jumlah Hari Aktif Belajar:',labelWidth:'170px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'"></select>
@@ -263,42 +240,32 @@
                 $("#id-presence-daily-semester").val(row.semester_id)
                 $("#id-presence-daily-start").val(periods[0])
                 $("#id-presence-daily-end").val(periods[1])
-                let startMonth = new Date()
-                $("#PresenceDailyMonth").combobox('setValue', parseInt(startMonth.getMonth() + 1))
-                var years = row.school_year.split("/")
-                var yearData = [{ "id": years[0], "name": years[0] },{ "id": years[1], "name": years[1] }]
-                $("#PresenceDailyYear").combobox('loadData',yearData)
-                $("#PresenceDailyYear").combobox('setValue', years[0])
                 var starts = periods[0].split("-")
                 var ends = periods[1].split("-")
-                var month = $("#PresenceDailyMonth").combobox('getValue')
-                var year = $("#PresenceDailyYear").combobox('getValue')
-                getDaysInMonth(month, year)
-                getTotalDays(1,1)
+                var now = new Date()
+                var d1 = new Date(starts[0], parseInt(starts[1]) - 1, starts[2])
+                var d2 = new Date(ends[0], parseInt(ends[1]) - 1, ends[2])
+                $("#PresenceDailyStart").datebox().datebox('calendar').calendar({
+                    validator: function(date){
+                        return d1 <= date && date <= d2
+                    }
+                })
+                $("#PresenceDailyEnd").datebox().datebox('calendar').calendar({
+                    validator: function(date){
+                        return d1 <= date && date <= d2;
+                    }
+                })
                 $("#PresenceDailyClass").combogrid('hidePanel')
                 $("#tb-presence-daily-form").datagrid("load", "{{ url('academic/student/list') }}" + "?fclass=" + row.id)
             }
         })
-        $("#PresenceDailyMonth").combobox({
-            onSelect: function(record) {
-                getDaysInMonth(record.id, $("#PresenceDailyYear").combobox('getValue'))
-                getTotalDays($("#PresenceDailyStart").combobox('getValue'),$("#PresenceDailyEnd").combobox('getValue'))
-            }
-        })
-        $("#PresenceDailyYear").combobox({
-            onSelect: function(record) {
-                getDaysInMonth($("#PresenceDailyMonth").combobox('getValue'), record.id)
-                getTotalDays($("#PresenceDailyStart").combobox('getValue'),$("#PresenceDailyEnd").combobox('getValue'))
-            }
-        })
-        $("#PresenceDailyStart").combobox({
-            onSelect: function(record) {
-                getTotalDays(record.id, $("#PresenceDailyEnd").combobox('getValue'))
-            }
-        })
-        $("#PresenceDailyEnd").combobox({
-            onSelect: function(record) {
-                getTotalDays($("#PresenceDailyStart").combobox('getValue'), record.id)
+        $("#PresenceDailyEnd").datebox({
+            onSelect: function(date){
+                let start_val = $("#PresenceDailyStart").datebox("getValue")
+                if (start_val != "") {
+                    let params = start_val.split("/")
+                    getTotalDays(parseInt(params[0]), date.getDate())
+                }
             }
         })
         $("#tb-presence-daily-form").datagrid('enableCellEditing').datagrid('gotoCell',{
@@ -308,22 +275,18 @@
         $("#form-presence-daily-main").form({
             onLoadSuccess: function(data) {
                 $("#id-presence-daily-semester").val(data.semester_id)
-                $("#id-presence-daily-start").val(data.start_date)
-                $("#id-presence-daily-end").val(data.end_date)
+                $("#id-presence-daily-start").val(data.period_start)
+                $("#id-presence-daily-end").val(data.period_end)
                 $("#PresenceDailyDept").textbox('setValue', data.department)
                 $("#PresenceDailyGrade").textbox('setValue', data.grade)
                 $("#PresenceDailySchoolYear").textbox('setValue', data.school_year)
                 $("#PresenceDailySemester").textbox('setValue', data.semester)
                 $("#PresenceDailyPeriod").textbox('setValue', data.period)
+                $("#PresenceDailyStart").datebox("setValue", data.start_date)
+                $("#PresenceDailyEnd").datebox("setValue", data.end_date)
                 let starts = data.start_date.split("-")
                 let ends = data.end_date.split("-")
-                $("#PresenceDailyMonth").combobox('setValue', parseInt(starts[1]))
-                let years = data.school_year.split("/")
-                let yearData = [{ "id": years[0], "name": years[0] },{ "id": years[1], "name": years[1] }]
-                $("#PresenceDailyYear").combobox('loadData',yearData)
-                $("#PresenceDailyYear").combobox('setValue', ends[0])
-                $("#PresenceDailyStart").combobox('setValue', parseInt(starts[2]))
-                $("#PresenceDailyEnd").combobox('setValue', parseInt(ends[2]))
+                getTotalDays(parseInt(starts[2]), parseInt(ends[2]))
                 $("#tb-presence-daily-form").datagrid("load", "{{ url('academic/presence/daily/list') }}" + "?id=" + data.id)
                 $("#PresenceDailyDay").combobox("setValue", data.active_day)
                 $("#PresenceDailyClass").combogrid("readonly", true)

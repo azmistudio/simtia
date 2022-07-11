@@ -220,7 +220,7 @@ class HRController extends Controller
         $sheet->getColumnDimension('P')->setWidth(50);
         //
         $sheet->setCellValue('A1', Str::upper($request->session()->get('institute')));
-        $sheet->setCellValue('A2', 'DATA SUMBER DAYA MANUSIA - SIMAK LTA');
+        $sheet->setCellValue('A2', 'DATA SUMBER DAYA MANUSIA - ' . config('app.name'));
         $sheet->setCellValue('A4', 'NO.');
         $sheet->setCellValue('B4', 'BAGIAN');
         $sheet->setCellValue('C4', 'NIP');

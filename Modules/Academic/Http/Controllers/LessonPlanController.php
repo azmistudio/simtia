@@ -142,8 +142,7 @@ class LessonPlanController extends Controller
      */
     public function show($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        $lesson_plan = $this->lessonPlanEloquent->show($search, true);
+        $lesson_plan = LessonPlan::find($id);
         $files = File::where('source_id', $id)->where('source_name','lesson_plan')->get();
         return response()->json(array(
             'id' => $lesson_plan->id,

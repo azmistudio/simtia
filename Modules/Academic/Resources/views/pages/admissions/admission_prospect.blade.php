@@ -55,7 +55,7 @@
             <table id="tb-prospective-student" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        <th data-options="field:'registration_no',width:100,resizeable:true,sortable:true">No. Daftar</th>
+                        <th data-options="field:'registration_no',width:110,resizeable:true,sortable:true">No. Daftar</th>
                         <th data-options="field:'name',width:150,resizeable:true,sortable:true">Nama</th>
                     </tr>
                 </thead>
@@ -281,25 +281,22 @@
                                         </select>
                                     </div>
                                     <div class="mb-1">
-                                        <input name="father_income" class="easyui-numberbox" style="width:335px;height:22px;" data-options="label:'Penghasilan:',labelWidth:'125px',precision:2,groupSeparator:',',decimalSeparator:'.',prefix:'Rp'" />
+                                        <input name="father_income" class="easyui-numberbox" style="width:335px;height:22px;" tabindex="15" data-options="label:'Penghasilan:',labelWidth:'125px',precision:2,groupSeparator:',',decimalSeparator:'.',prefix:'Rp'" />
                                         <span class="mr-2"></span>
-                                        <input name="mother_income" class="easyui-numberbox" style="width:210px;height:22px;" data-options="precision:2,groupSeparator:',',decimalSeparator:'.',prefix:'Rp'" />
+                                        <input name="mother_income" class="easyui-numberbox" style="width:210px;height:22px;" tabindex="16" data-options="precision:2,groupSeparator:',',decimalSeparator:'.',prefix:'Rp'" />
                                     </div>
                                     <div class="mb-1">
-                                        <input name="father_email" class="easyui-textbox" style="width:335px;height:22px;" data-options="label:'Email:',labelWidth:'125px'" />
+                                        <input name="father_email" class="easyui-textbox" style="width:335px;height:22px;" tabindex="17" data-options="label:'Email:',labelWidth:'125px'" />
                                         <span class="mr-2"></span>
-                                        <input name="mother_email" class="easyui-textbox" style="width:210px;height:22px;" data-options="" />
+                                        <input name="mother_email" class="easyui-textbox" style="width:210px;height:22px;" tabindex="18" data-options="" />
                                     </div>
                                     <div class="mb-1">
-                                        <input name="father_mobile" class="easyui-textbox" style="width:335px;height:22px;" data-options="label:'Handphone:',labelWidth:'125px'" />
+                                        <input name="father_mobile" class="easyui-textbox" style="width:335px;height:22px;" tabindex="19" data-options="label:'Handphone:',labelWidth:'125px'" />
                                         <span class="mr-2"></span>
-                                        <input name="mother_mobile" class="easyui-textbox" style="width:210px;height:22px;" data-options="" />
+                                        <input name="mother_mobile" class="easyui-textbox" style="width:210px;height:22px;" tabindex="20" data-options="" />
                                     </div>
-                                    {{-- <div class="mb-1">
-                                        <input name="parent_guardian" class="easyui-textbox" style="width:335px;height:22px;" data-options="label:'Nama Wali:',labelWidth:'125px'" />
-                                    </div> --}}
                                     <div class="mb-1">
-                                        <input name="parent_address" id="ProspectStudentParentAddress" class="easyui-textbox" style="width:557px;height:22px;" data-options="label:'Alamat:',labelWidth:'125px'" />
+                                        <input name="parent_address" id="ProspectStudentParentAddress" class="easyui-textbox" tabindex="21" style="width:557px;height:22px;" data-options="label:'Alamat:',labelWidth:'125px'" />
                                     </div>
                                 </div>
                             </div>
@@ -310,7 +307,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-1">
-                                        <select name="blood" class="easyui-combobox" style="width:335px;height:22px;" tabindex="10" data-options="label:'<b>*</b>Golongan Darah:',labelWidth:'125px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'">
+                                        <select name="blood" class="easyui-combobox" style="width:335px;height:22px;" tabindex="1" data-options="label:'<b>*</b>Golongan Darah:',labelWidth:'125px',labelPosition:'before',panelHeight:112,valueField:'id',textField:'name'">
                                             <option value="">---</option>
                                             @foreach ($bloods as $blood)
                                             <option value="{{ $blood->id }}">{{ $blood->name }}</option>
@@ -318,15 +315,15 @@
                                         </select>
                                     </div>
                                     <div class="mb-1">
-                                        <input name="weight" class="easyui-numberspinner" style="width:200px;height:22px;" tabindex="6" data-options="label:'Berat:',labelWidth:'125px',min:0" />
+                                        <input name="weight" class="easyui-numberspinner" style="width:200px;height:22px;" tabindex="2" data-options="label:'Berat:',labelWidth:'125px',min:0" />
                                         <span class="mr-2">kg</span>
                                     </div>
                                     <div class="mb-1">
-                                        <input name="height" class="easyui-numberspinner" style="width:200px;height:22px;" tabindex="6" data-options="label:'Tinggi:',labelWidth:'125px',min:0" />
+                                        <input name="height" class="easyui-numberspinner" style="width:200px;height:22px;" tabindex="3" data-options="label:'Tinggi:',labelWidth:'125px',min:0" />
                                         <span class="mr-2">cm</span>
                                     </div>
                                     <div class="mb-1">
-                                        <input name="medical" class="easyui-textbox" style="width:500px;height:150px;" tabindex="12" data-options="label:'Riwayat Penyakit:',labelWidth:'125px',multiline:true" />
+                                        <input name="medical" class="easyui-textbox" style="width:500px;height:150px;" tabindex="4" data-options="label:'Riwayat Penyakit:',labelWidth:'125px',multiline:true" />
                                     </div>
                                 </div>
                             </div>

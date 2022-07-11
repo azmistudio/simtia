@@ -52,6 +52,13 @@ class LessonExamTypeEloquent implements LessonExamTypeRepository
             });
         } 
         // filter
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->whereHas('getLesson', function($qry) use ($fdept) {
+                $qry->where('department_id', $fdept);
+            });
+        }
         $code = isset($request->params['fcode']) ? $request->params['fcode'] : '';
         if ($code != '') 
         {

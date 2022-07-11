@@ -25,8 +25,8 @@
                     @else 
                         <select id="fdept-lesson-teaching" class="easyui-combobox" style="width:285px;height:22px;" data-options="label:'Departemen:',labelPosition:'before',labelWidth:100,panelHeight:125,valueField:'id',textField:'name'">
                             <option value="">---</option>
-                            @foreach ($depts as $dept)
-                            <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                            @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
                             @endforeach
                         </select>
                     @endif
@@ -42,11 +42,8 @@
             <table id="tb-lesson-teaching" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        @if (auth()->user()->getDepartment->is_all == 1)
-                        <th data-options="field:'department_id',width:80,resizeable:true,sortable:true">Departemen</th>
-                        @endif
                         <th data-options="field:'employee',width:150,resizeable:true,sortable:true">Guru</th>
-                        <th data-options="field:'class_id',width:90,resizeable:true,sortable:true">Kelas</th>
+                        <th data-options="field:'class_id',width:100,resizeable:true,sortable:true">Kelas</th>
                     </tr>
                 </thead>
             </table>
@@ -327,6 +324,7 @@
                 $("#viewClass").tabs().panel({
                     href: "{{ url('academic/lesson/schedule/teaching/class') }}" + "/" + data.main.department_id 
                 })
+                
                 $("#tb-lesson-teaching-form").datagrid({ data: data.schedules })
             }
         })

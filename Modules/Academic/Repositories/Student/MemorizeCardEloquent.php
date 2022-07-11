@@ -49,6 +49,13 @@ class MemorizeCardEloquent implements MemorizeCardRepository
                 $qry->where('department_id', auth()->user()->department_id);
             });
         } 
+        $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
+        if ($fdept != '') 
+        {
+            $query = $query->whereHas('getClass.getSchoolYear', function($qry) use ($fdept) {
+                $qry->where('department_id', $fdept);
+            });
+        }
         $fclass = isset($request->params['fclass']) ? $request->params['fclass'] : '';
         if ($fclass != '') 
         {

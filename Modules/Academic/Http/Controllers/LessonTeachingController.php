@@ -54,7 +54,7 @@ class LessonTeachingController extends Controller
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
         //
-        $data['depts'] = $this->listDepartment();
+        $data['departments'] = $this->listDepartment();
         $data['status'] = Reference::select('id','name')->where('category', 'hr_teaching_status')->get();
         $data['maxtime'] = LessonScheduleTime::select('id')->count();
         return view('academic::pages.lessons.lesson_teaching', $data);
@@ -202,6 +202,7 @@ class LessonTeachingController extends Controller
             $model['lesson_id'] = $model->getLesson->name;
             $model['teaching'] = $model->teaching_status;
             $model['teaching_status'] = $model->getTeachingStatus->name;
+            $model['day'] = $this->getDayName($model->day);
             return $model;
         });
         return response()->json(array(
@@ -278,7 +279,7 @@ class LessonTeachingController extends Controller
     public function print(Request $request, $opt)
     {
         $payload = json_decode($request->data);
-        $data['infos'] = $payload->teacher.'-'.$payload->department.'-'.$payload->school_year.'-'.$payload->schedule.'-'.$payload->class;
+        $data['payloads'] = $payload;
         if ($opt == 'teacher')
         {
             $data['times'] = $this->getScheduleTimes($payload->department_id);
