@@ -73,7 +73,7 @@ class StudentMutationController extends Controller
         try
         {
             $request->merge([
-                'mutation_date' => Carbon::createFromFormat('d/m/Y',$request->mutation_date),
+                'mutation_date' => $this->formatDate($request->mutation_date,'sys'),
                 'remark' => Str::lower($request->remark),
                 'logged' => auth()->user()->email,
             ]);

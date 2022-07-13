@@ -189,7 +189,7 @@ class ReceiptController extends Controller
                             $uuid = strtotime('now');
                             $remark_journal = 'Pembayaran ' . $receipt_type->name . ' tanggal ' . date('d/m/Y') . ' santri '. $request->student_name .' ('. $request->student_no .')';
                             // store to journal
-                            $journal = $this->journalEloquent->store($request->journal_date, $remark_journal, $cash_no, $request->bookyear_id, 'receipt_skr', $request->department_id);
+                            $journal = $this->journalEloquent->store($this->formatDate($request->journal_date,'sys'), $remark_journal, $cash_no, $request->bookyear_id, 'receipt_skr', $request->department_id);
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
@@ -377,7 +377,7 @@ class ReceiptController extends Controller
                             DB::transaction(function () use ($request, $remark_journal, $receipt_type, $cash_no, $payment_majors, $is_paid) {
                                 $uuid = strtotime('now');
                                 // store to journal
-                                $journal = $this->journalEloquent->store($request->journal_date, $remark_journal, $cash_no, $request->bookyear_id, 'receipt_jtt_prospect', $request->department_id);
+                                $journal = $this->journalEloquent->store($this->formatDate($request->journal_date,'sys'), $remark_journal, $cash_no, $request->bookyear_id, 'receipt_jtt_prospect', $request->department_id);
                                 // store journal detail
                                 $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->instalment - $request->discount, 0, $uuid);
                                 $this->journalEloquent->createDetail($journal->id, $receipt_type->receivable_account, 0, $request->instalment, $uuid);
@@ -601,7 +601,7 @@ class ReceiptController extends Controller
                             $uuid = strtotime('now');
                             $remark_journal = 'Pembayaran ' . $receipt_type->name . ' tanggal ' . date('d/m/Y') . ' calon santri '. $request->student_name .' ('. $request->student_no .')';
                             // store to journal
-                            $journal = $this->journalEloquent->store($request->journal_date, $remark_journal, $cash_no, $request->bookyear_id, 'receipt_skr_prospect', $request->department_id);
+                            $journal = $this->journalEloquent->store($this->formatDate($request->journal_date,'sys'), $remark_journal, $cash_no, $request->bookyear_id, 'receipt_skr_prospect', $request->department_id);
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
@@ -752,7 +752,7 @@ class ReceiptController extends Controller
                             $uuid = strtotime('now');
                             $remark_journal = 'Data ' . $receipt_type->name . ' tanggal ' . $request->journal_date . ' dari ' . $request->source;
                             // store to journal
-                            $journal = $this->journalEloquent->store($request->journal_date, $remark_journal, $cash_no, $request->bookyear_id, 'receipt_others', $request->department_id);
+                            $journal = $this->journalEloquent->store($this->formatDate($request->journal_date,'sys'), $remark_journal, $cash_no, $request->bookyear_id, 'receipt_others', $request->department_id);
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
@@ -938,7 +938,7 @@ class ReceiptController extends Controller
                             DB::transaction(function () use ($request, $remark_journal, $receipt_type, $cash_no, $payment_majors, $is_paid) {
                                 $uuid = strtotime('now');
                                 // store to journal
-                                $journal = $this->journalEloquent->store($request->journal_date, $remark_journal, $cash_no, $request->bookyear_id, 'receipt_jtt', $request->department_id);
+                                $journal = $this->journalEloquent->store($this->formatDate($request->journal_date,'sys'), $remark_journal, $cash_no, $request->bookyear_id, 'receipt_jtt', $request->department_id);
                                 // store journal detail
                                 $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->instalment - $request->discount, 0, $uuid);
                                 $this->journalEloquent->createDetail($journal->id, $receipt_type->receivable_account, 0, $request->instalment, $uuid);
@@ -951,7 +951,7 @@ class ReceiptController extends Controller
                                 // store to receipt major
                                 $receiptMajorRequest = new Request();
                                 $receiptMajorRequest->merge([
-                                    'trans_date' => $request->journal_date,
+                                    'trans_date' => $this->formatDate($request->journal_date,'sys'),
                                     'major_id' => $payment_majors->id,
                                     'journal_id' => $journal->id,
                                     'total' => $request->instalment - $request->discount,

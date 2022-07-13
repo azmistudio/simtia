@@ -37,24 +37,6 @@ class ExamEloquent implements ExamRepository
         return Exam::where('id', $payload['id'])->update($payload);
 	}
 
-	public function show($search, $is_one)
-	{
-		$query = Exam::select('*');
-		foreach ($search as $val) 
-		{
-			switch ($val['action']) 
-			{
-				case 'like':
-					$query = $query->where($val['column'], 'like', '%'.Str::lower($val['query']).'%');
-					break;
-				default:
-					$query = $query->where($val['column'], $val['query']);
-					break;
-			}
-		}
-		return $is_one == true ? $query->first() : $query->get();
-	}
-
 	public function data(Request $request)
 	{
 		$param = $this->gridRequest($request);

@@ -114,7 +114,7 @@ class ExpenditureController extends Controller
         try 
         {
             $request->merge([
-                'trans_date' => date('Y-m-d'),
+                'trans_date' => $this->formatDate($request->trans_date, 'sys'),
                 'logged' => auth()->user()->email,
             ]);
             $bookyear = $this->getActiveBookYear();

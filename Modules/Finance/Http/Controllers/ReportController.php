@@ -986,7 +986,7 @@ class ReportController extends Controller
         $data['requests'] = $request->all();
         $data['startdate'] = $this->formatDate($this->formatDate($request->start,'sys'),'month');
         $data['lastdate'] = $this->formatDate($this->formatDate($request->end,'sys'),'iso');
-        $data['equities'] = $this->journalEloquent->equityChange($bookyear->start_date, $request->end, $request->bookyear_id);
+        $data['equities'] = $this->journalEloquent->equityChange($bookyear->start_date, $this->formatDate($request->end,'sys'), $request->bookyear_id);
         $data['month'] = $this->formatDate($this->formatDate($request->end,'sys'),'monthyear');
         return view('finance::reports.finances.equity_change_view', $data);
     }

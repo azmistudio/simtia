@@ -130,8 +130,8 @@ class MemorizeCardEloquent implements MemorizeCardRepository
                 'student_id' => $query->student_id, 
                 'employee_id' => $query->employee_id, 
                 'memorize_date' => $query->memorize_date, 
-                'from_surah' => $query->from_surah, 
-                'to_surah' => $query->to_surah, 
+                'from_surah' => $query->from_surah_id, 
+                'to_surah' => $query->to_surah_id, 
                 'from_verse' => $query->from_verse, 
                 'to_verse' => $query->to_verse, 
             );
@@ -139,8 +139,8 @@ class MemorizeCardEloquent implements MemorizeCardRepository
                 'student_id' => $request->has('student_id') ? $request->student_id : $query->student_id, 
                 'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id, 
                 'memorize_date' => $request->has('memorize_date') ? $request->memorize_date : $query->memorize_date, 
-                'from_surah' => $request->has('from_surah') ? $request->from_surah : $query->from_surah, 
-                'to_surah' => $request->has('to_surah') ? $request->to_surah : $query->to_surah, 
+                'from_surah' => $request->has('from_surah') ? $request->from_surah : $query->from_surah_id, 
+                'to_surah' => $request->has('to_surah') ? $request->to_surah : $query->to_surah_id, 
                 'from_verse' => $request->has('from_verse') ? $request->from_verse : $query->from_verse, 
                 'to_verse' => $request->has('to_verse') ? $request->to_verse : $query->to_verse, 
             );

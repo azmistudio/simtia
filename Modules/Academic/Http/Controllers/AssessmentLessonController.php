@@ -250,13 +250,8 @@ class AssessmentLessonController extends Controller
             abort(404);
         }
         $params = explode("-", $id);
-        $searchs[] = array('column' => 'lesson_assessment_id', 'action' => 'eq', 'query' => $params[0]);
-        array_push($searchs, array('column' => 'class_id', 'action' => 'eq', 'query' => $params[1]));
-        array_push($searchs, array('column' => 'semester_id', 'action' => 'eq', 'query' => $params[2]));
-        $data['exams'] = $this->examEloquent->show($searchs, false);
-        // 
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $params[3]);
-        $data['infos'] = $this->examEloquent->show($search, false)->map(function($model){
+        $data['exams'] = Exam::where('lesson_assessment_id', $params[0])->where('class_id', $params[1])->where('semester_id', $params[2])->get();
+        $data['infos'] = Exam::where('id', $params[3])->get()->map(function($model){
             $model['department_id'] = $model->getSemester->department_id;
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['grade'] = $model->getClass->getGrade->grade;
@@ -299,10 +294,7 @@ class AssessmentLessonController extends Controller
             $this->countAvgScoreStudent($request->class_id, $request->semester_id, $request->assessment_id, $student->student_id);
         }
         //
-        $search[] = array('column' => 'lesson_assessment_id', 'action' => 'eq', 'query' => $request->assessment_id);
-        array_push($search, array('column' => 'class_id', 'action' => 'eq', 'query' => $request->class_id));
-        array_push($search, array('column' => 'semester_id', 'action' => 'eq', 'query' => $request->semester_id));
-        $exams = $this->examEloquent->show($search, false);
+        $exams = Exam::where('lesson_assessment_id', $request->assessment_id)->where('class_id', $request->class_id)->where('semester_id', $request->semester_id)->get();
         foreach ($exams as $exam)
         {
             $this->countAvgScoreClass($request->class_id, $request->semester_id, $request->assessment_id, $exam->id);
@@ -331,13 +323,8 @@ class AssessmentLessonController extends Controller
             abort(404);
         }
         $params = explode("-", $id);
-        $searchs[] = array('column' => 'lesson_assessment_id', 'action' => 'eq', 'query' => $params[0]);
-        array_push($searchs, array('column' => 'class_id', 'action' => 'eq', 'query' => $params[1]));
-        array_push($searchs, array('column' => 'semester_id', 'action' => 'eq', 'query' => $params[2]));
-        $data['exams'] = $this->examEloquent->show($searchs, false);
-        //
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $params[3]);
-        $data['infos'] = $this->examEloquent->show($search, false)->map(function($model){
+        $data['exams'] = Exam::where('lesson_assessment_id', $params[0])->where('class_id', $params[1])->where('semester_id', $params[2])->get();
+        $data['infos'] = Exam::where('id', $params[3])->get()->map(function($model){
             $model['department_id'] = $model->getSemester->department_id;
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['grade'] = $model->getClass->getGrade->grade;
@@ -606,10 +593,7 @@ class AssessmentLessonController extends Controller
      */
     public function toExcel(Request $request)
     {
-        $search[] = array('column' => 'lesson_assessment_id', 'action' => 'eq', 'query' => $request->assessment_id);
-        array_push($search, array('column' => 'class_id', 'action' => 'eq', 'query' => $request->class_id));
-        array_push($search, array('column' => 'semester_id', 'action' => 'eq', 'query' => $request->semester_id));
-        $query_exams = $this->examEloquent->show($search, false);
+        $query_exams = Exam::where('lesson_assessment_id', $request->assessment_id)->where('class_id', $request->class_id)->where('semester_id', $request->semester_id)->get();
         $i = 1;
         //
         $spreadsheet = new Spreadsheet();
