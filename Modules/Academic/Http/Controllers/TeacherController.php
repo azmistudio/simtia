@@ -149,6 +149,15 @@ class TeacherController extends Controller
     }
 
     /**
+     * Display a listing of data.
+     * @return JSON
+     */
+    public function comboGridGroup(Request $request)
+    {
+        return response()->json($this->teacherEloquent->combogridGroup($request));
+    }
+
+    /**
      * Show the specified resource.
      * @param int $id
      * @return Renderable

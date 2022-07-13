@@ -110,12 +110,59 @@ class TeacherEloquent implements TeacherRepository
         {
     		$query->whereRaw('LOWER(employee) like ?', ['%'.Str::lower($filter).'%']);
         }
+        $fdept = $request->has('department_id') ? $request->department_id : '';
+        if ($fdept != '') 
+        {
+            $query->where('department_id', $fdept);
+        }
+        $fgrade = $request->has('grade_id') ? $request->grade_id : '';
+        if ($fgrade != '') 
+        {
+            $query->where('grade_id', $fgrade);
+        }
         $result["total"] = $query->count();
         $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
         	$model->department = Str::upper($model->department);
         	$model->lesson = Str::title($model->lesson);
         	$model->employee = $this->getEmployeeName($model->employee_id);
         	$model->grade = Str::upper($model->grade);
+        	$model->employee_no = $this->getEmployeeNo($model->employee_id);
+        	return $model;
+        });
+        return $result;
+    }
+
+    public function combogridGroup(Request $request)
+    {
+        $param = $this->gridRequest($request, 'asc', 'employee_id');
+        $query = DB::table('academic.teachers_view')
+        			->select('department_id','employee_id','grade_id','status_id','department','employee','status')
+        			->groupBy('department_id','employee_id','grade_id','status_id','department','employee','status');
+        // 
+        if (auth()->user()->getDepartment->is_all != 1)
+        {
+        	$query->where('department_id', auth()->user()->department_id);
+        } 
+        // filter
+        $filter = isset($request->q) ? $request->q : '';
+        if ($filter != '') 
+        {
+    		$query->whereRaw('LOWER(employee) like ?', ['%'.Str::lower($filter).'%']);
+        }
+        $fdept = $request->has('department_id') ? $request->department_id : '';
+        if ($fdept != '') 
+        {
+            $query->where('department_id', $fdept);
+        }
+        $fgrade = $request->has('grade_id') ? $request->grade_id : '';
+        if ($fgrade != '') 
+        {
+            $query->where('grade_id', $fgrade);
+        }
+        $result["total"] = $query->count();
+        $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
+        	$model->employee = $this->getEmployeeName($model->employee_id);
+        	$model->employee_no = $this->getEmployeeNo($model->employee_id);
         	return $model;
         });
         return $result;

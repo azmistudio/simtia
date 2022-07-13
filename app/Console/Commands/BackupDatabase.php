@@ -30,14 +30,13 @@ class BackupDatabase extends Command
      */
     public function handle()
     {
-        $schema = array('all','academic','finance');
+        $schema = array('all','academic','finance','no_exclude');
         $object = $this->argument('name');
         if (in_array($object, $schema))
         {
             try 
             {
                 $this->info('The backup has been started');
-                // 
                 $process = Process::fromShellCommandline($this->stringCommand($object));
                 $process->setWorkingDirectory($this->workingDir());
                 $process->run(null, $this->configConnection($object));
@@ -58,24 +57,12 @@ class BackupDatabase extends Command
         {
             $pg_password = 'SET PGPASSWORD="${:password}"&&pg_dump.exe';
         } else {
-            $pg_password = 'PGPASSWORD="${:password}" && pg_dump';
+            $pg_password = 'PGPASSWORD="${:password}" pg_dump';
         }
         // 
         $include_schema_all      = '-n public -n academic -n finance';
         $include_schema_academic = '-n academic -n finance';
-        $exclude_table_public    = '-T public.departments_id_seq -T public.departments 
-                                    -T public.institutes_id_seq -T public.institutes 
-                                    -T public.migrations_id_seq -T public.migrations 
-                                    -T public.references_id_seq -T public.references 
-                                    -T public.users_id_seq -T public.users 
-                                    -T public.references_id_seq -T public.references
-                                    -T public.model_has_permissions_id_seq -T public.model_has_permissions
-                                    -T public.model_has_roles_id_seq -T public.model_has_roles
-                                    -T public.permissions_id_seq -T public.permissions
-                                    -T public.roles_id_seq -T public.roles
-                                    -T public.role_has_permissions_id_seq -T public.role_has_permissions
-                                    -T public.employees_id_seq -T public.employees
-                                    ';
+        $exclude_table_public    = '-T public.departments_id_seq -T public.departments -T public.institutes_id_seq -T public.institutes -T public.migrations_id_seq -T public.migrations -T public.references_id_seq -T public.references -T public.users_id_seq -T public.users -T public.references_id_seq -T public.references -T public.model_has_permissions_id_seq -T public.model_has_permissions -T public.model_has_roles_id_seq -T public.model_has_roles -T public.permissions_id_seq -T public.permissions -T public.roles_id_seq -T public.roles -T public.role_has_permissions_id_seq -T public.role_has_permissions -T public.employees_id_seq -T public.employees';
         $exclude_table_finance   = '-T finance.code_categories_id_seq -T finance.code_categories -T finance.codes_id_seq -T finance.codes';
         // 
         switch ($schema) 
@@ -86,8 +73,11 @@ class BackupDatabase extends Command
             case 'finance':
                 return $pg_password.' -U "${:username}" -h localhost -p "${:port}" -n "${:schema}" -a '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
                 break;
+            case 'all':
+                $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a '.$exclude_table_public.' '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
+                break;
             default:
-                return $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a '.$exclude_table_public.' '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
+                return $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a "${:database}" >> "${:output}"';                
                 break;
         }
     }
@@ -124,7 +114,7 @@ class BackupDatabase extends Command
         {
             return 'C:\Program Files (x86)\PostgreSQL\10\bin';
         } else {
-            return '/home';
+            return '/';
         }
     }
 

@@ -168,7 +168,7 @@ class CalendarController extends Controller
             } else {
                 $request->merge([
                     'calendar_id' => $calendars[0],
-                    'description' => Str::lower($request->description),
+                    'description' => $request->description,
                     'start' => $this->formatDate($request->start,'sys'),
                     'end' => $this->formatDate($request->end,'sys'),
                     'logged' => auth()->user()->email,

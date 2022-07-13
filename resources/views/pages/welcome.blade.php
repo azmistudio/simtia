@@ -41,8 +41,8 @@
                         <div class="row">
                             <label class="col-md-4"></label>
                             <div class="col-md-8">
-                                <button type="button" class="easyui-linkbutton" tabindex="3" onclick="logMeIn({{ $is_mobile }})" style="width: 198px;">Masuk Aplikasi</button>
-                                <button type="button" class="easyui-linkbutton" tabindex="4" onclick="$('#login-form').form('clear')" style="width:80px">Batal</button>
+                                <button type="button" class="easyui-linkbutton" tabindex="3" onclick="logMeIn({{ $is_mobile }})">Masuk Aplikasi</button>
+                                <button type="button" class="easyui-linkbutton" tabindex="4" onclick="$('#login-form').form('clear')">Batal</button>
                             </div>
                         </div>
                     </form>

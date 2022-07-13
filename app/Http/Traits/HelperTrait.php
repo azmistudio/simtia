@@ -137,6 +137,12 @@ trait HelperTrait
         return $title_first .' '. $name .' '. $title_end;
     }
 
+    public function getEmployeeNo($employee_id)
+    {
+        $employee = Employee::where('id',$employee_id)->orWhere('employee_id',$employee_id)->first();
+        return $employee->employee_id;
+    }
+
 	public function getInstituteProfile()
     {
     	$foundation = Institute::whereHas('getDepartment', function($qry) {

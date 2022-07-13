@@ -13,8 +13,6 @@
                         <a style="font-weight:600;" class="easyui-menubutton" data-options="menu:'#mm5',iconCls:'icon-report'">Laporan</a>
                     </div>
                     <div id="mm1" style="width:200px;">
-                        <div onclick="openTabMenu('Dasbor','home/dashboard','init')">Dasbor</div>
-                        <div class="menu-sep"></div>
                         <div onclick="openTabMenu('Grup Pengguna','group','init')">Grup Pengguna</div>
                         <div onclick="openTabMenu('Pengguna','user','init')">Pengguna</div>
                         <div onclick="openTabMenu('Profil Saya','hr/profile')">Profil Saya</div>
