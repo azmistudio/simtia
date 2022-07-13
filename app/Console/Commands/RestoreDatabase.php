@@ -89,7 +89,7 @@ class RestoreDatabase extends Command
         {
             $pg_password = 'SET PGPASSWORD="${:password}"&&psql.exe';
         } else {
-            $pg_password = 'PGPASSWORD="${:password}" && psql';
+            $pg_password = 'PGPASSWORD="${:password}" psql';
         }
         return $pg_password.' -U "${:username}" -h localhost -p "${:port}" "${:database}" < "${:input}"';
     }
@@ -111,7 +111,7 @@ class RestoreDatabase extends Command
         {
             return 'C:\Program Files (x86)\PostgreSQL\10\bin';
         } else {
-            return '/home';
+            return '/';
         }
     }
 
