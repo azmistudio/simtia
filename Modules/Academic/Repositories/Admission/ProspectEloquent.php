@@ -72,6 +72,11 @@ class ProspectEloquent implements ProspectRepository
         {
             $query = $query->where('prospect_group_id', $group);
         }
+        $fgroup = isset($request->fprospect_group) ? $request->fprospect_group : '';
+        if ($fgroup != '') 
+        {
+            $query = $query->where('prospect_group_id', $fgroup);
+        }
         $is_student = $request->is_student || isset($request->params['fstudent']) ?: '';
         if ($is_student != '') 
         {

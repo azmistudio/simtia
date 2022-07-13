@@ -254,7 +254,7 @@
             url: '{{ url('hr/combo-grid') }}',
             method: 'post',
             mode:'remote',
-            queryParams: { _token: '{{ csrf_token() }}' },
+            queryParams: { _token: '{{ csrf_token() }}', section: 45 },
         })
         $("#tb-memorize-card-form").datagrid('enableCellEditing').datagrid('gotoCell',{
             index: 0,

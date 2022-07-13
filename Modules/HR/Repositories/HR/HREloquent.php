@@ -106,6 +106,11 @@ class HREloquent implements HRRepository
             	$query = $query->where('employee_id', $filter);
         	}
         }
+        $fsection = $request->has('section') ? $request->section : '';
+        if ($fsection != '') 
+        {
+            $query->where('section', $fsection);
+        }
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {

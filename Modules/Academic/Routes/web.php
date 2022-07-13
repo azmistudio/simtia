@@ -261,6 +261,7 @@ Route::group(['middleware' => ['auth']], function() {
             Route::post('/destroy/{id}', 'TeacherController@destroy')->middleware('permission:akademik-guru-destroy');
             Route::post('/export-pdf', 'TeacherController@toPdf');
             Route::post('/combo-grid', 'TeacherController@comboGrid');
+            Route::post('/combo-grid/group', 'TeacherController@comboGridGroup');
             Route::post('/list/{id}/{deptid}', 'TeacherController@list');
         });
         // calendar

@@ -82,22 +82,6 @@
                                         <input name="grade_id" id="LessonTeachingGradeId" class="easyui-textbox" style="width:310px;height:22px;" data-options="label:'Tingkat:',labelWidth:'125px',readonly:true" />
                                     </div>
                                     <div class="mb-1">
-                                        <select name="employee_id" id="LessonTeachingEmployeeId" class="easyui-combogrid" style="width:310px;height:22px;" data-options="
-                                            label:'<b>*</b>Guru:',
-                                            labelWidth:'125px',
-                                            panelWidth: 500,
-                                            idField: 'id',
-                                            textField: 'name',
-                                            fitColumns:true,
-                                            columns: [[
-                                                {field:'employee_id',title:'NIP',width:80},
-                                                {field:'name',title:'Nama',width:250},
-                                                {field:'section',title:'Bagian',width:230},
-                                            ]],
-                                        ">
-                                        </select>
-                                    </div>
-                                    <div class="mb-1">
                                         <select name="class_id" id="LessonTeachingClassId" class="easyui-combogrid" style="width:310px;height:22px;" data-options="
                                             label:'<b>*</b>Kelas:',
                                             labelWidth:'125px',
@@ -111,6 +95,22 @@
                                                 {field:'grade',title:'Tingkat',width:80,align:'center'},
                                                 {field:'class',title:'Kelas',width:120},
                                                 {field:'capacity',title:'Kapasitas/Terisi',width:120},
+                                            ]],
+                                        ">
+                                        </select>
+                                    </div>
+                                    <div class="mb-1">
+                                        <select name="employee_id" id="LessonTeachingEmployeeId" class="easyui-combogrid" style="width:310px;height:22px;" data-options="
+                                            label:'<b>*</b>Guru:',
+                                            labelWidth:'125px',
+                                            panelWidth: 500,
+                                            idField: 'employee_id',
+                                            textField: 'employee',
+                                            fitColumns:true,
+                                            columns: [[
+                                                {field:'employee_no',title:'NIP',width:80},
+                                                {field:'employee',title:'Nama',width:250},
+                                                {field:'status',title:'Status',width:230},
                                             ]],
                                         ">
                                         </select>
@@ -274,12 +274,8 @@
         actionButtonLessonTeaching("{{ $ViewType }}", [])
         actionTabLessonTeaching("{{ $ViewType }}")
         $("#LessonTeachingEmployeeId").combogrid({
-            url: '{{ url('hr/combo-grid') }}',
-            method: 'post',
-            mode:'remote',
-            queryParams: { _token: '{{ csrf_token() }}' },
             onClickRow: function(index, row) {
-                titleLessonTeaching.innerText = row.name
+                titleLessonTeaching.innerText = row.employee
                 $("#LessonTeachingEmployeeId").combogrid('hidePanel')
             }
         })
@@ -294,6 +290,7 @@
                 $("#LessonTeachingDeptId").textbox('setValue', row.department)
                 $("#LessonTeachingSchoolYearId").textbox('setValue', row.school_year)
                 $("#LessonTeachingGradeId").textbox('setValue', row.grade)
+                $("#LessonTeachingEmployeeId").combogrid("grid").datagrid("load","{{ url('academic/teacher/combo-grid/group') }}" + "?_token=" + "{{ csrf_token() }}" + "&department_id=" + row.department_id + "&grade_id=" + row.grade_id)
                 $('#LessonTeachingScheduleId').combobox('reload','{{ url("academic/lesson/schedule/info/list") }}' + "/" + row.schoolyear_id + "?_token=" + "{{ csrf_token() }}")
                 $("#LessonTeachingClassId").combogrid('hidePanel')
             }
@@ -310,11 +307,12 @@
                 $("#id-lesson-teaching").val(data.main.id)
                 $("#id-dept-lesson-teaching").val(data.main.department_id)
                 $("#id-schoolyear-lesson-teaching").val(data.main.schoolyear_id)
-                $("#LessonTeachingEmployeeId").combogrid('setValue', data.main.employee_id)
                 $("#LessonTeachingDeptId").textbox('setValue', data.main.department)
                 $("#LessonTeachingSchoolYearId").textbox('setValue', data.main.school_year)
                 $("#LessonTeachingGradeId").textbox('setValue', data.main.grade)
                 $("#LessonTeachingClassId").combogrid('setValue', data.main.class_id)
+                $("#LessonTeachingEmployeeId").combogrid("grid").datagrid("load","{{ url('academic/teacher/combo-grid/group') }}" + "?_token=" + "{{ csrf_token() }}" + "&department_id=" + data.main.department_id + "&grade_id=" + data.main.get_grade_by_dept.id)
+                $("#LessonTeachingEmployeeId").combogrid('setValue', data.main.employee_id)
                 $('#LessonTeachingScheduleId').combobox('reload','{{ url("academic/lesson/schedule/info/list") }}' + "/" + data.main.schoolyear_id + "?_token=" + "{{ csrf_token() }}")
                 $('#LessonTeachingScheduleId').combobox('setValue', data.main.schedule_id)
                 actionTabLessonTeaching("active")
@@ -363,7 +361,7 @@
         markLessonTeaching.innerText = "*"
         titleLessonTeaching.innerText = ""
         idLessonTeaching.value = "-1"
-        $("#LessonTeachingEmployeeId").combobox('textbox').focus()
+        $("#LessonTeachingClassId").combobox('textbox').focus()
         $("#tb-lesson-teaching-form").datagrid({data: []})
         tabsLessonTeaching.tabs("select", 0)
         $("#tt-lesson-teaching").waitMe("hide")

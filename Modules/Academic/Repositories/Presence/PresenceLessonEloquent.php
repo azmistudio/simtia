@@ -45,7 +45,7 @@ class PresenceLessonEloquent implements PresenceLessonRepository
 	public function data(Request $request)
 	{
 		$param = $this->gridRequest($request,'desc','academic.presence_lessons.id');
-        $query = PresenceLesson::select('*')->join('academic.semesters','academic.semesters.id','=','academic.presence_lessons.semester_id');
+        $query = PresenceLesson::select('*');
         if (auth()->user()->getDepartment->is_all != 1)
         {
             $query = $query->whereHas('getSemester', function($qry) {
@@ -73,19 +73,20 @@ class PresenceLessonEloquent implements PresenceLessonRepository
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) use ($request) {
+            $model['id'] = $model->id;
             $model['department_id'] = $model->getSemester->getDepartment->name;
             $model['grade'] = $model->getClass->getGrade->grade;
             $model['semester'] = $model->getSemester->semester;
             $model['school_year'] = $model->getClass->getSchoolYear->school_year;
             $model['teacher'] = $model->getEmployee->name;
             $model['status'] = $model->getTeacherType->name;
-            $model['date'] = Carbon::createFromFormat('Y-m-d', $model->date)->format('d/m/Y');
+            $model['date'] = $this->formatDate($model->date, 'local');
             $model['class_id'] = $model->getClass->class;
             $model['start_date'] = $model->getClass->getSchoolYear->start_date;
             $model['end_date'] = $model->getClass->getSchoolYear->end_date;
             $model['lesson'] = $model->getLesson->name;
             $model['lesson_schedule_id'] = 'Jam ke ' . $model->getLessonSchedule->getTimeId1->time .' - '. $model->getLessonSchedule->getTimeId2->time;
-            return $model->only(['id','department_id','grade','semester','school_year','teacher','status','date','class_id','start_date','end_date','lesson','lesson_schedule_id']);
+            return $model;
         });
         return $result;
 	}
