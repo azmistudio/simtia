@@ -237,10 +237,4 @@
         idPaymentMajor.value = "-1"
         $("#page-payment-major").waitMe({effect:"none"})
     }
-    function exportPaymentMajor(document) {
-        var dg = $("#tb-payment-major").datagrid('getData')
-        if (dg.total > 0) {
-            exportDocument("{{ url('finance/receipt/payment/major/export-') }}" + document,dg.rows,"Ekspor data Besar Pembayaran ke "+ document.toUpperCase(),"{{ csrf_token() }}")
-        }
-    }
 </script>

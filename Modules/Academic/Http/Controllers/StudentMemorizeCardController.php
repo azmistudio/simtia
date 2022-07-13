@@ -70,6 +70,7 @@ class StudentMemorizeCardController extends Controller
         try 
         {
             $request->merge([
+                'memorize_date' => $this->formatDate($request->memorize_date,'sys'),
                 'logged' => auth()->user()->email,
             ]);
 

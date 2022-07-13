@@ -82,7 +82,6 @@ class AssessmentReportController extends Controller
         $data['requests'] = $request->all();
         $data['assessments'] = $this->lessonAssessmentEloquent->show($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect)->sortBy('exam_id');
         $data['value_letters'] = $this->lessonGradingEloquent->show($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect)->sortBy('id')->where('grade','<>','');
-        // dd($data['assessments']);
         return view('academic::pages.assessments.assessment_report_score', $data);
     }
 
@@ -369,12 +368,12 @@ class AssessmentReportController extends Controller
         //
         $q_assessment = $this->lessonAssessmentEloquent->show($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect_id)->sortBy('exam_id');
         $q_finals = ExamScoreFinal::select('academic.exam_score_finals.*','academic.lesson_exams.code')
-                    ->join('academic.lesson_exams','academic.lesson_exams.id','=','academic.exam_score_finals.lesson_exam_id')
-                    ->join('academic.lesson_assessments','academic.lesson_assessments.id','=','academic.exam_score_finals.lesson_assessment_id')
-                    ->where('academic.exam_score_finals.lesson_id',$request->lesson_id)
-                    ->where('academic.exam_score_finals.class_id',$request->class_id)
-                    ->where('academic.exam_score_finals.semester_id',$request->semester_id)
-                    ->get();
+                        ->join('academic.lesson_exams','academic.lesson_exams.id','=','academic.exam_score_finals.lesson_exam_id')
+                        ->join('academic.lesson_assessments','academic.lesson_assessments.id','=','academic.exam_score_finals.lesson_assessment_id')
+                        ->where('academic.exam_score_finals.lesson_id',$request->lesson_id)
+                        ->where('academic.exam_score_finals.class_id',$request->class_id)
+                        ->where('academic.exam_score_finals.semester_id',$request->semester_id)
+                        ->get();
         $i = 0;
         $array_col = array();
         foreach ($q_assessment as $assessment) 

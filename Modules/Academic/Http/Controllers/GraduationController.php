@@ -421,7 +421,7 @@ class GraduationController extends Controller
                         'student_id' => $request->students[$i]['id'],
                         'end_class' => $request->class_id,
                         'end_grade' => $request->grade_id,
-                        'graduate_date' => Carbon::createFromFormat('d/m/Y',$request->date),
+                        'graduate_date' => $this->formatDate($request->date,'sys'),
                         'remark' => $request->students[$i]['remark'],
                         'logged' => auth()->user()->email,
                     ]);
