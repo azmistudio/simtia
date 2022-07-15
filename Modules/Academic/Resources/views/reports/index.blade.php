@@ -13,6 +13,7 @@
     <div data-options="region:'west',split:true,collapsible:true,title:'Daftar'" style="width:275px">
         <div class="p-1">
             <ul class="easyui-tree">
+                <li><a href="javascript:void(0)" onclick="reportPage('academic/report/admission/prospect', 'body-academic-report', 'Data Calon Santri')">Data Calon Santri</a></li>
                 <li><a href="javascript:void(0)" onclick="reportPage('academic/report/admission/stat', 'body-academic-report', 'Statistik Penerimaan Santri')">Statistik Penerimaan Santri</a></li>
                 <li><a href="javascript:void(0)" onclick="reportPage('academic/report/student/stat', 'body-academic-report', 'Statistik Kesantrian')">Statistik Kesantrian</a></li>
                 <li>

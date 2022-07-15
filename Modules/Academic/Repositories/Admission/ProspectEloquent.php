@@ -60,9 +60,9 @@ class ProspectEloquent implements ProspectRepository
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = AdmissionProspect::join('academic.prospect_student_groups','academic.prospect_student_groups.id','=','academic.prospect_students.prospect_group_id')
-						   ->join('academic.admissions','academic.admissions.id','=','academic.prospect_student_groups.admission_id')
-						   ->select('academic.prospect_students.*','academic.admissions.department_id')
-						   ->where('academic.admissions.department_id', auth()->user()->getDepartment->id);
+					   ->join('academic.admissions','academic.admissions.id','=','academic.prospect_student_groups.admission_id')
+					   ->select('academic.prospect_students.*','academic.admissions.department_id')
+					   ->where('academic.admissions.department_id', auth()->user()->getDepartment->id);
 		} else {
 	        $query = AdmissionProspect::select('*');
 		}

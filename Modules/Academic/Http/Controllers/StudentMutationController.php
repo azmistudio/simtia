@@ -155,6 +155,7 @@ class StudentMutationController extends Controller
                         ->where('graduate_date', Carbon::createFromFormat('d/m/Y',$request->students[$i]['mutation_date']))
                         ->delete();
                     $this->studentMutationEloquent->destroy($request->students[$i]['id'], $this->subject);
+                    AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 1]);
                 }
             });
             $response = $this->getResponse('destroy', '', $this->subject);

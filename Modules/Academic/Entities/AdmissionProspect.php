@@ -113,4 +113,9 @@ class AdmissionProspect extends Model
     {
         return $this->hasOne('Modules\Academic\Entities\AdmissionProspectGroup', 'id', 'prospect_group_id');
     }
+
+    public function getStudent()
+    {
+        return $this->belongsTo('Modules\Academic\Entities\Students', 'student_id', 'id');
+    }
 }
