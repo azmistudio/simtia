@@ -463,10 +463,19 @@ Route::group(['middleware' => ['auth']], function() {
             Route::post('/lesson/combo-box/{deptid}/{is_all}', 'ReportController@comboBoxLesson');
             // admission
             Route::prefix('admission')->group(function() {
-                Route::get('/stat', 'ReportController@admissionStat');
-                Route::post('/stat/data', 'ReportController@admissionStatData');
-                Route::post('/stat/data/detail', 'ReportController@admissionStatDataDetail');
-                Route::post('/stat/print', 'ReportController@admissionStatPrint');
+                // prospect
+                Route::prefix('prospect')->group(function() {
+                    Route::get('/', 'ReportController@admissionProspect');
+                    Route::post('/data', 'ReportController@admissionProspectData');
+                });
+
+                // stat
+                Route::prefix('stat')->group(function() {
+                    Route::get('/', 'ReportController@admissionStat');
+                    Route::post('/data', 'ReportController@admissionStatData');
+                    Route::post('/data/detail', 'ReportController@admissionStatDataDetail');
+                    Route::post('/print', 'ReportController@admissionStatPrint');
+                });
             });
             // student
             Route::prefix('student')->group(function() {

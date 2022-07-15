@@ -73,8 +73,8 @@
                 <span style="line-height: 25px;"><b>Data Transaksi Keuangan</b></span>
             </div>
             <div class="col-9 text-right">
-                <a href="javascript:void(0)" class="easyui-linkbutton lbtn" iconCls="ms-Icon ms-Icon--PDF" plain="true" onclick="exportAccountintReportTransaction('pdf')">Ekspor PDF</a>
-                <a href="javascript:void(0)" class="easyui-linkbutton lbtn" iconCls="ms-Icon ms-Icon--ExcelDocument" plain="true" onclick="exportAccountintReportTransaction('excel')">Ekspor Excel</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton lbtn" iconCls="ms-Icon ms-Icon--PDF" plain="true" onclick="exportAccountingReportTransaction('pdf')">Ekspor PDF</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton lbtn" iconCls="ms-Icon ms-Icon--ExcelDocument" plain="true" onclick="exportAccountingReportTransaction('excel')">Ekspor Excel</a>
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@
             + "&cash_no=" + $("#AccountingReportCashNo").textbox("getValue")
         )
     }
-    function exportAccountintReportTransaction(document) {
+    function exportAccountingReportTransaction(document) {
         var dg = $("#tb-accounting-report-transaction").datagrid('getData')
         if (dg.total > 0) {
             var payload = {

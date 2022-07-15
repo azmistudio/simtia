@@ -15,6 +15,7 @@ use App\Http\Traits\ReferenceTrait;
 use Modules\Academic\Entities\Classes;
 use Modules\Academic\Entities\Students;
 use Modules\Academic\Entities\StudentAlumni;
+use Modules\Academic\Entities\AdmissionProspect;
 use Modules\Academic\Http\Requests\StudentMutationRequest;
 use Modules\Academic\Http\Requests\StudentAlumniRequest;
 use Modules\Academic\Repositories\Student\StudentAlumniEloquent;
@@ -305,6 +306,7 @@ class GraduationController extends Controller
                             '".auth()->user()->email."'
                         )");
                         Students::where('id', $request->students[$i]['id'])->update(['is_active' => 0, 'alumni' => 1]);
+                        AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 0]);
                         DB::table('academic.student_class_histories')
                             ->where('student_id', $request->students[$i]['id'])
                             ->where('class_id', $request->class_id)
@@ -371,6 +373,7 @@ class GraduationController extends Controller
                     $old_id = DB::table('academic.student_dept_histories')->select('old_student_id')->where('student_id', $request->students[$i]['id'])->first();
                     Students::where('id', $old_id->old_student_id)->update(['is_active' => 1, 'alumni' => 0]);
                     Students::where('id', $request->students[$i]['id'])->delete();
+                    AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 1]);
                 }
             });
             $response = $this->getResponse('destroy', '', $this->subject_graduate);
@@ -415,6 +418,7 @@ class GraduationController extends Controller
                 for ($i = 0; $i < count($request->students); $i++)
                 {
                     Students::where('id', $request->students[$i]['id'])->update(['is_active' => 0, 'alumni' => 1]);
+                    AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 0]);
                     DB::table('academic.student_class_histories')->where('student_id', $request->students[$i]['id'])->where('active', 1)->update(['active' => 0]);
                     DB::table('academic.student_dept_histories')->where('student_id', $request->students[$i]['id'])->where('active', 1)->update(['active' => 0]);
                     $request->merge([
@@ -466,6 +470,7 @@ class GraduationController extends Controller
                 for ($i = 0; $i < count($request->students); $i++)
                 {
                     Students::where('id', $request->students[$i]['student_id'])->update(['is_active' => 1, 'alumni' => 0]);
+                    AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 0]);
                     $alumni = StudentAlumni::where('student_id', $request->students[$i]['student_id'])->first();
                     $this->studentAlumniEloquent->destroy($alumni->id, $this->subject_alumni);
                 }

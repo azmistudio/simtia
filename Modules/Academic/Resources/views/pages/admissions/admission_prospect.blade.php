@@ -49,7 +49,7 @@
                 </div>
                 <div style="margin-left:100px;padding:5px 0">
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="filterProspectiveStudent({fregister: $('#fregister-prospective-student').val(), fgroup: $('#fgroup-prospective-student').combobox('getValue'), fname: $('#fname-prospective-student').val(), fstudent: 'false'})">Cari</a>
-                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-prospective-student').form('reset');filterProspectiveStudent({})">Batal</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-prospective-student').form('reset');filterProspectiveStudent({fstudent: 'false'})">Batal</a>
                 </div>
             </form>
             <table id="tb-prospective-student" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">

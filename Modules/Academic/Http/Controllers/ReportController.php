@@ -143,6 +143,34 @@ class ReportController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
+    public function admissionProspect(Request $request)
+    {
+        if (!$request->ajax()) 
+        {
+            abort(404);
+        }
+        $window = explode(".", $request->w);
+        $data['InnerHeight'] = $window[0];
+        $data['InnerWidth'] = $window[1];
+        //
+        return view('academic::reports.admissions.admission_prospect', $data);
+    }
+
+    /**
+     * Display a listing of data.
+     * @return JSON
+     */
+    public function admissionProspectData(Request $request)
+    {
+        return response()->json($this->admissionReportEloquent->admissionProspectData($request));
+    }
+
+    /* Admission Stat */
+
+    /**
+     * Display a listing of the resource.
+     * @return Renderable
+     */
     public function admissionStat(Request $request)
     {
         if (!$request->ajax()) 
