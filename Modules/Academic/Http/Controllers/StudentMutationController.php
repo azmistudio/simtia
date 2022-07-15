@@ -14,6 +14,7 @@ use App\Http\Traits\HelperTrait;
 use App\Http\Traits\PdfTrait;
 use App\Http\Traits\ReferenceTrait;
 use App\Http\Traits\DepartmentTrait;
+use Modules\Academic\Entities\AdmissionProspect;
 use Modules\Academic\Entities\Students;
 use Modules\Academic\Entities\StudentMutation;
 use Modules\Academic\Entities\StudentAlumni;
@@ -84,6 +85,9 @@ class StudentMutationController extends Controller
                         'is_active' => 0,
                         'mutation' => $request->mutation_id,
                         'alumni' => 1,
+                    ]);
+                    AdmissionProspect::where('student_id', $request->students[$i]['id'])->update([
+                        'is_active' => 0,
                     ]);
                     DB::table('academic.student_class_histories')
                         ->where('student_id', $request->students[$i]['id'])

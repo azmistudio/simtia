@@ -84,6 +84,14 @@ class PaymentMajorEloquent implements PaymentMajorRepository
 			        ->join('public.departments','public.departments.id','=','finance.payment_major_students_view.department_id');
         // filter
         $query = $query->where('is_prospect', $request->is_prospect);
+		if ($request->is_prospect == 1)
+		{
+			$query = $query->join('academic.prospect_students','academic.prospect_students.id','=','finance.payment_major_students_view.student_id')
+						->where('academic.prospect_students.is_active',1);
+		} else {
+			$query = $query->join('academic.students','academic.students.id','=','finance.payment_major_students_view.student_id')
+						->where('academic.students.is_active',1);
+		}
         if (auth()->user()->getDepartment->is_all != 1)
         {
             $query = $query->where('public.departments.id', auth()->user()->department_id);
@@ -164,6 +172,7 @@ class PaymentMajorEloquent implements PaymentMajorRepository
 				->where('finance.payment_majors.bookyear_id',$bookyear_id)
 				->where('academic.grades.id',$grade_id)
 				->where('academic.students.class_id',$class_id)
+				->where('academic.students.is_active',1)
 				->get();
 	}
 

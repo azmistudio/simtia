@@ -32,13 +32,13 @@
                 <span class="mr-2"></span>
                 <select id="AcademicReportTeacher" class="easyui-combogrid cgrd" style="width:190px;height:22px;" data-options="
                     panelWidth: 500,
-                    idField: 'id',
-                    textField: 'name',
+                    idField: 'employee_id',
+                    textField: 'employee',
                     fitColumns:true,
                     columns: [[
-                        {field:'employee_id',title:'NIP',width:80},
-                        {field:'name',title:'Nama',width:200},
-                        {field:'section',title:'Bagian',width:250},
+                        {field:'employee_no',title:'NIP',width:80},
+                        {field:'employee',title:'Nama',width:200},
+                        {field:'status',title:'Status',width:250},
                     ]],
                 ">
                 </select>
@@ -120,7 +120,7 @@
 <script type="text/javascript">
     $(function () {
         $("#AcademicReportTeacher").combogrid({
-            url: '{{ url('hr/combo-grid') }}',
+            url: '{{ url('academic/teacher/combo-grid/group') }}',
             method: 'post',
             mode:'remote',
             queryParams: { _token: '{{ csrf_token() }}' },

@@ -61,9 +61,9 @@
                             <th data-options="field:'trans_date',width:90,sortable:true,resizeable:true,align:'center'">Tanggal</th>
                             <th data-options="field:'requested_name',width:150,resizeable:true">Pemohon</th>
                             <th data-options="field:'received_name',width:150,resizeable:true">Penerima</th>
-                            <th data-options="field:'total_val',width:100,resizeable:true,align:'right'">Jumlah</th>
-                            <th data-options="field:'purpose',width:300,resizeable:true">Keperluan</th>
-                            <th data-options="field:'employee',width:200,resizeable:true">Petugas</th>
+                            <th data-options="field:'amount_val',width:140,resizeable:true,align:'right'">Jumlah</th>
+                            <th data-options="field:'purpose',width:320,resizeable:true">Keperluan</th>
+                            <th data-options="field:'employee',width:150,resizeable:true">Petugas</th>
                         </tr>
                     </thead>
                 </table>

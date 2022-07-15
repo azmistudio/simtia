@@ -191,32 +191,33 @@ class PresenceDailyEloquent implements PresenceDailyRepository
     {
         $param = $this->gridRequest($request, 'asc', 'academic.classes.class');
         $query = PresenceDaily::select(
-                    DB::raw('UPPER(academic.classes.class) as class'),
-                    DB::raw('UPPER(academic.semesters.semester) as semester'),
-                    DB::raw('SUM(academic.presence_daily_students.present) as present'),
-                    DB::raw('SUM(academic.presence_daily_students.permit) as permit'),
-                    DB::raw('SUM(academic.presence_daily_students.sick) as sick'),
-                    DB::raw('SUM(academic.presence_daily_students.absent) as absent'),
-                    DB::raw('SUM(academic.presence_daily_students.leave) as leave'),
-                    'academic.students.student_no',
-                    DB::raw('INITCAP(academic.students.name) AS student')
-                )
-                ->join('academic.presence_daily_students','academic.presence_daily_students.presence_id','=','academic.presence_dailies.id')
-                ->join('academic.classes','academic.classes.id','=','academic.presence_dailies.class_id')
-                ->join('academic.semesters','academic.semesters.id','=','academic.presence_dailies.semester_id')
-                ->join('academic.students','academic.students.id','=','academic.presence_daily_students.student_id')
-                ->where('academic.presence_dailies.class_id', $request->class_id)
-                ->whereRaw('(
-                    academic.presence_dailies.start_date BETWEEN ? AND ? OR academic.presence_dailies.end_date BETWEEN ? AND ? OR
-                    ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date OR
-                    ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date
-                )', 
-                [
-                    $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys'),
-                    $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys'),
-                    $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys')
-                ])
-                ->groupBy('academic.classes.class','academic.semesters.semester','academic.students.student_no','academic.students.name');
+                        DB::raw('UPPER(academic.classes.class) as class'),
+                        DB::raw('UPPER(academic.semesters.semester) as semester'),
+                        DB::raw('SUM(academic.presence_daily_students.present) as present'),
+                        DB::raw('SUM(academic.presence_daily_students.permit) as permit'),
+                        DB::raw('SUM(academic.presence_daily_students.sick) as sick'),
+                        DB::raw('SUM(academic.presence_daily_students.absent) as absent'),
+                        DB::raw('SUM(academic.presence_daily_students.leave) as leave'),
+                        'academic.students.student_no',
+                        DB::raw('INITCAP(academic.students.name) AS student')
+                    )
+                    ->join('academic.presence_daily_students','academic.presence_daily_students.presence_id','=','academic.presence_dailies.id')
+                    ->join('academic.classes','academic.classes.id','=','academic.presence_dailies.class_id')
+                    ->join('academic.semesters','academic.semesters.id','=','academic.presence_dailies.semester_id')
+                    ->join('academic.students','academic.students.id','=','academic.presence_daily_students.student_id')
+                    ->where('academic.presence_dailies.class_id', $request->class_id)
+                    ->where('academic.students.is_active', 1)
+                    ->whereRaw('(
+                        academic.presence_dailies.start_date BETWEEN ? AND ? OR academic.presence_dailies.end_date BETWEEN ? AND ? OR
+                        ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date OR
+                        ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date
+                    )', 
+                    [
+                        $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys'),
+                        $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys'),
+                        $this->formatDate($request->start_date,'sys'), $this->formatDate($request->end_date,'sys')
+                    ])
+                    ->groupBy('academic.classes.class','academic.semesters.semester','academic.students.student_no','academic.students.name');  
         //
         $result["total"] = $query->count();
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get();
@@ -244,7 +245,8 @@ class PresenceDailyEloquent implements PresenceDailyRepository
                     ->join('academic.students','academic.students.id','=','academic.presence_daily_students.student_id')
                     ->where('academic.semesters.department_id', $request->department_id)
                     ->where('academic.classes.schoolyear_id', $request->schoolyear_id)
-                    ->where('academic.presence_dailies.semester_id', $request->semester_id);
+                    ->where('academic.presence_dailies.semester_id', $request->semester_id)
+                    ->where('academic.students.is_active', 1);
                     // filter
                     if ($request->grade_id > 0)
                     {
@@ -335,6 +337,7 @@ class PresenceDailyEloquent implements PresenceDailyRepository
                 ->where('academic.presence_dailies.semester_id', $semester_id)
                 ->where('academic.classes.grade_id', $grade_id)
                 ->where('academic.presence_dailies.class_id', $class_id)
+                ->where('academic.students.is_active', 1)
                 ->whereRaw('(
                     academic.presence_dailies.start_date BETWEEN ? AND ? OR academic.presence_dailies.end_date BETWEEN ? AND ? OR
                     ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date OR
@@ -431,6 +434,7 @@ class PresenceDailyEloquent implements PresenceDailyRepository
                 ->where('academic.presence_dailies.semester_id', $semester_id)
                 ->where('academic.classes.grade_id', $grade_id)
                 ->where('academic.presence_dailies.class_id', $class_id)
+                ->where('academic.students.is_active', 1)
                 ->whereRaw('(
                     academic.presence_dailies.start_date BETWEEN ? AND ? OR academic.presence_dailies.end_date BETWEEN ? AND ? OR
                     ? BETWEEN academic.presence_dailies.start_date AND academic.presence_dailies.end_date OR

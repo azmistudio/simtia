@@ -805,6 +805,7 @@ class ComposerStaticInita4c7258ee94bafb598d4b5c42283bdae
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\InstituteController' => __DIR__ . '/../..' . '/app/Http/Controllers/InstituteController.php',
         'App\\Http\\Controllers\\ReferenceController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReferenceController.php',
+        'App\\Http\\Controllers\\UpdaterController' => __DIR__ . '/../..' . '/app/Http/Controllers/UpdaterController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',

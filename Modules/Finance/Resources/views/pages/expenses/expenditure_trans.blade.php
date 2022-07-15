@@ -125,7 +125,7 @@
                             </div>
                             <div class="mb-2">
                                 <label class="mb-1" style="width:146px;">Keterangan/Referensi:</label><br/>
-                                <input name="remark" class="easyui-textbox" style="width:320px;height:34px;" data-options="multiline:true" />
+                                <input name="remark" class="easyui-textbox" style="width:320px;height:22px;" />
                             </div>
                             <div class="mb-1 d-none" id="AccountingExpenditureReason">
                                 <label class="mb-1" style="width:146px;"><b>*</b>Alasan Ubah Data:</label><br/>

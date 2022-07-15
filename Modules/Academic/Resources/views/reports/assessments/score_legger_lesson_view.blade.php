@@ -15,6 +15,7 @@
 	$jtot_avg_student = 0;
 	$sum_avg_student = 0;
 	$jsum_avg_student = 0;
+	$avg_score = 0;
 	$no = 1;
 @endphp
 <div class="container-fluid">
@@ -54,7 +55,7 @@
 							$jtot_avg_student += 1;
 							$avg_lesson[$k][0] += $values[0]->value;
 							$avg_lesson[$k][1] += 1;
-							$avg_score = $jtot_avg_student == 0 ? '' : round($tot_avg_student/$jtot_avg_student, 2);
+							$avg_score = $jtot_avg_student == 0 ? 0 : round($tot_avg_student/$jtot_avg_student, 2);
 						@endphp
 						<td class="text-center">{{ number_format($values[0]->value,2) }}</td>
 						<td class="text-center">{{ $values[0]->value_letter }}</td>
@@ -68,14 +69,14 @@
 						@endif
 					</tr>
 					@endforeach
-					@php $valsumavg = $jsum_avg_student == 0 ? "" : round($sum_avg_student / $jsum_avg_student, 2); @endphp
+					@php $valsumavg = $jsum_avg_student == 0 ? 0 : round($sum_avg_student / $jsum_avg_student, 2); @endphp
 					<tr>
 						<td class="text-right" colspan="3"><b>RATA - RATA</b></td>
 						@for ($l = 0; $l < $count_aspect; $l++)
 						@php
 							$sum_avg_lesson = $avg_lesson[$l][0];
 							$jsum_avg_lesson = $avg_lesson[$l][1];
-							$valavglesson = $jsum_avg_lesson == 0 ? '' : round($sum_avg_lesson/$jsum_avg_lesson, 2);
+							$valavglesson = $jsum_avg_lesson == 0 ? 0 : round($sum_avg_lesson/$jsum_avg_lesson, 2);
 						@endphp
 						<td class="text-center"><b>{{ number_format($valavglesson,2) }}</b></td>
 						<td></td>

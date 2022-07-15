@@ -49,6 +49,11 @@ class StudentMutationEloquent implements StudentMutationRepository
         {
             $query = $query->where('department_id', auth()->user()->department_id);
         } 
+        $fdept = isset($request->fdept) ? $request->fdept : '';
+        if ($fdept != '') 
+        {
+            $query = $query->where('department_id', $fdept);
+        }
         $year = isset($request->fyear) ? $request->fyear : '';
         if ($year != '') 
         {
