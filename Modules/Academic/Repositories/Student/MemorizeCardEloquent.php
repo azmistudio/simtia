@@ -96,6 +96,7 @@ class MemorizeCardEloquent implements MemorizeCardRepository
                         $request->class_id, $request->memorize_date,
                         $request->class_id, $request->memorize_date
                     ])
+                    ->where('academic.students.is_active', 1)
                     ->where('academic.students.class_id', $request->class_id);
         // result
         $result["total"] = $query->count();

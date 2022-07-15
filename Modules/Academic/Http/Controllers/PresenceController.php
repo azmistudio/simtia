@@ -217,8 +217,7 @@ class PresenceController extends Controller
     public function print(Request $request)
     {
         $payload = json_decode($request->data);
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $payload->id);
-        $data['presences'] = $this->presenceDailyEloquent->show($search, true);
+        $data['presences'] = PresenceDaily::find($payload->id);
         $data['students'] = PresenceDailyStudent::where('presence_id', $payload->id)->get();                     
         $data['profile'] = $this->getInstituteProfile();
         //

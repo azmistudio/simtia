@@ -178,24 +178,24 @@ class PresenceLessonEloquent implements PresenceLessonRepository
     public function queryReportData($start_date, $end_date, $student_id, $is_presence)
     {
         $query = PresenceLesson::select(
-                    DB::raw('academic.presence_lessons.date as date'),
-                    'academic.presence_lessons.time',
-                    DB::raw('UPPER(academic.classes.class) as class'),
-                    'academic.presence_lessons.remark',
-                    DB::raw('UPPER(academic.lessons.name) as lesson'),
-                    DB::raw('INITCAP(employees.name) as employee'),
-                    'academic.presence_lessons.subject',
-                )
-                ->join('academic.presence_lesson_students','academic.presence_lesson_students.presence_id','=','academic.presence_lessons.id')
-                ->join('academic.classes','academic.classes.id','=','academic.presence_lessons.class_id')
-                ->join('academic.semesters','academic.semesters.id','=','academic.presence_lessons.semester_id')
-                ->join('academic.lessons','academic.lessons.id','=','academic.presence_lessons.lesson_id')
-                ->join('employees','employees.id','=','academic.presence_lessons.employee_id')
-                ->where('academic.presence_lesson_students.student_id', $student_id)
-                ->whereRaw('academic.presence_lessons.date BETWEEN ? AND ?', [
-                    $this->formatDate($start_date,'sys'), 
-                    $this->formatDate($end_date,'sys')
-                ]);
+                        DB::raw('academic.presence_lessons.date as date'),
+                        'academic.presence_lessons.time',
+                        DB::raw('UPPER(academic.classes.class) as class'),
+                        'academic.presence_lessons.remark',
+                        DB::raw('UPPER(academic.lessons.name) as lesson'),
+                        DB::raw('INITCAP(employees.name) as employee'),
+                        'academic.presence_lessons.subject',
+                    )
+                    ->join('academic.presence_lesson_students','academic.presence_lesson_students.presence_id','=','academic.presence_lessons.id')
+                    ->join('academic.classes','academic.classes.id','=','academic.presence_lessons.class_id')
+                    ->join('academic.semesters','academic.semesters.id','=','academic.presence_lessons.semester_id')
+                    ->join('academic.lessons','academic.lessons.id','=','academic.presence_lessons.lesson_id')
+                    ->join('employees','employees.id','=','academic.presence_lessons.employee_id')
+                    ->where('academic.presence_lesson_students.student_id', $student_id)
+                    ->whereRaw('academic.presence_lessons.date BETWEEN ? AND ?', [
+                        $this->formatDate($start_date,'sys'), 
+                        $this->formatDate($end_date,'sys')
+                    ]);
         if ($is_presence > 0)
         {
            $query = $query->where('academic.presence_lesson_students.presence','<>',0);
@@ -282,7 +282,8 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                         $this->formatDate($start_date,'sys'), 
                         $this->formatDate($end_date,'sys'),
                         $lesson_id
-                    ]);
+                    ])
+                    ->where('academic.students.is_active', 1);
         } else {
             $query = PresenceLessonStudent::selectRaw('
                         academic.students.student_no,
@@ -317,7 +318,8 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                         $semester_id, 
                         $this->formatDate($start_date,'sys'), 
                         $this->formatDate($end_date,'sys')
-                    ]);
+                    ])
+                    ->where('academic.students.is_active', 1);
         }
         //
         $query = $query->join('academic.presence_lessons','academic.presence_lessons.id','=','academic.presence_lesson_students.presence_id')
@@ -402,7 +404,8 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                     ->join('academic.presence_lesson_students','academic.presence_lesson_students.presence_id','=','academic.presence_lessons.id')
                     ->join('academic.students','academic.students.id','=','academic.presence_lesson_students.student_id')
                     ->where('academic.presence_lessons.semester_id', $request->semester_id)
-                    ->where('academic.presence_lesson_students.presence','<>',0);
+                    ->where('academic.presence_lesson_students.presence','<>',0)
+                    ->where('academic.students.is_active', 1);
                     // filter
                     if ($request->grade_id > 0)
                     {
@@ -548,6 +551,7 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                 ->where('academic.presence_lessons.semester_id', $semester_id)
                 ->where('academic.presence_lessons.class_id', $class_id)
                 ->where('academic.presence_lessons.lesson_id', $lesson_id)
+                ->where('academic.students.is_active', 1)
                 ->whereRaw('academic.presence_lessons.date BETWEEN ? AND ?', [
                     $this->formatDate($start_date,'sys'), 
                     $this->formatDate($end_date,'sys')
@@ -603,6 +607,7 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                     ->join('academic.classes','academic.classes.id','=','academic.presence_lessons.class_id')
                     ->where('academic.presence_lessons.semester_id', $request->semester_id)
                     ->where('academic.presence_lessons.lesson_id', $request->lesson_id)
+                    ->where('academic.students.is_active', 1)
                     ->whereRaw('academic.presence_lessons.date BETWEEN ? AND ?', [
                         $this->formatDate($request->start_date,'sys'), 
                         $this->formatDate($request->end_date,'sys')
@@ -637,6 +642,7 @@ class PresenceLessonEloquent implements PresenceLessonRepository
                     ->where('academic.presence_lessons.semester_id', $semester_id)
                     ->where('academic.presence_lessons.lesson_id', $lesson_id)
                     ->where('academic.presence_lessons.class_id', $class_id)
+                    ->where('academic.students.is_active', 1)
                     ->whereRaw('academic.presence_lessons.date BETWEEN ? AND ?', [
                         $this->formatDate($start_date,'sys'), 
                         $this->formatDate($end_date,'sys')

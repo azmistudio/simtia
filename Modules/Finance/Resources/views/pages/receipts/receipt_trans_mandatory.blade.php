@@ -134,7 +134,7 @@
                         </div>
                         <div class="mb-1">
                             <label class="mb-1" style="width:121px;">Keterangan:</label>
-                            <input name="remark" class="easyui-textbox" style="width:300px;height:34px;" data-options="multiline:true" />
+                            <input name="remark" class="easyui-textbox" style="width:300px;height:22px;" data-options="" />
                         </div>
                         <div id="receipt-trans-reason" class="mb-1 d-none">
                             <label class="mb-1" style="width:121px;">*Alasan Ubah Data:</label>

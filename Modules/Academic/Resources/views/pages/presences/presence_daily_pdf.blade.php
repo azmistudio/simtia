@@ -12,7 +12,7 @@
             <tbody>
                 <tr>
                     <th rowspan="2" width="100px"><img src="file:///{{ $logo }}" height="80px" /></th>
-                    <td><b>{{ $profile['name'] }}</b></td>
+                    <td><b>{{ strtoupper($profile['name']) }}</b></td>
                 </tr>
                 <tr>
                     <td style="font-size:11px;">

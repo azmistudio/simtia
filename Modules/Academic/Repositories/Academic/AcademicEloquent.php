@@ -96,8 +96,8 @@ class AcademicEloquent implements AcademicRepository
         $result["rows"] = $query->orderBy('id')->get()->map(function ($model) {
 			                    $model['school_year'] = $model->getSchoolYearByDept(1)->school_year;
 			                    $model['schoolyear_id'] = $model->getSchoolYearByDept(1)->id;
-			                    $model['semester'] = Str::upper($model->getSemesterByDept->semester);
-			                    $model['semester_id'] = $model->getSemesterByDept->id;
+			                    $model['semester'] = isset($model->getSemesterByDept) ? Str::upper($model->getSemesterByDept->semester) : '-';
+			                    $model['semester_id'] = isset($model->getSemesterByDept) ? $model->getSemesterByDept->id : 0;
 			                    $model['department'] = $model->getDepartment->name;
 			                    return $model->only(['id','department','grade','school_year','schoolyear_id','semester','semester_id','department_id']);
 			                });

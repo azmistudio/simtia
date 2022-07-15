@@ -69,10 +69,10 @@
             <table id="tb-presence-lesson" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        <th data-options="field:'class_id',width:70,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'lesson',width:100,resizeable:true">Pelajaran</th>
                         <th data-options="field:'date',width:75,resizeable:true,sortable:true">Tanggal</th>
-                        <th data-options="field:'lesson_schedule_id',width:80,resizeable:true">Jam</th>
+                        <th data-options="field:'lesson_schedule_id',width:90,resizeable:true">Jam</th>
+                        <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
                     </tr>
                 </thead>
             </table>
@@ -186,7 +186,6 @@
                                     data-options="method:'post',rownumbers:'true', queryParams: { _token: '{{ csrf_token() }}' }">
                                     <thead>
                                         <tr>
-                                            <th data-options="field:'id',width:50,hidden:true">ID</th>
                                             <th data-options="field:'student_no',width:80,resizeable:true,align:'center'">NIS</th>
                                             <th data-options="field:'name',width:150,resizeable:true,align:'left'">Nama</th>
                                             <th data-options="field:'presence',width:100,resizeable:true,align:'center',editor:{type:'combobox',options:{valueField:'id',textField:'name',panelHeight:112,data:[{id:'Hadir',name:'Hadir'},{id:'Ijin',name:'Ijin'},{id:'Sakit',name:'Sakit'},{id:'Alpa',name:'Alpa'},{id:'Cuti',name:'Cuti'}]}}">Presensi</th>

@@ -218,15 +218,15 @@ class SavingTypeController extends Controller
                         $request->merge([
                             'department_id' => $department->id,
                         ]);  
-                        $this->savingTypeEloquent->create($request, $this->subject_student);                           
+                        $this->savingTypeEloquent->create($request, $this->subject_employee);                           
                     }
                 } else {
-                    $this->savingTypeEloquent->create($request, $this->subject_student);
+                    $this->savingTypeEloquent->create($request, $this->subject_employee);
                 }
             } else {
-                $this->savingTypeEloquent->update($request, $this->subject_student);
+                $this->savingTypeEloquent->update($request, $this->subject_employee);
             }
-            $response = $this->getResponse('store', '', $this->subject_student);
+            $response = $this->getResponse('store', '', $this->subject_employee);
         } catch (\Throwable $e) {
             $response = $this->getResponse('error', $e->getMessage(), 'Kombinasi Departemen, Nama, Rekening Kas dan Rekening Utang');
         }

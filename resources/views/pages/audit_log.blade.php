@@ -35,6 +35,7 @@
                         <input type="hidden" name="department_id" value="{{ auth()->user()->department_id }}" />
                     @else 
                         <select name="department_id" id="AuditLogDeptId" class="easyui-combobox" style="width:250px;height:22px;" data-options="panelHeight:125">
+                            <option value="">---</option>    
                             @foreach ($depts as $dept)
                             <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                             @endforeach
@@ -57,7 +58,7 @@
                         data-options="method:'post',url: '{{ url('audit/log/data') }}',queryParams: { _token: '{{ csrf_token() }}', fstart: $('#AuditLogFromDate').datebox('getValue'), fend: $('#AuditLogToDate').datebox('getValue') },pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                         <thead>
                             <tr>
-                                <th data-options="field:'user',width:50,hidden:true">Email</th>
+                                <th data-options="field:'user',width:150">Email</th>
                                 <th data-options="field:'created',width:150,resizeable:true,align:'center'">Waktu</th>
                                 <th data-options="field:'ip',width:100,resizeable:true,align:'center'">Alamat IP</th>
                                 <th data-options="field:'remark',width:300,resizeable:true">Aktivitas</th>

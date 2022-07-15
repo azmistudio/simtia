@@ -24,7 +24,7 @@ return new class extends Migration
                             WHEN a.source = 'receipt_jtt_prospect' THEN SUM(b.debit)
                             WHEN a.source = 'receipt_skr' THEN SUM(b.debit)
                             WHEN a.source = 'receipt_skr_prospect' THEN SUM(b.debit)
-                            WHEN a.source = 'receipt_other' THEN SUM(b.debit)
+                            WHEN a.source = 'receipt_others' THEN SUM(b.debit)
                             ELSE 0.00
                         END 
                         FROM finance.journal_details b

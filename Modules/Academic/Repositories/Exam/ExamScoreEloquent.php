@@ -87,13 +87,19 @@ class ExamScoreEloquent implements ExamScoreRepository
         {
             $string .= ' _' . $col . ' NUMERIC,';
         }
-        //
-        $query_rows = DB::select("SELECT academic.fn_pivot_exam_scores('".$arr_exam."','".rtrim($string, ',')."')");
-        $rows = DB::select($query_rows[0]->fn_pivot_exam_scores);
-        $total = collect(DB::select($query_rows[0]->fn_pivot_exam_scores)); 
-        //
-        $result["total"] = $total->count();
-        $result["rows"] = $rows;
+        if (!empty($arr_exam) && !empty($string))
+        {
+            //
+            $query_rows = DB::select("SELECT academic.fn_pivot_exam_scores('".$arr_exam."','".rtrim($string, ',')."')");
+            $rows = DB::select($query_rows[0]->fn_pivot_exam_scores);
+            $total = collect(DB::select($query_rows[0]->fn_pivot_exam_scores)); 
+            //
+            $result["total"] = $total->count();
+            $result["rows"] = $rows;
+        } else {
+            $result["total"] = 0;
+            $result["rows"] = [];
+        }
         return $result;
     }
 }

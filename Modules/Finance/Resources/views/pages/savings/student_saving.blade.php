@@ -2,7 +2,7 @@
     $WindowHeight = $InnerHeight - 168 . "px";
     $WindowWidth = $InnerWidth - 12 . "px";
     $GridHeight = $InnerHeight - 326 . "px";
-    $SubGridHeight = $InnerHeight - 436 . "px";
+    $SubGridHeight = $InnerHeight - 427 . "px";
     $TabHeight = $InnerHeight - 250 . "px";
 @endphp
 <div class="container-fluid mt-1 mb-1">
@@ -121,7 +121,7 @@
                         <div class="mb-1">
                             <input name="amount" id="AccountingStudentSavingAmount" class="easyui-numberbox" style="width:300px;height:22px;" data-options="label:'<b>*</b>Jumlah:',labelWidth:'125px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" value="0" />
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <input name="trans_date" class="easyui-datebox" style="width:240px;height:22px;" data-options="label:'<b>*</b>Tanggal Transaksi:',labelWidth:'125px',formatter:dateFormatter,parser:dateParser" value="{{ date('d/m/Y') }}" />
                         </div>
                         <div class="mb-1">
@@ -134,11 +134,11 @@
                         </div>
                         <div class="mb-1">
                             <label class="mb-1" style="width:121px;">Keterangan:</label>
-                            <input name="remark" id="AccountingStudentSavingRemark" class="easyui-textbox" style="width:300px;height:34px;" data-options="multiline:true" />
+                            <input name="remark" id="AccountingStudentSavingRemark" class="easyui-textbox" style="width:300px;height:22px;" />
                         </div>
                         <div id="student-saving-reason" class="mb-1 d-none">
                             <label class="mb-1" style="width:121px;">*Alasan Ubah Data:</label>
-                            <input name="reason" id="AccountingStudentSavingReason" class="easyui-textbox" style="width:300px;height:34px;" data-options="multiline:true" />
+                            <input name="reason" id="AccountingStudentSavingReason" class="easyui-textbox" style="width:300px;height:22px;" />
                         </div>
                         </form>
                     </div>
@@ -233,7 +233,7 @@
                     $("#AccountingStudentSavingDept").textbox("setValue", row.department)
                     $("#AccountingStudentSavingStudentNo").textbox("setValue", row.student_no)
                     $("#AccountingStudentSavingStudentName").textbox("setValue", row.name)
-                    $("#AccountingStudentSavingClass").textbox("setValue", row.grade + " - " + row.class_name)
+                    $("#AccountingStudentSavingClass").textbox("setValue", row.grade + " / " + row.class_name)
                     $("#AccountingStudentSavingTypes").combogrid("grid").datagrid("reload", "{{ url('finance/saving/student/type/combo-grid') }}" + "?_token=" + "{{ csrf_token() }}" + "&department_id=" + row.department_id + "&is_employee=" + 0)
                     $("#AccountingStudentSavingTypeFilter").combobox("enable")
                     $("#AccountingStudentSavingTypeFilter").combobox("reload", "{{ url('finance/saving/student/type/combo-box') }}" + "?_token=" + "{{ csrf_token() }}" + "&department_id=" + row.department_id)

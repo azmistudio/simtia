@@ -193,7 +193,7 @@
             url: '{{ url('academic/class/combo-grid/view') }}',
             method: 'post',
             mode:'remote',
-            queryParams: { _token: '{{ csrf_token() }}', fstu_active: 1, fsem_active: 1, fscy_active: 2, fcount: 1 },
+            queryParams: { _token: '{{ csrf_token() }}', fstu_active: 1, fsem_active: 1, fscy_active: 1, fcount: 1 },
             onClickRow: function (index, row) {
                 $("#StudentMutationDept").textbox('setValue', row.department)
                 $("#StudentMutationSchoolyear").textbox('setValue', row.school_year)
@@ -220,7 +220,7 @@
             onClickRow: function (index, row) {
                 $("#StudentMutationDeptDest").textbox('setValue', row.department)
                 $("#StudentMutationPeriodDest").textbox('setValue', row.period)
-                $("#tb-student-mutated").datagrid("load", "{{ url('academic/student/mutation/data') }}" + "?_token=" + "{{ csrf_token() }}")
+                $("#tb-student-mutated").datagrid("load", "{{ url('academic/student/mutation/data') }}" + "?_token=" + "{{ csrf_token() }}" + "&ftype=" + row.mutation_id + "&fdept=" + row.department_id + "&fyear=" + row.period)
             }
         })
         $("#tb-student-mutation-student").datagrid("enableFilter")

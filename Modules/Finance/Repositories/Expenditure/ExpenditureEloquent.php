@@ -252,6 +252,7 @@ class ExpenditureEloquent implements ExpenditureRepository
                         'finance.expenditures.total',
                         'finance.expenditures.remark',
                         'finance.expenditures.employee',
+                        'finance.expenditure_details.amount',
                         DB::raw('finance.expenditure_details.remark as purpose'),
                     )
                     ->join('finance.journals','finance.journals.id','=','finance.expenditures.journal_id')
@@ -287,12 +288,13 @@ class ExpenditureEloquent implements ExpenditureRepository
         $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function($model){
             $model['trans_date'] = $this->formatDate($model->trans_date,'iso');
             $model['total_val'] = 'Rp'.number_format($model->total,2);
+            $model['amount_val'] = 'Rp'.number_format($model->amount,2);
             $model['purpose'] = '<b>Keperluan:</b> '. $model->purpose . '<br/><b>Keterangan: </b>' . $model->remark;  
             return $model;
         });
         $footer[] = array(
             'received_name' => 'Total',
-            'total_val' => '<b>Rp'.number_format($result['rows']->sum('total'),2).'</b>',
+            'amount_val' => '<b>Rp'.number_format($result['rows']->sum('total'),2).'</b>',
         );
         $result["footer"] = $footer;
         return $result;
@@ -315,7 +317,16 @@ class ExpenditureEloquent implements ExpenditureRepository
                     ->where('finance.expenditures.department_id', $request->department_id)
                     ->where('finance.journals.bookyear_id', $request->bookyear_id)
                     ->whereRaw('finance.expenditures.trans_date::date >= ?', $this->formatDate($request->start_date,'sys'))
-                    ->whereRaw('finance.expenditures.trans_date::date <= ?', $this->formatDate($request->end_date,'sys'));
+                    ->whereRaw('finance.expenditures.trans_date::date <= ?', $this->formatDate($request->end_date,'sys'))
+                    ->groupBy(
+                        'finance.journals.cash_no',
+                        'finance.expenditures.trans_date',
+                        'finance.journals.transaction',
+                        'finance.journals.source',
+                        'finance.journals.bookyear_id',
+                        'finance.expenditures.journal_id',
+                        'finance.expenditures.employee'
+                    );
 
         // result
         $result["total"] = $query->count();

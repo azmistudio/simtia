@@ -163,6 +163,7 @@ return array(
     'App\\Http\\Controllers\\HomeController' => $baseDir . '/app/Http/Controllers/HomeController.php',
     'App\\Http\\Controllers\\InstituteController' => $baseDir . '/app/Http/Controllers/InstituteController.php',
     'App\\Http\\Controllers\\ReferenceController' => $baseDir . '/app/Http/Controllers/ReferenceController.php',
+    'App\\Http\\Controllers\\UpdaterController' => $baseDir . '/app/Http/Controllers/UpdaterController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\Authenticate' => $baseDir . '/app/Http/Middleware/Authenticate.php',
