@@ -176,7 +176,7 @@
         }
     }
     function deleteRoomStudent() {
-        $.messager.confirm("Konfirmasi", "Anda akan menghapus data Proses Penerimaan terpilih, tetap lanjutkan?", function (r) {
+        $.messager.confirm("Konfirmasi", "Anda akan menghapus data Kamar Santri terpilih, tetap lanjutkan?", function (r) {
             if (r) {
                 $.post("{{ url('general/room/destroy') }}" +"/"+idRoomStudent.value, { _token: "{{ csrf_token() }}" }, "json").done(function( response ) {
                     ajaxRoomStudentResponse(response)
@@ -195,18 +195,23 @@
         $("#form-room-student-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-room-student").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxRoomStudentResponse(response)
+                $("#page-room-student").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-room-student").waitMe("hide")
             }
         })
         return false
     }
     function ajaxRoomStudentResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearRoomStudent()
             $("#tb-room-student").datagrid("reload")
         } else {

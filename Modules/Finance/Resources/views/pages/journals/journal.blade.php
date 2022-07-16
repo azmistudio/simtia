@@ -323,11 +323,16 @@
             $("#form-journal-voucher-main").ajaxSubmit({
                 url: route,
                 data: { _token: '{{ csrf_token() }}', rows: dg.rows, totalDebit: $("#AccountingJournalVoucherTotalDebit").text().replace("Rp",""), totalCredit: $("#AccountingJournalVoucherTotalCredit").text().replace("Rp","") },
+                beforeSubmit: function(formData, jqForm, options) {
+                    $("#page-journal-voucher").waitMe({effect:"facebook"})
+                },
                 success: function(response) {
                     ajaxAdmissionResponse(response)
+                    $("#page-journal-voucher").waitMe("hide")
                 },
                 error: function(xhr) {
                     failResponse(xhr)
+                    $("#page-journal-voucher").waitMe("hide")
                 }
             })
         }
@@ -335,7 +340,7 @@
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearJournalVoucher()
             $("#tb-journal-voucher").datagrid("reload")
         } else {

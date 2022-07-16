@@ -63,7 +63,7 @@ class ExamReportCommentEloquent implements ExamReportCommentRepository
 
 	public function updateLesson(Request $request, $subject)
 	{
-		$payload = Arr::except($request->all(), ['created_at','_token']);
+		$payload = Arr::except($request->all(), ['type_id','type','created_at','_token']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $payload['id'], $subject, 'Ubah', 'lesson');
         // 

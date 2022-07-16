@@ -241,18 +241,23 @@
         $("#form-lesson-plan-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-lesson-plan").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxLessonPlanResponse(response)
+                $("#page-lesson-plan").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-lesson-plan").waitMe("hide")
             }
         })
         return false
     }
     function ajaxLessonPlanResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLessonPlan()
             $("#tb-lesson-plan").datagrid("reload")
         } else {

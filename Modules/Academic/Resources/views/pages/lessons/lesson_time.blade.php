@@ -145,18 +145,23 @@
         $("#form-lesson-time-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-lesson-time").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxLessonTimeResponse(response)
+                $("#page-lesson-time").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-lesson-time").waitMe("hide")
             }
         })
         return false
     }
     function ajaxLessonTimeResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLessonTime()
             $("#tb-lesson-time").datagrid("reload")
         } else {

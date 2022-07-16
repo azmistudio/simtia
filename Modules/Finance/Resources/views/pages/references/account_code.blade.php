@@ -199,18 +199,23 @@
         $("#form-accounting-code-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-accounting-code").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAccountingCodeResponse(response)
+                $("#page-accounting-code").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-accounting-code").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAccountingCodeResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearAccountingCode()
             $("#tb-accounting-code").treegrid("reload")
         } else {

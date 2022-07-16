@@ -48,8 +48,8 @@
             <table id="tb-academic-calendar" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        <th data-options="field:'calendar',width:155,resizeable:true,sortable:false">Kalender</th>
-                        <th data-options="field:'activity',width:150,resizeable:true,sortable:false">Kegiatan</th>
+                        <th data-options="field:'calendar',width:175,resizeable:true,sortable:false">Kalender</th>
+                        <th data-options="field:'activity',width:200,resizeable:true,sortable:false">Kegiatan</th>
                     </tr>
                 </thead>
             </table>
@@ -303,18 +303,23 @@
         $("#form-academic-calendar-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-academic-calendar").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAcademicCalendarResponse(response)
+                $("#page-academic-calendar").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-academic-calendar").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAcademicCalendarResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearAcademicCalendar()
             $("#tb-academic-calendar").datagrid("reload")
         } else {

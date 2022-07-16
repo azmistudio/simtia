@@ -24,7 +24,7 @@
             <div title="Umum" class="pt-3">
                 <form id="form-employee-profile-main" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="{{ $profile->id }}" />
-                <input type="hidden" name="section" value="{{ $profile->section_id }}" />
+                <input type="hidden" name="section" value="{{ $profile->section }}" />
                 <div class="container-fluid">
                     <div class="row row-cols-auto">
                         <div class="col">
@@ -66,7 +66,7 @@
                             <div class="mb-1">
                                 <input value="{{ $profile->pob }}" name="pob" class="easyui-textbox" style="width:335px;height:22px;" tabindex="3" data-options="label:'<b>*</b>Tempat Lahir:',labelWidth:'125px'" />
                                 <span class="mr-2"></span>
-                                <input value="{{ $profile->email }}" class="easyui-textbox" style="width:335px;height:22px;" tabindex="12" data-options="label:'Email:',labelWidth:'125px',readonly:true" />
+                                <input value="{{ $profile->email }}" name="email" class="easyui-textbox" style="width:335px;height:22px;" tabindex="12" data-options="label:'Email:',labelWidth:'125px',readonly:true" />
                             </div>
                             <div class="mb-1">
                                 <input value="{{ $profile->dob }}" name="dob" class="easyui-datebox" style="width:250px;height:22px;" tabindex="4" data-options="label:'<b>*</b>Tanggal Lahir:',labelWidth:'125px',formatter:dateFormatter,parser:dateParser" />
@@ -200,12 +200,15 @@
             url: "{{ url('user/store') }}",
             data: { _token: '{{ csrf_token() }}' },
             beforeSubmit: function(formData, jqForm, options) {
+                $("#form-region").waitMe({effect:"facebook"})
                 if (formData[4].value != formData[5].value) {
+                    $('#form-region').waitMe('hide')
                     $.messager.alert("Peringatan", "Kata Sandi dan Konfirmasi Kata Sandi harus sama.", "warning")
                     return false
                 }
             },
             success: function(response) {
+                $('#form-region').waitMe('hide')
                 if (response.success) {
                     $.messager.alert({
                         title: "Informasi",
@@ -220,14 +223,17 @@
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $('#form-region').waitMe('hide')
             }
         })
     })
     function saveEmployeeProfile() {
-        $("#form-region").waitMe({effect : 'facebook'})
         $("#form-employee-profile-main").ajaxSubmit({
             url: "{{ url('hr/store') }}",
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#form-region").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 if (response.success) {
                     $.messager.alert('Informasi', response.message)

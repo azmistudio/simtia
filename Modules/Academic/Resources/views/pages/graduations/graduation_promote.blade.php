@@ -263,17 +263,22 @@
                 $("#form-graduation-promote-main").ajaxSubmit({
                     url: "{{ url('academic/graduation/promote/store') }}",
                     data: { _token: '{{ csrf_token() }}', students: dg },
+                    beforeSubmit: function(formData, jqForm, options) {
+                        $("#page-graduation-promote").waitMe({effect:"facebook"})
+                    },
                     success: function(response) {
                         if (response.success) {
-                            $.messager.alert('Informasi', response.message)
+                            Toast.fire({icon:"success",title:response.message})
                             actionClearGraduationPromote()
                             $("#GraduationPromoteClassIdDestination").combogrid("grid").datagrid("reload")
                         } else {
                             $.messager.alert('Peringatan', response.message, 'error')
                         }
+                        $("#page-graduation-promote").waitMe("hide")
                     },
                     error: function(xhr) {
                         failResponse(xhr)
+                        $("#page-graduation-promote").waitMe("hide")
                     }
                 })
             }

@@ -171,18 +171,23 @@
         $("#form-institute-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-institute").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxInstituteResponse(response)
+                $("#page-institute").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-institute").waitMe("hide")
             }
         })
         return false
     }
     function ajaxInstituteResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearInstitute()
             $("#tb-institute").datagrid("reload")
         } else {

@@ -73,10 +73,10 @@
             <table id="tb-assessment-lesson" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        <th data-options="field:'class_id',width:70,resizeable:true,sortable:true">Kelas</th>
-                        <th data-options="field:'lesson',width:100,resizeable:true,sortable:true">Pelajaran</th>
-                        <th data-options="field:'code',width:80,resizeable:true">Kode Uji</th>
-                        <th data-options="field:'date',width:80,resizeable:true,sortable:true">Tanggal</th>
+                        <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
+                        <th data-options="field:'lesson',width:120,resizeable:true,sortable:true">Pelajaran</th>
+                        <th data-options="field:'code',width:100,resizeable:true">Kode Uji</th>
+                        <th data-options="field:'date',width:100,resizeable:true,sortable:true">Tanggal</th>
                     </tr>
                 </thead>
             </table>
@@ -93,7 +93,7 @@
         <div class="title">
             <h6><span id="mark-assessment-lesson"></span>Pelajaran: <span id="title-assessment-lesson"></span></h6>
         </div>
-        <div>
+        <div id="page-assessment-lesson">
             <form id="form-assessment-lesson-main" method="post">
                 <div id="tt-assessment-lesson" class="easyui-tabs borderless" plain="true" narrow="true" style="height:{{ $TabHeight }}">
                     <div title="Umum" class="content-doc pt-2">
@@ -468,18 +468,23 @@
         $("#form-assessment-lesson-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-assessment-lesson").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAssessmentLessonResponse(response)
+                $("#page-assessment-lesson").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-assessment-lesson").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAssessmentLessonResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearAssessmentLesson()
             $("#tb-assessment-lesson").datagrid("reload")
         } else {

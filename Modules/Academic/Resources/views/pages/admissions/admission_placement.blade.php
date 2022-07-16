@@ -352,9 +352,12 @@
         $("#form-placement-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-placement-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 if (response.success) {
-                    $.messager.alert('Informasi', response.message)
+                    Toast.fire({icon:"success",title:response.message})
                     actionClearPlacement()
                     $("#PlacementClassId").combogrid("grid").datagrid("reload")
                     $("#PlacementStudentClassId").combogrid("grid").datagrid("reload")
@@ -363,9 +366,11 @@
                 } else {
                     $.messager.alert('Peringatan', response.message, 'error')
                 }
+                ("#page-placement-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                ("#page-placement-main").waitMe("hide")
             }
         })
         return false

@@ -211,18 +211,23 @@
         $("#form-receipt-type-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-receipt-type").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-receipt-type").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-receipt-type").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearReceiptType()
             $("#tb-receipt-type").datagrid("reload")
         } else {

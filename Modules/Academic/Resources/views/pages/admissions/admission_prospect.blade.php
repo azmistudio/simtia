@@ -56,7 +56,7 @@
                 <thead>
                     <tr>
                         <th data-options="field:'registration_no',width:110,resizeable:true,sortable:true">No. Daftar</th>
-                        <th data-options="field:'name',width:150,resizeable:true,sortable:true">Nama</th>
+                        <th data-options="field:'name',width:180,resizeable:true,sortable:true">Nama</th>
                     </tr>
                 </thead>
             </table>
@@ -74,7 +74,7 @@
         <div class="title">
             <h6><span id="mark-prospective-student"></span>Nama Calon Santri: <span id="title-prospective-student"></span></h6>
         </div>
-        <div>
+        <div id="page-prospective-student">
             <form id="form-prospective-student-main" method="post">
                 <input type="hidden" id="id-prospective-student" name="id" value="-1" />
                 <input type="hidden" id="id-admission-prospect" name="admission_id" value="" />
@@ -584,18 +584,23 @@
         $("#form-prospective-student-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-prospective-student").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxProspectiveStudentResponse(response)
+                $("#page-prospective-student").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-prospective-student").waitMe("hide")
             }
         })
         return false
     }
     function ajaxProspectiveStudentResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearProspectiveStudent()
             $("#tb-prospective-student").datagrid("reload")
             $("#fgroup-prospective-student").combogrid("grid").datagrid("reload")

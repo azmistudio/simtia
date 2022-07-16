@@ -321,18 +321,23 @@
         $("#form-memorize-card-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-memorize-card").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxMemorizeCardResponse(response)
+                $("#page-memorize-card").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-memorize-card").waitMe("hide")
             }
         })
         return false
     }
     function ajaxMemorizeCardResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearMemorizeCard()
             $("#tb-memorize-card").datagrid("reload")
         } else {

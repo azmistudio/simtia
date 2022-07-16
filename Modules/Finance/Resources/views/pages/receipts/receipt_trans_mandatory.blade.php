@@ -90,7 +90,7 @@
             <a id="clearReceiptTrans" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Clear'" onclick="clearReceiptTrans()">Batal</a>
             <a id="printReceiptTrans" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Print'" onclick="printReceiptTrans()">Cetak</a>
         </div>
-        <div class="pl-1 pt-3 pr-1">
+        <div class="pl-1 pt-3 pr-1" id="page-trans-mandatory">
             <div class="container-fluid">
                 <div class="row">
                     <div id="page-receipt-trans" class="col-4">
@@ -335,18 +335,23 @@
         $("#form-receipt-trans-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-trans-mandatory").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-trans-mandatory").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-trans-mandatory").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearReceiptTrans()
             refreshInstalment()
             if (response.params !== 0) {

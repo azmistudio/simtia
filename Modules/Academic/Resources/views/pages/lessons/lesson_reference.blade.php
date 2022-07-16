@@ -312,11 +312,16 @@
         $("#"+idForm).ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-"+subject+"-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAcademicLessonRefResponse(response, idGrid, subject)
+                $("#page-"+subject+"-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-"+subject+"-main").waitMe("hide")
             }
         })
         return false
@@ -330,7 +335,7 @@
     }
     function ajaxAcademicLessonRefResponse(response, idGrid, subject) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             switch(subject) {
                 case "lesson-group":
                     actionClearLessonGroup()

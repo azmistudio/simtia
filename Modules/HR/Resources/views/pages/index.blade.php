@@ -62,7 +62,7 @@
         <div class="title">
             <h6><span id="mark-employee"></span>Pegawai: <span id="title-employee"></span></h6>
         </div>
-        <div>
+        <div id="page-employee">
             <form id="form-employee-main" method="post" enctype="multipart/form-data">
             <input type="hidden" id="id-employee" name="id" value="-1" />
                 <div id="tt-employee" class="easyui-tabs borderless" plain="true" narrow="true" style="height:{{ $TabHeight }}">
@@ -294,12 +294,16 @@
         $("#form-employee-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-employee").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxEmployeeResponse(response)
-                $("#tt-employee").waitMe({effect: 'none'})
+                $("#page-employee").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-employee").waitMe("hide")
             }
         })
         return false
@@ -315,7 +319,7 @@
                     }
                 })
             } else {
-                $.messager.alert('Informasi', response.message)
+                Toast.fire({icon:"success",title:response.message})
                 actionClearEmployee()
                 $("#tb-employee").datagrid("reload")
             }

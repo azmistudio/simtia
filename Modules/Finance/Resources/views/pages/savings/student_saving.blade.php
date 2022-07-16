@@ -71,7 +71,7 @@
         <div class="title">
             <h6><span id="mark-student-saving"></span>Jenis Tabungan: <span id="title-student-saving"></span></h6>
         </div>
-        <div class="pl-2 pt-3 pr-2">
+        <div class="pl-2 pt-3 pr-2" id="page-student-saving-main">
             <div class="container-fluid">
                 <div class="row">
                     <div id="page-student-saving" class="col-4">
@@ -322,18 +322,23 @@
         $("#form-student-saving-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-student-saving-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-student-saving-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-student-saving-main").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             reloadStudentSavingDetail($("#AccountingStudentSavingTypes").combogrid("getValue"))
             actionDataStudentSaving()
         } else {

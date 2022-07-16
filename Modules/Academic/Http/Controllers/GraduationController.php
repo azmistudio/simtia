@@ -347,6 +347,9 @@ class GraduationController extends Controller
                             'logged' => auth()->user()->email,
                             'created_at' => date('Y-m-d H:i:s')
                         ]);
+                        DB::table('academic.room_placements')
+                            ->where('student_id', $request->students[$i]['id'])
+                            ->delete();
                     }
                 });
                 $response = $this->getResponse('store', '', $this->subject_graduate);
@@ -421,6 +424,7 @@ class GraduationController extends Controller
                     AdmissionProspect::where('student_id', $request->students[$i]['id'])->update(['is_active' => 0]);
                     DB::table('academic.student_class_histories')->where('student_id', $request->students[$i]['id'])->where('active', 1)->update(['active' => 0]);
                     DB::table('academic.student_dept_histories')->where('student_id', $request->students[$i]['id'])->where('active', 1)->update(['active' => 0]);
+                    DB::table('academic.room_placements')->where('student_id', $request->students[$i]['id'])->delete();
                     $request->merge([
                         'student_id' => $request->students[$i]['id'],
                         'end_class' => $request->class_id,

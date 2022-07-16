@@ -82,7 +82,7 @@
                     <tr>
                         <th data-options="field:'class',width:75,resizeable:true,sortable:true">Kelas</th>
                         <th data-options="field:'lesson',width:100,resizeable:true">Pelajaran</th>
-                        <th data-options="field:'score_aspect',width:130,resizeable:true">Aspek Nilai</th>
+                        <th data-options="field:'score_aspect',width:150,resizeable:true">Aspek Nilai</th>
                     </tr>
                 </thead>
             </table>
@@ -283,18 +283,23 @@
         $("#form-assessment-report-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-assessment-report").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAssessmentReportResponse(response)
+                $("#page-assessment-report").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-assessment-report").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAssessmentReportResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearAssessmentReport()
             $("#tb-assessment-report").datagrid("reload")
         } else {

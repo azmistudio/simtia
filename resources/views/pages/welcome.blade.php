@@ -94,7 +94,7 @@
 <script type="text/javascript">
     function logMeIn(is_mobile) {
         if (is_mobile) {
-            $.messager.confirm('Peringatan', 'Jika diakses via Handphone/Tablet, tampilan aplikasi akan berantakan, tetap lanjutkan?', function(r){
+            $.messager.confirm('Peringatan', 'Jika diakses via Handphone/Tablet, tampilan aplikasi tidak nyaman dilihat, tetap lanjutkan?', function(r){
                 if (r) {
                     submitLogin("{{ url('login') }}", "{{ csrf_token() }}")
                 }

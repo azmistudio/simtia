@@ -12,7 +12,7 @@
             <a id="saveReceiptTransOther" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Save'" onclick="saveReceiptTransOther()">Simpan</a>
             <a id="clearReceiptTransOther" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Clear'" onclick="clearReceiptTransOther()">Batal</a>
         </div>
-        <div class="pl-1 pt-3 pr-1">
+        <div class="pl-1 pt-3 pr-1" id="page-trans-other">
             <div class="container-fluid">
                 <div class="row">
                     <div id="page-receipt-trans-other" class="col-4">
@@ -124,18 +124,23 @@
         $("#form-receipt-trans-other-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-trans-other").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-trans-other").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-trans-other").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearReceiptTransOther()
             $("#tb-receipt-trans-other").datagrid("reload")
         } else {

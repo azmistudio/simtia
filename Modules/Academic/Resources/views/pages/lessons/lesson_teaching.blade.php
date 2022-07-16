@@ -62,7 +62,7 @@
         <div class="title">
             <h6><span id="mark-lesson-teaching"></span>Guru: <span id="title-lesson-teaching"></span></h6>
         </div>
-        <div>
+        <div id="page-lesson-teaching">
             <form id="form-lesson-teaching-main" method="post">
                 <div id="tt-lesson-teaching" class="easyui-tabs borderless" plain="true" narrow="true" style="height:{{ $TabHeight }}">
                     <div title="Umum" class="content-doc pt-3 pb-3">
@@ -409,18 +409,23 @@
         $("#form-lesson-teaching-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', dg: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-lesson-teaching").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxLessonTeachingResponse(response)
+                $("#page-lesson-teaching").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-lesson-teaching").waitMe("hide")
             }
         })
         return false
     }
     function ajaxLessonTeachingResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLessonTeaching()
             $("#tb-lesson-teaching").datagrid("reload")
         } else {

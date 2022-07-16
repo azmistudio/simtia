@@ -245,18 +245,23 @@
                 $("#form-student-mutation-main").ajaxSubmit({
                     url: "{{ url('academic/student/mutation/store') }}",
                     data: { _token: '{{ csrf_token() }}', students: dg },
+                    beforeSubmit: function(formData, jqForm, options) {
+                        $("#page-student-mutation").waitMe({effect:"facebook"})
+                    },
                     success: function(response) {
                         if (response.success) {
-                            $.messager.alert('Informasi', response.message)
+                            Toast.fire({icon:"success",title:response.message})
                             actionClearStudentMutation()
                             $("#StudentMutationClassId").combogrid("grid").datagrid("reload")
                             $("#StudentMutationType").combogrid("grid").datagrid("reload")
                         } else {
                             $.messager.alert('Peringatan', response.message, 'error')
                         }
+                        $("#page-student-mutation").waitMe("hide")
                     },
                     error: function(xhr) {
                         failResponse(xhr)
+                        $("#page-student-mutation").waitMe("hide")
                     }
                 })
             }

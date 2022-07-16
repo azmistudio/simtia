@@ -188,18 +188,23 @@
         $("#form-payment-major-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-payment-major").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-payment-major").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-payment-major").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearPaymentMajor()
             $("#tb-payment-major").datagrid("reload")
         } else {

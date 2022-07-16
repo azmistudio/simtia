@@ -111,6 +111,9 @@ class StudentMutationController extends Controller
                         'department_id' => $request->department_id
                     ]);
                     $this->studentMutationEloquent->create($request, $this->subject);
+                    DB::table('academic.room_placements')
+                        ->where('student_id', $request->students[$i]['id'])
+                        ->delete();
                 }
             });
             $response = $this->getResponse('store', '', $this->subject);

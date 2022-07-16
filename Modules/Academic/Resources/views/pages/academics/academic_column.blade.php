@@ -239,18 +239,23 @@
         $("#form-column-prospective-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-column-prospective-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxColumnProspectiveResponse(response)
+                $("#page-column-prospective-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-column-prospective-main").waitMe("hide")
             }
         })
         return false
     }
     function ajaxColumnProspectiveResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearColumnProspective()
             $("#tb-column-prospective").datagrid("reload")
         } else {
