@@ -71,7 +71,7 @@
             if (row !== null) {
                 $.post("{{ url('reference/destroy')}}" + "/" + row.id, { _token: "{{ csrf_token() }}" }, "json").done(function( response ) {
                     if (response.success) {
-                        $.messager.alert('Informasi', response.message)
+                        Toast.fire({icon:"success",title:response.message})
                         dg.datagrid("reload")
                     } else {
                         $.messager.alert('Peringatan', response.message, 'error')
@@ -102,7 +102,7 @@
             onSave: function(index, row) {
                 if (typeof row.success !== "undefined") {
                     if (row.success) {
-                        $.messager.alert('Informasi', row.message)
+                        Toast.fire({icon:"success",title:response.message})
                     } else {
                         $.messager.alert('Peringatan', row.message, 'error')
                     }
