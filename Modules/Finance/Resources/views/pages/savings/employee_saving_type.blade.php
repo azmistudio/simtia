@@ -183,18 +183,23 @@
         $("#form-employee-saving-type-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-employee-saving-type").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-employee-saving-type").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-employee-saving-type").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearEmployeeSavingType()
             $("#tb-employee-saving-type").datagrid("reload")
         } else {

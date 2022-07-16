@@ -146,10 +146,12 @@
         })
     }
     function ajaxGroup(route) {
-        $("#GroupMainForm").waitMe({effect: 'facebook'})
         $("#form-group-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#GroupMainForm").waitMe({effect: 'facebook'})
+            },
             success: function(response) {
                 ajaxGroupResponse(response)
                 $("#GroupMainForm").waitMe('hide')
@@ -163,7 +165,7 @@
     }
     function ajaxGroupResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearGroup()
             dgGroup.datagrid("reload")
         } else {

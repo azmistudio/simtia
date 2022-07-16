@@ -14,6 +14,7 @@ use App\Http\Traits\ReferenceTrait;
 use App\Http\Traits\AuditLogTrait;
 use App\Models\Reference;
 use Modules\Academic\Entities\LessonAssessment;
+use Modules\Academic\Entities\ScoreAspect;
 use Modules\Academic\Entities\Students;
 use Modules\Academic\Entities\ExamReport;
 use Modules\Academic\Entities\ExamReportScoreFinal;
@@ -137,7 +138,7 @@ class AssessmentReportCommentController extends Controller
                                 $model['score_aspect_id'] = $model->getExamReport->score_aspect_id;
                                 return $model;
                             });
-        $data['students'] = Students::select('id','student_no','name')->where('class_id', $request->class_id)->get();
+        $data['students'] = Students::select('id','student_no','name')->where('class_id', $request->class_id)->where('is_active',1)->get();
         $data['comments'] = ExamReportComment::where('class_id', $request->class_id)
                                 ->where('semester_id', $request->semester_id)
                                 ->orderByDesc('aspect')
@@ -166,9 +167,9 @@ class AssessmentReportCommentController extends Controller
         $data['requests'] = $request->all();
         if (!isset($request->aspect))
         {
-            $data['templates'] = ExamReportCommentLesson::find($id);
+            $data['templates'] = ExamReportCommentLesson::find($request->id);
         } else {
-            $data['templates'] = ExamReportCommentSocial::find($id);
+            $data['templates'] = ExamReportCommentSocial::find($request->id);
         }
         return view('academic::pages.assessments.comment_template', $data);
     }

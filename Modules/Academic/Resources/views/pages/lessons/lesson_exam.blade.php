@@ -200,18 +200,23 @@
         $("#form-lesson-exam-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-lesson-exam").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxLessonExamResponse(response)
+                $("#page-lesson-exam").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-lesson-exam").waitMe("hide")
             }
         })
         return false
     }
     function ajaxLessonExamResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLessonExam()
             $("#tb-lesson-exam").datagrid("reload")
         } else {

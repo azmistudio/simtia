@@ -72,7 +72,7 @@
                         <th data-options="field:'lesson',width:100,resizeable:true">Pelajaran</th>
                         <th data-options="field:'date',width:75,resizeable:true,sortable:true">Tanggal</th>
                         <th data-options="field:'lesson_schedule_id',width:90,resizeable:true">Jam</th>
-                        <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
+                        <th data-options="field:'class_id',width:100,resizeable:true,sortable:true">Kelas</th>
                     </tr>
                 </thead>
             </table>
@@ -427,18 +427,23 @@
         $("#form-presence-lesson-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-presence-lesson").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxPresenceLessonResponse(response)
+                $("#page-presence-lesson").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-presence-lesson").waitMe("hide")
             }
         })
         return false
     }
     function ajaxPresenceLessonResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearPresenceLesson()
             $("#tb-presence-lesson").datagrid("reload")
         } else {

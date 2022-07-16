@@ -104,12 +104,16 @@ class HRController extends Controller
                 if ($employee->email != $request->email)
                 {
                     $user = User::where('email', $employee->email)->first();
-                    $user->email = $request->email;
-                    $user->updated_at = Carbon::now();
-                    $user->save();
-                    if (auth()->user()->email == $employee->email)
+                    if (!empty($user))
                     {
-                        $is_update_email = true;
+                        $user->email = $request->email;
+                        $user->updated_at = Carbon::now();
+                        $user->save();
+                        //
+                        if (auth()->user()->email == $employee->email)
+                        {
+                            $is_update_email = true;
+                        }
                     }
                 }
             }

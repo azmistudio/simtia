@@ -228,18 +228,23 @@
         $("#form-prospective-group-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-prospective-group").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxProspectiveGroupResponse(response)
+                $("#page-prospective-group").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-prospective-group").waitMe("hide")
             }
         })
         return false
     }
     function ajaxProspectiveGroupResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearProspectiveGroup()
             dgProspectiveGroup.datagrid("reload")
         } else {

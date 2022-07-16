@@ -50,7 +50,7 @@
                 <thead>
                     <tr>
                         <th data-options="field:'class_id',width:80,resizeable:true,sortable:true">Kelas</th>
-                        <th data-options="field:'period',width:170,resizeable:true">Periode</th>
+                        <th data-options="field:'period',width:180,resizeable:true">Periode</th>
                     </tr>
                 </thead>
             </table>
@@ -354,18 +354,23 @@
         $("#form-presence-daily-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', students: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-presence-daily").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxPresenceDailyResponse(response)
+                $("#page-presence-daily").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-presence-daily").waitMe("hide")
             }
         })
         return false
     }
     function ajaxPresenceDailyResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearPresenceDaily()
             $("#tb-presence-daily").datagrid("reload")
         } else {

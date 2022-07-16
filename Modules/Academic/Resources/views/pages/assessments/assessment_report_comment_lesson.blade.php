@@ -1,7 +1,7 @@
 <form id="form-assessment-report-comment-lesson" method="post">
 <input type="hidden" name="type" value="lesson" />
 <input type="hidden" name="student_id" value="{{ $students['student_id'] }}" />
-<div class="container-fluid">
+<div class="container-fluid" id="page-report-comment-lesson">
     <div class="row">
         <div class="col-12 p-2">
             <div class="mb-1">
@@ -121,23 +121,22 @@
         $("#form-assessment-report-comment-lesson").ajaxSubmit({
             url: "{{ url('academic/assessment/report/comment/store') }}",
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-report-comment-lesson").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 if (response.success) {
                     $("#assessment-report-comment-lesson-w").window("close")
-                    $.messager.alert('Informasi', response.message)
+                    Toast.fire({icon:"success",title:response.message})
                     $("#tb-assessment-report-comment").datagrid("reload")
                 } else {
                     $.messager.alert('Peringatan', response.message, 'error')
                 }
+                $("#page-report-comment-lesson").waitMe("hide")
             },
             error: function(xhr) {
-                if (xhr.status == 422) {
-                    $.messager.alert('Peringatan', 'Input yang bertanda bintang (*) wajib diisi.', 'error')
-                } else if (xhr.status == 419) {
-                    $.messager.alert('Peringatan', 'Sesi Anda telah berakhir, silahkan muat ulang (tekan tombol F5) untuk memulai lagi.', 'error')
-                } else {
-                    $.messager.alert('Peringatan', 'Terjadi gangguan pada Server, silahkan ulangi kembali.', 'error')
-                }
+                failResponse(xhr)
+                $("#page-report-comment-lesson").waitMe("hide")
             }
         })
         return false

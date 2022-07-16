@@ -74,7 +74,7 @@
         <div class="title">
             <h6><span id="mark-student"></span>Nama Santri: <span id="title-student"></span></h6>
         </div>
-        <div>
+        <div id="page-student">
             <form id="form-student-main" method="post">
                 <input type="hidden" id="id-student" name="id" value="-1" />
                 <input type="hidden" id="id-old-class" value="" />
@@ -490,18 +490,23 @@
         $("#form-student-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-student").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxStudentResponse(response)
+                $("#page-student").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-student").waitMe("hide")
             }
         })
         return false
     }
     function ajaxStudentResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearStudent()
             $("#tb-students").datagrid("reload")
             $("#fclass-student").combogrid('grid').datagrid("reload")

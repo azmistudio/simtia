@@ -4,7 +4,7 @@
 <input type="hidden" id="lesson-id" value="{{ $report->lesson_id }}" />
 <input type="hidden" id="class-id" name="class_id" value="{{ $report->class_id }}" />
 <input type="hidden" id="semester-id" name="semester_id" value="{{ $report->semester_id }}" />
-<div class="container-fluid">
+<div class="container-fluid" id="page-report-comment-social">
 	<div class="row">
         <div class="col-12 p-2">
             <div class="mb-1">
@@ -159,23 +159,22 @@
         $("#form-assessment-report-comment-social").ajaxSubmit({
             url: "{{ url('academic/assessment/report/comment/store') }}",
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-report-comment-social").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 if (response.success) {
                     $("#assessment-report-comment-social-w").window("close")
-                    $.messager.alert('Informasi', response.message)
+                    Toast.fire({icon:"success",title:response.message})
                     $("#tb-assessment-report-comment").datagrid("reload")
                 } else {
                     $.messager.alert('Peringatan', response.message, 'error')
                 }
+                $("#page-report-comment-social").waitMe("hide")
             },
             error: function(xhr) {
-                if (xhr.status == 422) {
-                    $.messager.alert('Peringatan', 'Input yang bertanda bintang (*) wajib diisi.', 'error')
-                } else if (xhr.status == 419) {
-                    $.messager.alert('Peringatan', 'Sesi Anda telah berakhir, silahkan muat ulang (tekan tombol F5) untuk memulai lagi.', 'error')
-                } else {
-                    $.messager.alert('Peringatan', 'Terjadi gangguan pada Server, silahkan ulangi kembali.', 'error')
-                }
+                failResponse(xhr)
+                $("#page-report-comment-social").waitMe("hide")
             }
         })
         return false

@@ -57,7 +57,7 @@
         <div class="title">
             <h6><span id="mark-employee-saving"></span>Jenis Tabungan: <span id="title-employee-saving"></span></h6>
         </div>
-        <div class="pl-2 pt-3 pr-2">
+        <div class="pl-2 pt-3 pr-2" id="page-employee-saving-main">
             <div class="container-fluid">
                 <div class="row">
                     <div id="page-employee-saving" class="col-4">
@@ -321,18 +321,23 @@
         $("#form-employee-saving-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-employee-saving-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-employee-saving-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-employee-saving-main").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             reloadEmployeeSavingDetail($("#AccountingEmployeeSavingTypes").combogrid("getValue"), $("#id-employee-saving-bookyear").val())
             actionDataEmployeeSaving()
         } else {

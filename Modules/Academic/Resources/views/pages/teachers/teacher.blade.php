@@ -45,9 +45,9 @@
             <table id="tb-teacher" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
-                        <th data-options="field:'employee',width:120,resizeable:true">Guru</th>
+                        <th data-options="field:'employee',width:140,resizeable:true">Guru</th>
                         <th data-options="field:'lesson_id',width:100,resizeable:true,sortable:true">Pelajaran</th>
-                        <th data-options="field:'status_id',width:120,resizeable:true,sortable:true">Status</th>
+                        <th data-options="field:'status_id',width:130,resizeable:true,sortable:true">Status</th>
                     </tr>
                 </thead>
             </table>
@@ -215,18 +215,23 @@
         $("#form-teacher-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-teacher").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxTeacherResponse(response)
+                $("#page-teacher").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-teacher").waitMe("hide")
             }
         })
         return false
     }
     function ajaxTeacherResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearTeacher()
             $("#tb-teacher").datagrid("reload")
         } else {

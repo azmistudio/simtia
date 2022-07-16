@@ -115,7 +115,7 @@
                                 <div class="title">
                                     <h6><span id="mark-schoolyear"></span>Tahun Ajaran: <span id="title-schoolyear"></span></h6>
                                 </div>
-                                <div class="p-3" id="page-schoolyear-main">
+                                <div class="p-3" id="page-schoolyear">
                                     <form id="form-schoolyear-main" method="post">
                                     <input type="hidden" id="id-schoolyear" name="id" value="-1" />
                                     <div class="mb-1">
@@ -254,7 +254,7 @@
                             <div class="title">
                                 <h6><span id="mark-class"></span>Kelas: <span id="title-class"></span></h6>
                             </div>
-                            <div class="p-3" id="page-class-main">
+                            <div class="p-3" id="page-class">
                                 <form id="form-class-main" method="post">
                                 <input type="hidden" id="id-class" name="id" value="-1" />
                                 <div class="mb-1">
@@ -392,7 +392,7 @@
                     actionButtonSchoolYear("active",[2,3])
                     $("#SchoolYearId").numberspinner("readonly")
                     $("#form-schoolyear-main").form("load", "{{ url('academic/school-year/show') }}" + "/" + row.id)
-                    $("#page-schoolyear-main").waitMe("hide")
+                    $("#page-schoolyear").waitMe("hide")
                 }
             }
         })
@@ -407,7 +407,7 @@
                 titleSchoolYear.innerText = $(this).val()
             },
         })
-        $("#page-schoolyear-main").waitMe({effect:"none"})
+        $("#page-schoolyear").waitMe({effect:"none"})
         // semester
         sessionStorage.formRef_Akademik_Semester = "init"
         var dgSemester = $("#tb-ref-semester")
@@ -450,7 +450,7 @@
                     $("#ClassDeptId").textbox("setValue", row.department_id)
                     $("#ClassSchoolYearId").combobox("reload", "{{ url('academic/school-year/combo-box') }}" + "/" + 1 + "?_token=" + "{{ csrf_token() }}").combobox("setValue",row.id_schoolyear)
                     $("#ClassCopy").checkbox("disable")
-                    $("#page-class-main").waitMe("hide")
+                    $("#page-class").waitMe("hide")
                 }
             }
         })
@@ -460,7 +460,7 @@
         $("#ClassId").textbox("textbox").bind("keyup", function (e) {
             titleClass.innerText = $(this).val()
         })
-        $("#page-class-main").waitMe({effect:"none"})
+        $("#page-class").waitMe({effect:"none"})
         $("#ClassGradeId").combogrid({
             url: '{{ url('academic/grade/combo-grid') }}',
             method: 'post',
@@ -561,7 +561,7 @@
         titleSchoolYear.innerText = ""
         idSchoolYear.value = "-1"
         $("#SchoolYearId").numberspinner("readonly", false)
-        $("#page-schoolyear-main").waitMe("hide")
+        $("#page-schoolyear").waitMe("hide")
     }
     function editSchoolYear() {
         sessionStorage.formRef_Akademik_SchoolYear = "active"
@@ -594,7 +594,7 @@
         titleSchoolYear.innerText = ""
         markSchoolYear.innerText = ""
         idSchoolYear.value = "-1"
-        $("#page-schoolyear-main").waitMe({effect:"none"})
+        $("#page-schoolyear").waitMe({effect:"none"})
     }
     function actionButtonSchoolYear(viewType, idxArray) {
         for (var i = 0; i < menuActionSchoolYear.length; i++) {
@@ -679,7 +679,7 @@
         titleClass.innerText = ""
         idClass.value = "-1"
         $("#ClassCopy").checkbox("enable")
-        $("#page-class-main").waitMe("hide")
+        $("#page-class").waitMe("hide")
     }
     function editClass() {
         sessionStorage.formRef_Akademik_Class = "active"
@@ -713,7 +713,7 @@
         markClass.innerText = ""
         idClass.value = "-1"
         $("#ClassCopy").checkbox("disable")
-        $("#page-class-main").waitMe({effect:"none"})
+        $("#page-class").waitMe({effect:"none"})
     }
     function actionButtonClass(viewType, idxArray) {
         for (var i = 0; i < menuActionClass.length; i++) {
@@ -744,11 +744,16 @@
         $("#"+idForm).ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-"+subject).waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxRefResponse(response, idGrid, subject)
+                $("#page-"+subject).waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-"+subject).waitMe("hide")
             }
         })
         return false
@@ -762,7 +767,7 @@
     }
     function ajaxRefResponse(response, idGrid, subject) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             switch(subject) {
                 case "grade":
                     actionClearGrade()

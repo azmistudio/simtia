@@ -188,18 +188,23 @@
         $("#form-student-saving-type-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-student-saving-type").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-student-saving-type").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-student-saving-type").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearStudentSavingType()
             $("#tb-student-saving-type").datagrid("reload")
         } else {

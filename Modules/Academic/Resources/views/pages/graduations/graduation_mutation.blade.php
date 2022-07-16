@@ -297,17 +297,22 @@
                 $("#form-graduation-mutation-main").ajaxSubmit({
                     url: "{{ url('academic/graduation/mutation/store') }}",
                     data: { _token: '{{ csrf_token() }}', students: dg },
+                    beforeSubmit: function(formData, jqForm, options) {
+                        $("#page-graduation-mutation").waitMe({effect:"facebook"})
+                    },
                     success: function(response) {
                         if (response.success) {
-                            $.messager.alert('Informasi', response.message)
+                            Toast.fire({icon:"success",title:response.message})
                             actionClearGraduationMutation()
                             $("#GraduationMutationClassIdDestination").combogrid("grid").datagrid("reload")
                         } else {
                             $.messager.alert('Peringatan', response.message, 'error')
                         }
+                        $("#page-graduation-mutation").waitMe("hide")
                     },
                     error: function(xhr) {
                         failResponse(xhr)
+                        $("#page-graduation-mutation").waitMe("hide")
                     }
                 })
             }

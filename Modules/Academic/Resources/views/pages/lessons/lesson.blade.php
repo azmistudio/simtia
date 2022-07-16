@@ -191,18 +191,23 @@
         $("#form-lesson-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-lesson").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxLessonResponse(response)
+                $("#page-lesson").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-lesson").waitMe("hide")
             }
         })
         return false
     }
     function ajaxLessonResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLesson()
             $("#tb-lesson").datagrid("reload")
         } else {

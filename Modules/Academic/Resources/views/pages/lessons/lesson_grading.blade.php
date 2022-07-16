@@ -291,11 +291,16 @@
             $("#form-lesson-grading-main").ajaxSubmit({
                 url: route,
                 data: { _token: '{{ csrf_token() }}', grades: dg.rows },
+                beforeSubmit: function(formData, jqForm, options) {
+                    $("#page-lesson-grading").waitMe({effect:"facebook"})
+                },
                 success: function(response) {
                     ajaxLessonGradingResponse(response)
+                    $("#page-lesson-grading").waitMe("hide")
                 },
                 error: function(xhr) {
                     failResponse(xhr)
+                    $("#page-lesson-grading").waitMe("hide")
                 }
             })
         } else {
@@ -305,7 +310,7 @@
     }
     function ajaxLessonGradingResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearLessonGrading()
             $("#tb-lesson-grading").datagrid("reload")
         } else {

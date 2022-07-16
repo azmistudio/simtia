@@ -70,7 +70,7 @@
         <div class="title">
             <h6><span id="mark-expenditure"></span>No. Jurnal: <span id="title-expenditure"></span></h6>
         </div>
-        <div id="page-expenditure"  class="pl-2 pt-3 pr-2">
+        <div id="page-expenditure" class="pl-2 pt-3 pr-2">
             <form id="form-expenditure-main" method="post">
                 <div class="container-fluid">
                     <div class="row">
@@ -305,11 +305,16 @@
             $("#form-expenditure-main").ajaxSubmit({
                 url: route,
                 data: { _token: '{{ csrf_token() }}', rows: dg.rows, totalCredit: $("#AccountingExpenditureTotal").text().replace("Rp","") },
+                beforeSubmit: function(formData, jqForm, options) {
+                    $("#page-expenditure").waitMe({effect:"facebook"})
+                },
                 success: function(response) {
                     ajaxAdmissionResponse(response)
+                    $("#page-expenditure").waitMe("hide")
                 },
                 error: function(xhr) {
                     failResponse(xhr)
+                    $("#page-expenditure").waitMe("hide")
                 }
             })
         }
@@ -317,7 +322,7 @@
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearExpenditure()
             $("#tb-expenditure").datagrid("reload")
         } else {

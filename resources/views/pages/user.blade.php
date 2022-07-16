@@ -181,18 +181,23 @@
         $("#form-user-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-user").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxUserResponse(response)
+                $("#page-user").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-user").waitMe("hide")
             }
         })
         return false
     }
     function ajaxUserResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearUser()
             dgUser.datagrid("reload")
         } else {

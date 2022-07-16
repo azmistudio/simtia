@@ -21,7 +21,7 @@
                         @if (auth()->user()->getDepartment->is_all == 1)
                         <th data-options="field:'department_id',width:100,resizeable:true,sortable:true">Departemen</th>
                         @endif
-                        <th data-options="field:'admission_id',width:150,resizeable:true,sortable:true">Proses</th>
+                        <th data-options="field:'admission_id',width:180,resizeable:true,sortable:true">Proses</th>
                     </tr>
                 </thead>
             </table>
@@ -197,18 +197,23 @@
         $("#form-admission-config-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}', configs: dg.rows },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-admission-config-main").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionConfigResponse(response)
+                $("#page-admission-config-main").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-admission-config-main").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionConfigResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearAdmissionConfig()
             $("#tb-admission-config").datagrid("reload")
         } else {

@@ -243,17 +243,22 @@
                         $("#form-graduation-alumni-main").ajaxSubmit({
                             url: "{{ url('academic/graduation/alumni/store') }}",
                             data: { _token: '{{ csrf_token() }}', students: dg },
+                            beforeSubmit: function(formData, jqForm, options) {
+                                $("#page-graduation-alumni").waitMe({effect:"facebook"})
+                            },
                             success: function(response) {
                                 if (response.success) {
-                                    $.messager.alert('Informasi', response.message)
+                                    Toast.fire({icon:"success",title:response.message})
                                     actionClearGraduationAlumni()
                                     $("#GraduationAlumniClassLast").combogrid("grid").datagrid("reload")
                                 } else {
                                     $.messager.alert('Peringatan', response.message, 'error')
                                 }
+                                $("#page-graduation-alumni").waitMe("hide")
                             },
                             error: function(xhr) {
                                 failResponse(xhr)
+                                $("#page-graduation-alumni").waitMe("hide")
                             }
                         })
                     }

@@ -153,8 +153,7 @@ class AssessmentLessonController extends Controller
      */
     public function show($id)
     {
-        $search[] = array('column' => 'id', 'action' => 'eq', 'query' => $id);
-        return response()->json($this->examEloquent->show($search, false)->map(function($model){
+        return response()->json(Exam::where('id', $id)->get()->map(function($model){
             $model['department_id'] = $model->getSemester->department_id;
             $model['department'] = $model->getSemester->getDepartment->name;
             $model['grade_id'] = $model->getClass->grade_id;

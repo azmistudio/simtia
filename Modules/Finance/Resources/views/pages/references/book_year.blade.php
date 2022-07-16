@@ -145,18 +145,23 @@
         $("#form-book-year-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-book-year").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-book-year").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-book-year").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearBookYear()
             $("#tb-book-year").datagrid("reload")
         } else {

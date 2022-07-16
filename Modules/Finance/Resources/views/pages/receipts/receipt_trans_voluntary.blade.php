@@ -90,7 +90,7 @@
             <a id="clearReceiptTransVoluntary" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Clear'" onclick="clearReceiptTransVoluntary()">Batal</a>
             <a id="printReceiptTransVoluntary" class="easyui-linkbutton action-btn" style="width: 80px" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Print'" onclick="printReceiptTransVoluntary()">Cetak</a>
         </div>
-        <div class="pl-1 pt-3 pr-1">
+        <div class="pl-1 pt-3 pr-1" id="page-trans-voluntary">
             <div class="container-fluid">
                 <div class="row">
                     <div id="page-receipt-trans-voluntary" class="col-4">
@@ -251,18 +251,23 @@
         $("#form-receipt-trans-voluntary-main").ajaxSubmit({
             url: route,
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#page-trans-voluntary").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#page-trans-voluntary").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#page-trans-voluntary").waitMe("hide")
             }
         })
         return false
     }
     function ajaxAdmissionResponse(response) {
         if (response.success) {
-            $.messager.alert('Informasi', response.message)
+            Toast.fire({icon:"success",title:response.message})
             actionClearReceiptTransVoluntary()
             refreshPaymentVoluntary()
         } else {
