@@ -236,7 +236,7 @@
             },
             success: function(response) {
                 if (response.success) {
-                    $.messager.alert('Informasi', response.message)
+                    Toast.fire({icon:"success",title:response.message})
                 } else {
                     $.messager.alert('Peringatan', response.message, 'error')
                 }
