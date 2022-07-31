@@ -64,7 +64,7 @@
                     </div>
                 </div>
                 <div class="well mt-2">
-                    <h6>Akun Akses Demo (<i><small>Data akan direset setiap pekan</small></i>)</h6>
+                    <h6>Akun Akses Demo (<i><small>Data akan direset setiap bulan</small></i>)</h6>
                     <table class="table table-sm">
                         <thead>
                             <tr>
