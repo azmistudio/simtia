@@ -16,6 +16,7 @@
         <tr><td colspan="{{ $colspan + 5 }}" align="center" class="title"><b>{{ config('app.name') .' '. strtoupper(Session::get('institute')) }}</b></td></tr>
         <tr><td colspan="{{ $colspan + 5 }}" align="center" class="title"><b>LAPORAN PEMBAYARAN PER SANTRI MENUNGGAK - {{ $payloads->payment }}</b></td></tr>
         <tr><td colspan="{{ $colspan + 5 }}" align="center" class="subtitle"><b>DEPARTEMEN {{ $payloads->department }} - TAHUN AJARAN {{ $payloads->schoolyear }} - TINGKAT/SEMESTER {{ $payloads->grade }} - KELAS {{ $payloads->class }}</b></td></tr>
+        <tr><td colspan="{{ $colspan + 5 }}" align="center" class="subtitle"><b>PERIODE BAYAR {{ $period }}</b></td></tr>
       </tbody>
     </table>
     <br/>
@@ -44,7 +45,7 @@
           <td class="text-center">{{ $pay->student_no }}</td>
           <td>{{ $pay->student }}</td>
           @php 
-            $receipts = $receiptMajorEloquent->listPayment($payloads->bookyear_id, $pay->student_id, $payloads->status); 
+            $receipts = $receiptMajorEloquent->listPayment($payloads->bookyear_id, $pay->student_id, $payloads->status, $pay->id); 
           @endphp
           @if (count($receipts['queries']) > 0)
           @foreach ($receipts['queries'] as $receipt) 
@@ -71,7 +72,7 @@
             <td></td>
           @endfor
           @endif
-          <td class="text-center">{{ $receiptMajorEloquent->paymentClassDelay($payloads->bookyear_id, $payloads->payment_id, $payloads->duration, $payloads->date_delay, $pay->student_id)->pluck('delay')->first() }}</td>
+          <td class="text-center">{{ $receiptMajorEloquent->paymentClassDelay($payloads->bookyear_id, $payloads->payment_id, $payloads->duration, $payloads->date_delay, $pay->student_id, $payloads->period)->pluck('delay')->first() }}</td>
           <td class="text-right">Rp{{ number_format($pay->amount,2) }}</td>
           <td class="text-right">Rp{{ number_format($receipts['major'],2) }}</td>
           <td class="text-right">Rp{{ number_format($receipts['discount'],2) }}</td>

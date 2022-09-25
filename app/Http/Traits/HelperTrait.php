@@ -24,6 +24,12 @@ define("SEC_IN_DAY", 86400);
 trait HelperTrait 
 {
 
+    public function getPeriodName($param)
+    {
+        $value = sprintf('%06d', $param);
+        return $this->getMonthName(substr($value, 0,2)) .' / '. substr($value, 2,4);
+    }
+
     public function getConfigs($slug, $key = '#')
     {
         $query = DB::table('public.configs')->where('slug', $slug);
@@ -430,6 +436,49 @@ trait HelperTrait
                 break;
             default:
                 return 'Ahad';
+                break;
+        }
+    }
+
+    public function getMonthName($value)
+    {
+        switch ($value) 
+        {
+            case '01':
+                return 'Januari';
+                break;
+            case '02':
+                return 'Pebruari';
+                break;
+            case '03':
+                return 'Maret';
+                break;
+            case '04':
+                return 'April';
+                break;
+            case '05':
+                return 'Mei';
+                break;
+            case '06':
+                return 'Juni';
+                break;
+            case '07':
+                return 'Juli';
+                break;
+            case '08':
+                return 'Agustus';
+                break;
+            case '09':
+                return 'September';
+                break;
+            case '10':
+                return 'Oktober';
+                break;
+            case '11':
+                return 'Nopember';
+                break;
+            default:
+                return 'Desember';
                 break;
         }
     }

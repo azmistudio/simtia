@@ -142,7 +142,10 @@ class PaymentMajorEloquent implements PaymentMajorRepository
 							->whereRaw('trans_date::date <= ?', $this->formatDate($request['end_date'],'sys'));
 					});
 		$query = $request['is_prospect'] == 0 ? $query->where('student_id',$request['student_id']) : $query->where('prospect_student_id',$request['student_id']);
-		return $query->get();
+		return $query->get()->map(function($model){
+			$model['period'] = $this->getPeriodName($model->period_month.$model->period_year);
+			return $model;
+		});
 	}    
 
 	public function dataRecapStudent($bookyear_id, $department_id, $grade_id, $class_id)

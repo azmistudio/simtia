@@ -71,7 +71,7 @@
             } else {
                 page = "other"
             }
-            $("#p-receipt-trans-form").panel("refresh", "{{ url('finance/receipt') }}" + "/" + page + "?w=" + "{{ $PanelHeight }}" + "." + "{{ $WindowWidth }}" + "&t=init" + "&department_id=" + department_id + "&receipt_id=" + receipt_id + "&category_id=" + category_id);
+            $("#p-receipt-trans-form").panel("refresh", "{{ url('finance/receipt') }}" + "/" + page + "?w=" + "{{ $PanelHeight }}" + "." + "{{ $WindowWidth }}" + "&t=init" + "&department_id=" + department_id + "&receipt_id=" + receipt_id + "&category_id=" + category_id + "&bookyear_id=" + {{ $bookyear->id }});
         } 
     } 
 </script>

@@ -134,17 +134,19 @@ class ReportReceiptController extends Controller
     {
         $payload = json_decode($request->data);
         $data['requests'] = $payload;
+        $data['period'] = $this->getPeriodName($payload->period);
         $request->merge([
             'bookyear_id' => $payload->bookyear_id,
             'class_id' => $payload->class_id,
             'department_id' => $payload->department_id,
             'is_prospect' => $payload->is_prospect,
+            'period' => $payload->period,
         ]);
         $data['profile'] = $this->getInstituteProfile();
         if ($data['requests']->status > -2)
         {
             $data['max_installment'] = $this->receiptMajorEloquent->maxInstallment($request);
-            $data['payments'] = $this->receiptMajorEloquent->paymentClass($payload->bookyear_id, $payload->class_id, $payload->status)->get();
+            $data['payments'] = $this->receiptMajorEloquent->paymentClass($payload->bookyear_id, $payload->class_id, $payload->status, $payload->period)->get();
             $view = View::make('finance::reports.receipts.class_mandatory_pdf', $data);
             $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake() . '_pembayaran_kelas';
         } else {
@@ -169,16 +171,18 @@ class ReportReceiptController extends Controller
     {
         $data['profile'] = $this->getInstituteProfile();
         $data['payloads'] = json_decode($request->data);
+        $data['period'] = $this->getPeriodName($data['payloads']->period);
         $request->merge([
             'bookyear_id' => $data['payloads']->bookyear_id,
             'class_id' => $data['payloads']->class_id,
             'department_id' => $data['payloads']->department_id,
             'is_prospect' => $data['payloads']->is_prospect,
+            'period' => $data['payloads']->period,
         ]);
         if ($data['payloads']->status > -2)
         {
             $data['max_installment'] = $this->receiptMajorEloquent->maxInstallment($request);
-            $data['payments'] = $this->receiptMajorEloquent->paymentClass($data['payloads']->bookyear_id, $data['payloads']->class_id, $data['payloads']->status)->get();
+            $data['payments'] = $this->receiptMajorEloquent->paymentClass($data['payloads']->bookyear_id, $data['payloads']->class_id, $data['payloads']->status, $data['payloads']->period)->get();
             $view = View::make('finance::reports.receipts.class_mandatory_xlsx', $data);
             $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake() . '_pembayaran_kelas';
         } else {
@@ -348,8 +352,9 @@ class ReportReceiptController extends Controller
     {
         $payload = json_decode($request->data);
         $data['requests'] = $payload;
-        $data['max_installment'] = $this->receiptMajorEloquent->paymentClassDelay($payload->bookyear_id, $payload->payment_id, $payload->duration, $payload->date_delay,0)->get()->pluck('count_trx')->max();
-        $data['payments'] = $this->receiptMajorEloquent->paymentClassArrear($payload->bookyear_id, $payload->payment_id, $payload->duration, $payload->date_delay)->get();
+        $data['period'] = $this->getPeriodName($payload->period);
+        $data['max_installment'] = $this->receiptMajorEloquent->paymentClassDelay($payload->bookyear_id, $payload->payment_id, $payload->duration, $payload->date_delay,0,$payload->period)->get()->pluck('count_trx')->max();
+        $data['payments'] = $this->receiptMajorEloquent->paymentClassArrear($payload->bookyear_id, $payload->payment_id, $payload->duration, $payload->date_delay,$payload->period)->get();
         $data['profile'] = $this->getInstituteProfile();
         // 
         $view = View::make('finance::reports.receipts.student_arrear_pdf', $data);
@@ -370,8 +375,9 @@ class ReportReceiptController extends Controller
     {
         $data['profile'] = $this->getInstituteProfile();
         $data['payloads'] = json_decode($request->data);
-        $data['max_installment'] = $this->receiptMajorEloquent->paymentClassDelay($data['payloads']->bookyear_id, $data['payloads']->payment_id, $data['payloads']->duration, $data['payloads']->date_delay,0)->get()->pluck('count_trx')->max();
-        $data['payments'] = $this->receiptMajorEloquent->paymentClassArrear($data['payloads']->bookyear_id, $data['payloads']->payment_id, $data['payloads']->duration, $data['payloads']->date_delay)->get();
+        $data['period'] = $this->getPeriodName($data['payloads']->period);
+        $data['max_installment'] = $this->receiptMajorEloquent->paymentClassDelay($data['payloads']->bookyear_id, $data['payloads']->payment_id, $data['payloads']->duration, $data['payloads']->date_delay,0,$data['payloads']->period)->get()->pluck('count_trx')->max();
+        $data['payments'] = $this->receiptMajorEloquent->paymentClassArrear($data['payloads']->bookyear_id, $data['payloads']->payment_id, $data['payloads']->duration, $data['payloads']->date_delay,$data['payloads']->period)->get();
         // 
         $view = View::make('finance::reports.receipts.student_arrear_xlsx', $data);
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake() . '_pembayaran_santri_tunggak';

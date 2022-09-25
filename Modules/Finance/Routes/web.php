@@ -63,7 +63,8 @@ Route::group(['middleware' => ['auth']], function() {
             Route::post('/data', 'ReceiptController@data');
             Route::post('/data/voluntary', 'ReceiptController@dataVoluntary');
             Route::post('/data/other', 'ReceiptController@dataOther');
-            Route::post('/data/payment', 'ReceiptController@dataPayment');
+            Route::get('/data/period', 'ReceiptController@dataPeriod');
+            Route::get('/data/payment', 'ReceiptController@dataPayment');
             Route::post('/data/print', 'ReceiptController@print');
             Route::post('/data/print/receipt', 'ReceiptController@printReceipt');
             Route::get('/data/show', 'ReceiptController@dataShow');
@@ -88,8 +89,10 @@ Route::group(['middleware' => ['auth']], function() {
                 Route::group(['prefix' => 'major'], function() {
                     Route::get('/', 'PaymentMajorController@index')->middleware('permission:keuangan-besar_pembayaran-index');
                     Route::post('/store', 'PaymentMajorController@store')->middleware('permission:keuangan-besar_pembayaran-store');
+                    Route::get('/show/{id}', 'PaymentMajorController@show');
                     Route::get('/detail', 'PaymentMajorController@detail');
                     Route::post('/student', 'PaymentMajorController@dataStudent');
+                    Route::post('/period/combo-box', 'PaymentMajorController@periodPayment');
                 });
             });
         });

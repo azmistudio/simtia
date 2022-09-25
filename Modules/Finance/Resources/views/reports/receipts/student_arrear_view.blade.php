@@ -41,6 +41,7 @@
                 duration: {{ $requests['duration'] }},
                 date_delay: "{{ $requests['date_delay'] }}",
                 payment: {{ $requests['payment'] }},
+                period: {{ $requests['period'] }}
             },
         })
     })
@@ -60,6 +61,7 @@
                 status: 0,
                 duration: {{ $requests['duration'] }},
                 date_delay: "{{ $requests['date_delay'] }}",
+                period: {{ $requests['period'] }}
             }
             exportDocument("{{ url('finance/report/receipt/student/arrear/export-') }}" + document,payload,"Ekspor data Laporan ke "+ document.toUpperCase(),"{{ csrf_token() }}")
         }

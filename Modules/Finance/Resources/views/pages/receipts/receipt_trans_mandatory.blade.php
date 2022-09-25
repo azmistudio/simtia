@@ -134,7 +134,7 @@
                         </div>
                         <div class="mb-1">
                             <label class="mb-1" style="width:121px;">Keterangan:</label>
-                            <input name="remark" class="easyui-textbox" style="width:300px;height:22px;" data-options="" />
+                            <input name="remark" id="AccountingReceiptTransRemark" class="easyui-textbox" style="width:300px;height:22px;" data-options="" />
                         </div>
                         <div id="receipt-trans-reason" class="mb-1 d-none">
                             <label class="mb-1" style="width:121px;">*Alasan Ubah Data:</label>
@@ -152,32 +152,37 @@
                         <input type="hidden" id="id-receipt-paid" name="receipt_id" value="{{ $payload['receipt_id'] }}" />
                         <input type="hidden" name="bookyear_id" value="{{ $book_year->id }}" />
                         <input type="hidden" name="category_id" value="1-JTT" />
-                        <fieldset class="mb-3">
+                        <fieldset class="mb-3" id="panel-receipt-trans-paid">
                             <legend><b>Pembayaran yang harus dilunasi</b></legend>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-7">
                                     <div class="mb-1">
-                                        <input name="amount" id="AccountingReceiptTransAmountPaid" class="easyui-numberbox" style="width:293px;height:22px;" data-options="label:'<b>*</b>Jumlah Bayaran:',labelWidth:'125px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" />
+                                        @if ($payload['category_id'] == 1)
+                                        <select name="period_payment" id="AccountingReceiptTransAmountPeriod" class="easyui-combobox" style="width:384px;height:22px;" data-options="label:'<b>*</b>Periode Bayar:',labelWidth:'125px',panelHeight:150,valueField:'id',textField:'text'"></select>
+                                        @else 
+                                        <input name="period_payment" id="AccountingReceiptTransAmountPeriodYear" class="easyui-textbox" style="width:384px;height:22px;" data-options="label:'*Periode Bayar:',labelWidth:'125px',readonly:'true'" />
+                                        @endif
                                     </div>
                                     <div class="mb-1">
-                                        <input name="instalment" id="AccountingReceiptTransInstalmentPaid" class="easyui-numberbox" style="width:293px;height:22px;" data-options="label:'<b>*</b>Besar Cicilan:',labelWidth:'125px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" />
+                                        <input name="amount" id="AccountingReceiptTransAmountPaid" class="easyui-numberbox" style="width:225px;height:22px;" data-options="label:'<b>*</b>Jumlah Bayaran:',labelWidth:'125px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" />
+                                        <span class="mr-1"></span>
+                                        <input name="instalment" id="AccountingReceiptTransInstalmentPaid" class="easyui-numberbox" style="width:151px;height:22px;" data-options="label:'<b>*</b>Cicilan:',labelWidth:'60px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" />
                                     </div>
                                     <div class="mb-1">
-                                        <input name="journal_paid" id="AccountingReceiptTransJournalPaid" class="easyui-textbox" style="width:293px;height:22px;" data-options="label:'Tanggal Jurnal:',labelWidth:'125px',readonly:'true'" />
+                                        <input name="journal_paid" id="AccountingReceiptTransJournalPaid" class="easyui-textbox" style="width:225px;height:22px;" data-options="label:'Tanggal Jurnal:',labelWidth:'125px',readonly:'true'" />
+                                        <span class="mr-1"></span>
+                                        <input id="AccountingReceiptTransStatus" class="easyui-textbox" style="width:151px;height:22px;" data-options="label:'Status:',labelWidth:'60px',readonly:'true'" />
                                     </div>
                                     <div class="mb-1">
-                                        <input id="AccountingReceiptTransStatus" class="easyui-textbox" style="width:293px;height:22px;" data-options="label:'Status:',labelWidth:'125px',readonly:'true'" />
+                                        <input name="remark_paid" id="AccountingReceiptTransRemarkPaid" class="easyui-textbox" style="width:384px;height:22px;" data-options="label:'Keterangan:',labelWidth:'125px'" />
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-5 pl-0">
                                     <div class="mb-1">
-                                        <input name="remark_paid" class="easyui-textbox" style="width:293px;height:22px;" data-options="label:'Keterangan:',labelWidth:'125px'" />
-                                    </div>
-                                    <div class="mb-1">
-                                        <input name="reason_paid" class="easyui-textbox" style="width:293px;height:40px;" data-options="label:'*Alasan Perubahan<br/>Data:',labelWidth:'125px',multiline:'true'" />
+                                        <input name="reason_paid" id="AccountingReceiptTransInstalmentPaidReason" class="easyui-textbox" style="width:280px;height:75px;" data-options="label:'*Alasan Perubahan<br/>Data:',labelWidth:'125px',multiline:'true'" />
                                     </div>
                                     <div style="margin-left:125px;">
-                                        <a href="javascript:void(0)" class="easyui-linkbutton " data-options="iconCls:'ms-Icon ms-Icon--Save'" onclick="storePaymentMajor()">Ubah Simpan</a>
+                                        <a href="javascript:void(0)" class="easyui-linkbutton" style="height:22px;" data-options="iconCls:'ms-Icon ms-Icon--Save'" onclick="storePaymentMajor()">Ubah Simpan</a>
                                     </div>
                                 </div>
                             </div>
@@ -240,30 +245,40 @@
                     $("#id-student-name-paid").val(row.name)
                     @if ($payload['category_id'] == 1)
                         $("#AccountingReceiptTransClass").textbox("setValue", row.grade + " - " + row.class_name)
+                        $.getJSON("{{ url('finance/receipt/data/period') }}", $.param({
+                            _token: "{{ csrf_token() }}",
+                            department_id: row.department_id,
+                            receipt_id: $("#AccountingReceiptTransPayment").combogrid("getValue"),
+                            student_id: row.student_id,
+                        }), function(response) {
+                            $("#AccountingReceiptTransAmountPeriod").combobox("loadData", response).combobox("setValue", response[0].id)
+                        })
                     @else
                         $("#AccountingReceiptTransClass").textbox("setValue", row.admission_name + " - " + row.admission_group)
+                        $.getJSON("{{ url('finance/receipt/data/payment') }}", $.param({ 
+                            _token: "{{ csrf_token() }}",
+                            department_id: row.department_id,
+                            receipt_id: $("#AccountingReceiptTransPayment").combogrid("getValue"),
+                            student_id: row.student_id,
+                        }, true), function(response) {
+                            $("#AccountingReceiptTransInstalment").numberbox("setValue", response.instalment)
+                            $("#AccountingReceiptTransAmountPeriodYear").textbox("setValue", response.period)
+                            $("#AccountingReceiptTransPay").numberbox("setValue", response.instalment)
+                            $("#AccountingReceiptTransAmountPaid").numberbox("setValue", response.amount)
+                            $("#AccountingReceiptTransInstalmentPaid").numberbox("setValue", response.instalment)
+                            $("#AccountingReceiptTransJournalPaid").textbox("setValue", response.journal_date)
+                            if (response.is_paid > 0) {
+                                $("#AccountingReceiptTransStatus").textbox("setValue", "Lunas")
+                            } else {
+                                $("#AccountingReceiptTransStatus").textbox("setValue", "Belum Lunas")
+                            }
+                            $("#AccountingReceiptTransRemarkPaid").textbox("setValue", response.remark)
+                            $("#id-payment-major").val(response.payment_major_id)
+                            $("#id-payment-major-paid").val(response.payment_major_id)
+                            $("#tb-receipt-trans-instalment").datagrid("reload", "{{ url('finance/receipt/data') }}" + "?_token=" + "{{ csrf_token() }}" + "&payment_major_id=" + response.payment_major_id + "&amount=" + $("#AccountingReceiptTransAmountPaid").numberbox("getValue"))
+                        })
                     @endif
-                    $.post("{{ url('finance/receipt/data/payment') }}", $.param({ 
-                        _token: "{{ csrf_token() }}",
-                        department_id: row.department_id,
-                        receipt_id: $("#AccountingReceiptTransPayment").combogrid("getValue"),
-                        student_id: row.student_id,
-                    }, true), function(response) {
-                        $("#AccountingReceiptTransInstalment").numberbox("setValue", response.instalment)
-                        $("#AccountingReceiptTransAmountPaid").numberbox("setValue", response.amount)
-                        $("#AccountingReceiptTransInstalmentPaid").numberbox("setValue", response.instalment)
-                        $("#AccountingReceiptTransJournalPaid").textbox("setValue", response.journal_date)
-                        if (response.is_paid > 0) {
-                            $("#AccountingReceiptTransStatus").textbox("setValue", "Lunas")
-                        } else {
-                            $("#AccountingReceiptTransStatus").textbox("setValue", "Belum Lunas")
-                        }
-                        $("#AccountingReceiptTransPay").numberbox("setValue", response.instalment)
-                        $("#id-payment-major").val(response.payment_major_id)
-                        $("#id-payment-major-paid").val(response.payment_major_id)
-                        $("#tb-receipt-trans-instalment").datagrid("reload", "{{ url('finance/receipt/data') }}" + "?_token=" + "{{ csrf_token() }}" + "&payment_major_id=" + response.payment_major_id + "&amount=" + $("#AccountingReceiptTransAmountPaid").numberbox("getValue"))
-                    },"json")
-                    
+                    $("#AccountingReceiptTransInstalmentPaidReason").textbox("setValue","")
                 }
             }
         })
@@ -288,13 +303,41 @@
                     $.messager.alert('Peringatan', 'Form sedang aktif, silahkan batalkan terlebih dahulu', 'error')
                 } else {
                     actionButtonReceiptTrans("active", [0,2,3,4])
+                    $("#AccountingReceiptTransAmountPeriod").combobox("readonly")
                     $("#receipt-trans-reason").removeClass("d-none")
                     $("#form-receipt-trans-main").form("load", "{{ url('finance/receipt/show') }}" + "/" + row.id + "/" + {{ $payload['category_id'] }})
                 }
             }
         })
         $("#page-receipt-trans").waitMe({effect:"none"})
+        $("#AccountingReceiptTransAmountPeriod").combobox({
+            onSelect: function(record) {
+                getPaymentData($("#id-receipt-paid-dept").val(), $("#AccountingReceiptTransPayment").combogrid("getValue"), record.id)
+            }
+        })
     })
+    function getPaymentData(department_id, receipt_id, payment_major_id) {
+        $.getJSON("{{ url('finance/receipt/data/payment') }}", $.param({
+            _token: "{{ csrf_token() }}",
+            department_id: department_id,
+            receipt_id: receipt_id,
+            payment_major_id: payment_major_id,
+            student_id: $("#id-receipt-trans-student").val()
+        }), function(response) {
+            $("#id-payment-major").val(payment_major_id)
+            $("#id-payment-major-paid").val(payment_major_id)
+            $("#AccountingReceiptTransInstalment").numberbox("setValue", response.instalment)
+            $("#AccountingReceiptTransAmountPaid").numberbox("setValue", response.amount)
+            $("#AccountingReceiptTransInstalmentPaid").numberbox("setValue", response.instalment)
+            $("#AccountingReceiptTransJournalPaid").textbox("setValue", response.journal_date)
+            if (response.is_paid > 0) {
+                $("#AccountingReceiptTransStatus").textbox("setValue", "Lunas")
+            } else {
+                $("#AccountingReceiptTransStatus").textbox("setValue", "Belum Lunas")
+            }
+            $("#tb-receipt-trans-instalment").datagrid("reload", "{{ url('finance/receipt/data') }}" + "?_token=" + "{{ csrf_token() }}" + "&payment_major_id=" + payment_major_id + "&amount=" + response.amount)
+        })
+    }
     function setAmountPay(instalment, discount) {
         var total = parseFloat(instalment) - parseFloat(discount)
         $("#AccountingReceiptTransPay").numberbox("setValue", total)
@@ -315,6 +358,7 @@
     function newReceiptTrans() {
         sessionStorage.formTransaksi_Penerimaan = "active"
         actionButtonReceiptTrans("active", [0,1,4])
+        $("#AccountingReceiptTransRemark").textbox("setValue","")
         $("#page-receipt-trans").waitMe("hide")
     }
     function editReceiptTrans() {
@@ -353,7 +397,7 @@
         if (response.success) {
             Toast.fire({icon:"success",title:response.message})
             actionClearReceiptTrans()
-            refreshInstalment()
+            getPaymentData($("#id-receipt-trans-dept").val(), $("#AccountingReceiptTransPayment").combogrid("getValue"), $("#id-payment-major").val())
             if (response.params !== 0) {
                 $("#AccountingReceiptTransStatus").textbox("setValue", "Lunas")
             } else {
@@ -398,11 +442,14 @@
         $("#id-receipt-paid-dept").val(-1)
         $("#receipt-trans-reason").addClass("d-none")
         $("#tb-receipt-trans-instalment").datagrid("loadData", [])
+        $("#AccountingReceiptTransAmountPeriod").combobox("loadData", []).combobox("readonly",false)
         $("#page-receipt-trans").waitMe({effect:"none"})
     }
     function actionClearReceiptTrans() {
         sessionStorage.formTransaksi_Penerimaan = "init"
         actionButtonReceiptTrans("active", [1,2,3])
+        $("#AccountingReceiptTransAmountPeriod").combobox("readonly",false)
+        $("#AccountingReceiptTransInstalmentPaidReason").textbox("setValue","")
         $("#receipt-trans-reason").addClass("d-none")
         $("#page-receipt-trans").waitMe({effect:"none"})
     }
@@ -413,11 +460,16 @@
         $("#form-receipt-trans-paid").ajaxSubmit({
             url: "{{ url('finance/receipt/payment/major/store') }}",
             data: { _token: '{{ csrf_token() }}' },
+            beforeSubmit: function(formData, jqForm, options) {
+                $("#panel-receipt-trans-paid").waitMe({effect:"facebook"})
+            },
             success: function(response) {
                 ajaxAdmissionResponse(response)
+                $("#panel-receipt-trans-paid").waitMe("hide")
             },
             error: function(xhr) {
                 failResponse(xhr)
+                $("#panel-receipt-trans-paid").waitMe("hide")
             }
         })
         return false
@@ -431,7 +483,8 @@
             student_no: $("#AccountingReceiptTransStudentNo").textbox("getValue"),
             student_name: $("#AccountingReceiptTransStudentName").textbox("getValue"),
             class: $("#AccountingReceiptTransClass").textbox("getValue"),
-            category_id: {{ $payload['category_id'] }}
+            category_id: {{ $payload['category_id'] }},
+            bookyear_id: {{ $payload['bookyear_id'] }}
         }, "Ekspor data ke PDF", "{{ csrf_token() }}")
     }
     function printReceipt() {

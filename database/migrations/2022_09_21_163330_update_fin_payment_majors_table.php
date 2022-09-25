@@ -14,8 +14,9 @@ return new class extends Migration
     public function up()
     {
         //
-        Schema::table('academic.memorize_cards', function (Blueprint $table) {
-            $table->unique(['class_id','student_id','from_surah_id','from_verse','to_surah_id','to_verse']);
+        Schema::table('finance.payment_majors', function (Blueprint $table) {
+            $table->char('period_month',2)->nullable();
+            $table->tinyInteger('period_year')->nullable();
         });
     }
 
@@ -27,8 +28,9 @@ return new class extends Migration
     public function down()
     {
         //
-        Schema::table('academic.memorize_cards', function (Blueprint $table) {
-            $table->dropUnique(['class_id','student_id','from_surah_id','from_verse','to_surah_id','to_verse']);
+        Schema::table('finance.payment_majors', function (Blueprint $table) {
+            $table->dropColumn('period_month');
+            $table->dropColumn('period_year');
         });
     }
 };
