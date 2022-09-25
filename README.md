@@ -28,7 +28,7 @@ Video tutorial penggunaan aplikasi: <a href="https://www.youtube.com/channel/UCd
 
 ### &raquo; Sistem Operasi Windows
 
--   Unduh installer untuk Windows 7,8,10,11 <a href="https://drive.google.com/file/d/17AKNk6-vv_PKHdCxRVKHd43v2lb0SSPo/view?usp=sharing" target="_blank">disini.</a>
+-   Unduh installer untuk Windows 7,8,10,11 <a href="https://drive.google.com/file/d/1RHBpFq8EhACZAjZc84WeioOI87GzHz6c/view?usp=sharing" target="_blank">disini.</a>
 -   Akses aplikasi di http://localhost:8080
 -   Login Admin:
     -   Email: admin@simtia.org
