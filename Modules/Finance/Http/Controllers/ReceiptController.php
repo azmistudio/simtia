@@ -104,7 +104,7 @@ class ReceiptController extends Controller
         //
         $data['categories'] = DB::table('finance.receipt_categories')->select('id','code','category')->whereIn('code', ['JTT','CSWJB'])->orderBy('order')->get();
         $data['codes_cash'] = $this->codeEloquent->combobox(1, '1-1');
-        $data['book_year'] = BookYear::where('is_active', 1)->first();
+        $data['book_year'] = BookYear::find($request->bookyear_id);
         $data['payload'] = $request->all();
         return view('finance::pages.receipts.receipt_trans_mandatory', $data);
     }
@@ -345,9 +345,8 @@ class ReceiptController extends Controller
                         // check is_paid
                         if ($payment_majors->is_paid == 1)
                         {
-                            throw new Exception('Pembayaran ' .$receipt_type->name. ' santri '  . $request->student_name . ' (' . $request->student_no . ') sudah lunas.', 1);
+                            throw new Exception('Pembayaran ' .$receipt_type->name. ' santri '  . $request->student_name . ' (' . $request->student_no . ') periode '. $payment_majors->period_year .' sudah lunas.', 1);
                         }
-
                         // get instalment and discount
                         $total_receipt = ReceiptMajor::select(DB::raw('SUM(total) AS total'), DB::raw('SUM(discount_amount) AS instalment'))->where('major_id', $payment_majors->id)->first();
                         // check instalment amount with payment major must have paid
@@ -361,11 +360,11 @@ class ReceiptController extends Controller
                             $remark_journal = '';
                             if (($total_receipt->total + $total_receipt->instalment + ($request->instalment - $request->discount) + $request->discount) == $payment_majors->amount)
                             {
-                                $remark_journal = 'Pelunasan '. $receipt_type->name .' calon santri '. $request->student_name .' ('. $request->student_no .')';
+                                $remark_journal = 'Pelunasan '. $receipt_type->name .' calon santri '. $request->student_name .' ('. $request->student_no .') periode '. $payment_majors->period_year;
                                 $is_paid = 1;
                             } else {
                                 $instalment_count = ReceiptMajor::where('major_id', $payment_majors->id)->count() + 1;
-                                $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' calon santri '. $request->student_name .' ('. $request->student_no .')';
+                                $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' calon santri '. $request->student_name .' ('. $request->student_no .') periode '. $payment_majors->period_year;
                                 $is_paid = 0;
                             }
                             // fetch prefix and number from bookyear for cash no.
@@ -390,7 +389,7 @@ class ReceiptController extends Controller
                                 // store to receipt major
                                 $receiptMajorRequest = new Request();
                                 $receiptMajorRequest->merge([
-                                    'trans_date' => date('Y-m-d'),
+                                    'trans_date' => $this->formatDate($request->journal_date,'sys'),
                                     'major_id' => $payment_majors->id,
                                     'journal_id' => $journal->id,
                                     'total' => $request->instalment - $request->discount,
@@ -879,6 +878,7 @@ class ReceiptController extends Controller
             default:
                 // JTT
                 $validated = $request->validate([
+                    'major_id' => 'required|int',
                     'student_id' => 'required|int',
                     'department_id' => 'required|int',
                     'receipt_id' => 'required|int',
@@ -896,17 +896,12 @@ class ReceiptController extends Controller
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
                         // find pay amount
-                        $payment_majors = PaymentMajor::where('student_id',$request->student_id)
-                                            ->where('receipt_id',$request->receipt_id)
-                                            ->where('bookyear_id',$request->bookyear_id)
-                                            ->first();
-                        
+                        $payment_majors = PaymentMajor::find($request->major_id);
                         // check is_paid
                         if ($payment_majors->is_paid == 1)
                         {
-                            throw new Exception('Pembayaran ' .$receipt_type->name. ' santri '  . $request->student_name . ' (' . $request->student_no . ') sudah lunas.', 1);
+                            throw new Exception('Pembayaran ' .$receipt_type->name. ' santri '  . $request->student_name . ' (' . $request->student_no . ') periode '. $this->getMonthName($payment_majors->period_month) .' / '. $payment_majors->period_year .' sudah lunas.', 1);
                         }
-
                         // get instalment and discount
                         $total_receipt = ReceiptMajor::select(DB::raw('SUM(total) AS total'), DB::raw('SUM(discount_amount) AS instalment'))
                                             ->where('major_id', $payment_majors->id)
@@ -922,11 +917,11 @@ class ReceiptController extends Controller
                             $remark_journal = '';
                             if (($total_receipt->total + $total_receipt->instalment + ($request->instalment - $request->discount) + $request->discount) == $payment_majors->amount)
                             {
-                                $remark_journal = 'Pelunasan '. $receipt_type->name .' santri '. $request->student_name .' ('. $request->student_no .')';
+                                $remark_journal = 'Pelunasan '. $receipt_type->name .' santri '. $request->student_name .' ('. $request->student_no .') periode '. $this->getMonthName($payment_majors->period_month) .'/'. $payment_majors->period_year;
                                 $is_paid = 1;
                             } else {
                                 $instalment_count = ReceiptMajor::where('major_id', $payment_majors->id)->count() + 1;
-                                $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' santri '. $request->student_name .' ('. $request->student_no .')';
+                                $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' santri '. $request->student_name .' ('. $request->student_no .') periode '. $this->getMonthName($payment_majors->period_month) .'/'. $payment_majors->period_year;
                                 $is_paid = 0;
                             }
                             // fetch prefix and number from bookyear for cash no.
@@ -959,6 +954,7 @@ class ReceiptController extends Controller
                                     'first_instalment' => 1,
                                     'is_prospect' => $request->is_prospect,
                                     'discount_amount' => $request->discount,
+                                    'remark' => $this->getMonthName($payment_majors->period_month) .'/'. $payment_majors->period_year,
                                     'logged' => auth()->user()->email,
                                 ]);
                                 $this->receiptMajorEloquent->create($receiptMajorRequest, $this->subject .' Iuran Wajib Santri');
@@ -1032,9 +1028,9 @@ class ReceiptController extends Controller
                                 } else {
                                     $remark_journal = '';
                                     $is_paid = 0;
-                                    if (($total_receipt->total + $total_receipt->discount + ($request->instalment - $request->discount) + $request->discount) == $receipt_majors->total)
+                                    if (($total_receipt->total + $total_receipt->discount + ($request->instalment - $request->discount) + $request->discount) == $payment_majors->amount)
                                     {
-                                        $remark_journal = 'Pelunasan '. $receipt_type->name .' santri '. $request->student_name .' ('. $request->student_no .')';
+                                        $remark_journal = 'Pelunasan '. $receipt_type->name .' santri '. $request->student_name .' ('. $request->student_no .') periode '. $this->getMonthName($payment_majors->period_month) .'/'. $payment_majors->period_year;
                                         $is_paid = 1;
                                     } else {
                                         $instalment_count = 0;
@@ -1045,7 +1041,7 @@ class ReceiptController extends Controller
                                             if ($val->id == $request->receipt_id)
                                                 break;
                                         }
-                                        $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' santri '. $request->student_name .' ('. $request->student_no .')';
+                                        $remark_journal = 'Pembayaran ke-'. $instalment_count . ' ' . $receipt_type->name . ' santri '. $request->student_name .' ('. $request->student_no .') periode '. $this->getMonthName($payment_majors->period_month) .'/'. $payment_majors->period_year;
                                         $is_paid = 0;
                                     }
                                     $cash_account_id = $this->journalEloquent->getAccount($receipt_majors->journal_id, 'KAS', $request->id);
@@ -1119,7 +1115,7 @@ class ReceiptController extends Controller
                                         $paymentMajorRequest = new Request();
                                         $paymentMajorRequest->merge([
                                             'id' => $request->major_id,
-                                            'is_paid' => 1,
+                                            'is_paid' => $is_paid,
                                             'logged' => auth()->user()->email,
                                         ]);
                                         $this->paymentMajorEloquent->update($paymentMajorRequest, $this->subject .' Iuran Wajib Santri');
@@ -1199,14 +1195,37 @@ class ReceiptController extends Controller
      * @param Request $request
      * @return JSON
      */
+    public function dataPeriod(Request $request)
+    {
+        $receipt_type = ReceiptType::find($request->receipt_id);
+        $periods = PaymentMajor::where('department_id', $request->department_id)
+                        ->where('category_id', $receipt_type->category_id)
+                        ->where('receipt_id', $request->receipt_id)
+                        ->where('student_id', $request->student_id)
+                        ->orderBy('period_month','desc')
+                        ->get()->map(function($model) {
+                            $model['id'] = $model->id;
+                            $model['text'] = $this->getMonthName($model->period_month) .' / '. $model->period_year;
+                            return $model->only('id','text');
+                        });
+        return response()->json($periods);
+    }
+
+    /**
+     * Display a listing of data.
+     * @param Request $request
+     * @return JSON
+     */
     public function dataPayment(Request $request)
     {
         $receipt_type = ReceiptType::find($request->receipt_id);
         $payment_majors = PaymentMajor::where('department_id', $request->department_id)
                             ->where('category_id', $receipt_type->category_id)
                             ->where('receipt_id', $request->receipt_id);
-        if ($receipt_type->category_id == 1 || $receipt_type->category_id == 2)
+        if ($receipt_type->category_id == 1)
         {
+            $payment_majors = $payment_majors->where('id', $request->payment_major_id)->first();
+        } elseif ($receipt_type->category_id == 2) {
             $payment_majors = $payment_majors->where('student_id', $request->student_id)->first();
         } elseif ($receipt_type->category_id == 3 || $receipt_type->category_id == 4) {
             $payment_majors = $payment_majors->where('prospect_student_id', $request->student_id)->first();
@@ -1220,7 +1239,8 @@ class ReceiptController extends Controller
             'amount' => $payment_majors->amount,
             'instalment' => $payment_majors->instalment,
             'is_paid' => $payment_majors->is_paid,
-            'journal_date' => $this->formatDate($journal->journal_date,'local')
+            'period' => 'Tahun ' . $payment_majors->period_year,
+            'journal_date' => $this->formatDate($journal->journal_date,'local'),
         ));
     }
 
@@ -1253,36 +1273,22 @@ class ReceiptController extends Controller
                 $view = View::make('finance::pages.receipts.receipt_voluntary_pdf', $data);
                 break;
             case 3:
-                $data['payment_majors'] = PaymentMajor::select(
-                                                'finance.payment_majors.id',
-                                                DB::raw('UPPER(public.departments.name) as department'),
-                                                'finance.book_years.book_year',
-                                                'finance.receipt_categories.category',
-                                                DB::raw('finance.receipt_types.name as receipt_type'),
-                                                'finance.payment_majors.amount',
-                                                'finance.payment_majors.is_paid',
-                                                'finance.payment_majors.remark',
-                                                DB::raw('academic.prospect_students.registration_no as student_no'),
-                                                DB::raw('INITCAP(academic.prospect_students.name) as student_name'),
-                                                DB::raw("CONCAT(UPPER(academic.admissions.name), ' - ', UPPER(academic.prospect_student_groups.group)) as class"),
-                                                'academic.prospect_students.phone',
-                                                'academic.prospect_students.mobile',
-                                                'academic.prospect_students.address',
-                                            )
-                                            ->join('public.departments','public.departments.id','=','finance.payment_majors.department_id')
-                                            ->join('finance.receipt_categories','finance.receipt_categories.id','=','finance.payment_majors.category_id')
-                                            ->join('finance.receipt_types','finance.receipt_types.id','=','finance.payment_majors.receipt_id')
-                                            ->join('finance.book_years','finance.book_years.id','=','finance.payment_majors.bookyear_id')
-                                            ->join('academic.prospect_students','academic.prospect_students.id','=','finance.payment_majors.prospect_student_id')
-                                            ->join('academic.prospect_student_groups','academic.prospect_student_groups.id','=','academic.prospect_students.prospect_group_id')
-                                            ->join('academic.admissions','academic.admissions.id','=','academic.prospect_student_groups.admission_id')
-                                            ->where('finance.payment_majors.department_id', $payload->department_id)
-                                            ->where('finance.payment_majors.category_id', $payload->category_id)
-                                            ->where('finance.payment_majors.prospect_student_id', $payload->student_id)
-                                            ->where('finance.payment_majors.receipt_id', $payload->receipt_id)
-                                            ->first();
-                $data['instalments'] = $this->receiptMajorEloquent->dataInstalment($data['payment_majors']->id);  
-                $data['total'] = $this->receiptMajorEloquent->totalInstalment($data['payment_majors']->id);
+                $data['payment_majors'] = PaymentMajor::where('department_id', $payload->department_id)
+                                            ->where('category_id', $payload->category_id)
+                                            ->where('prospect_student_id', $payload->student_id)
+                                            ->where('receipt_id', $payload->receipt_id)
+                                            ->where('bookyear_id', $payload->bookyear_id)
+                                            ->orderBy('id', 'asc')
+                                            ->get()->map(function($model){
+                                                $model['department'] = $model->getDepartment->name;
+                                                $model['book_year'] = $model->getBookYear->book_year;
+                                                $model['category'] = $model->getCategory->category;
+                                                $model['receipt_type'] = $model->getReceipt->name;
+                                                $model['student'] = DB::table('academic.prospect_students')->find($model->prospect_student_id);
+                                                $model['period_payment'] = 'Tahun '. $model->period_year;
+                                                return $model;
+                                            });
+
                 $view = View::make('finance::pages.receipts.receipts_pdf', $data);
                 break;
             case 4:
@@ -1303,34 +1309,21 @@ class ReceiptController extends Controller
                 $view = View::make('finance::pages.receipts.receipt_voluntary_pdf', $data);
                 break;
             default:
-                // get paid info
-                $data['payment_majors'] = PaymentMajor::select(
-                                                'finance.payment_majors.id',
-                                                DB::raw('UPPER(public.departments.name) as department'),
-                                                'finance.book_years.book_year',
-                                                'finance.receipt_categories.category',
-                                                DB::raw('finance.receipt_types.name as receipt_type'),
-                                                'finance.payment_majors.amount',
-                                                'finance.payment_majors.is_paid',
-                                                'finance.payment_majors.remark',
-                                                'academic.students.student_no',
-                                                DB::raw('INITCAP(academic.students.name) as student_name'),
-                                                'academic.students.phone',
-                                                'academic.students.mobile',
-                                                'academic.students.address',
-                                            )
-                                            ->join('public.departments','public.departments.id','=','finance.payment_majors.department_id')
-                                            ->join('finance.receipt_categories','finance.receipt_categories.id','=','finance.payment_majors.category_id')
-                                            ->join('finance.receipt_types','finance.receipt_types.id','=','finance.payment_majors.receipt_id')
-                                            ->join('finance.book_years','finance.book_years.id','=','finance.payment_majors.bookyear_id')
-                                            ->join('academic.students','academic.students.id','=','finance.payment_majors.student_id')
-                                            ->where('finance.payment_majors.department_id', $payload->department_id)
-                                            ->where('finance.payment_majors.category_id', $payload->category_id)
-                                            ->where('finance.payment_majors.student_id', $payload->student_id)
-                                            ->where('finance.payment_majors.receipt_id', $payload->receipt_id)
-                                            ->first();
-                $data['instalments'] = $this->receiptMajorEloquent->dataInstalment($data['payment_majors']->id);  
-                $data['total'] = $this->receiptMajorEloquent->totalInstalment($data['payment_majors']->id);
+                $data['payment_majors'] = PaymentMajor::where('department_id', $payload->department_id)
+                                            ->where('category_id', $payload->category_id)
+                                            ->where('student_id', $payload->student_id)
+                                            ->where('receipt_id', $payload->receipt_id)
+                                            ->where('bookyear_id', $payload->bookyear_id)
+                                            ->orderBy('id', 'asc')
+                                            ->get()->map(function($model){
+                                                $model['department'] = $model->getDepartment->name;
+                                                $model['book_year'] = $model->getBookYear->book_year;
+                                                $model['category'] = $model->getCategory->category;
+                                                $model['receipt_type'] = $model->getReceipt->name;
+                                                $model['student'] = $model->getStudent;
+                                                $model['period_payment'] = $this->getMonthName($model->period_month) .' / '. $model->period_year;
+                                                return $model;
+                                            });
                 $view = View::make('finance::pages.receipts.receipts_pdf', $data);
                 break;
         }

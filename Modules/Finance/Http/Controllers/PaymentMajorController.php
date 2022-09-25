@@ -94,6 +94,12 @@ class PaymentMajorController extends Controller
                         $response = $this->getResponse('warning', 'Kelas wajib dipilih (minimal 1).');
                     } else {
                         $isValid = true;
+                        // validate month
+                        if (!$request->has('period_month'))
+                        {
+                            $isValid = false;
+                            $response = $this->getResponse('warning', 'Periode Bayar wajib dipilih.');
+                        }
                         // get Active's Book Year
                         $bookyear = BookYear::where('is_active', 1)->firstOr( function () {
                             $isValid = false;
@@ -112,7 +118,12 @@ class PaymentMajorController extends Controller
                         $listStudents = array();
                         foreach ($students as $student) 
                         {
-                            $majors = PaymentMajor::where('student_id', $student->id)->where('receipt_id', $request->receipt_id)->where('bookyear_id', $bookyear_id)->count();
+                            $majors = PaymentMajor::where('student_id', $student->id)
+                                        ->where('receipt_id', $request->receipt_id)
+                                        ->where('bookyear_id', $bookyear_id)
+                                        ->where('period_month', $request->period_month)
+                                        ->where('period_year', $request->period_year)
+                                        ->count();
                             if ($majors == 0) 
                             {
                                 $listStudents[] = $student->id;
@@ -148,7 +159,7 @@ class PaymentMajorController extends Controller
                                     $student = Students::select('student_no','name')->where('id', $studentId)->first();
                                     $bookyear_number += 1;
                                     $cash_no = sprintf('%06d', $bookyear_number);
-                                    $remark = 'Pendataan Besar Pembayaran ' . $name_account . 'santri ' . Str::title($student->name) . ' (' . $student->student_no . ')';
+                                    $remark = 'Pendataan Besar Pembayaran ' . $name_account . 'santri ' . Str::title($student->name) . ' (' . $student->student_no . ') ' . ' Periode ' . $this->getMonthName($request->period_month) . '/' . $request->period_year;
                                     // is paid
                                     $is_paid = 0;
                                     if ($request->amount == 0)
@@ -168,6 +179,8 @@ class PaymentMajorController extends Controller
                                             'bookyear_id' => $bookyear_id,
                                             'is_paid' => $is_paid,
                                             'is_prospect' => 0,
+                                            'period_month' => $request->period_month,
+                                            'period_year' => $request->period_year
                                         ]);
                                         $major = $this->paymentMajorEloquent->create($request, $this->subject);
                                         $major_id = $major->id;
@@ -284,6 +297,7 @@ class PaymentMajorController extends Controller
                                             'bookyear_id' => $bookyear_id,
                                             'is_paid' => $is_paid,
                                             'is_prospect' => 1,
+                                            'period_year' => dat('Y')
                                         ]);
                                         $major = $this->paymentMajorEloquent->create($request, $this->subject);
                                         $major_id = $major->id;
@@ -339,7 +353,7 @@ class PaymentMajorController extends Controller
                     $continue = true;
                     if ($total_paid->total > $amount)
                     {
-                        $response = $this->getResponse('warning', 'Maaf, besar pembayaran yang harus dilunasi lebih kecil dari jumlah pembayaran cicilan yang telah dilakukan.');
+                        throw new Exception('Maaf, besar pembayaran yang harus dilunasi lebih kecil dari jumlah pembayaran cicilan yang telah dilakukan.', 1);
                         $amount = 0;
                         $continue = false;
                     } 
@@ -449,6 +463,16 @@ class PaymentMajorController extends Controller
 
     /**
      * Show the specified resource.
+     * @param int $id
+     * @return Renderable
+     */
+    public function show($id)
+    {
+        return response()->json(PaymentMajor::find($id));
+    }
+
+    /**
+     * Show the specified resource.
      * @param Request $request
      * @return JSON
      */
@@ -462,5 +486,30 @@ class PaymentMajorController extends Controller
             $query = $query->where('prospect_student_id', $request->student_id);
         }
         return $query->first();
+    }
+
+    /**
+     * Show the specified resource.
+     * @param Request $request
+     * @return JSON
+     */
+    public function periodPayment(Request $request)
+    {
+        $periods = explode('/', $request->schoolyear);
+        $bookyear = BookYear::where('book_year', $periods[0])->first();
+        $query = PaymentMajor::select('period_month','period_year')
+                    ->where('department_id', $request->department_id)
+                    ->where('category_id', $request->category_id)
+                    ->where('receipt_id', $request->receipt_id)
+                    ->where('bookyear_id', $bookyear->id)
+                    ->groupBy('period_month','period_year')
+                    ->orderBy('period_month')
+                    ->get()->map(function($model)
+                    {
+                        $model['id'] = $model->period_month.$model->period_year;
+                        $model['text'] = 'Periode ' . $this->getMonthName($model->period_month) . ' / ' . $model->period_year; 
+                        return $model->only(['id','text']);
+                    });
+        return response()->json($query);
     }
 }

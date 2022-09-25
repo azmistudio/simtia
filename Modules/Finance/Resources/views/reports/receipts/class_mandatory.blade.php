@@ -1,5 +1,5 @@
 @php
-    $GridHeight = rtrim($InnerHeight,'px') - 10 . 'px';
+    $GridHeight = rtrim($InnerHeight,'px') . 'px';
 @endphp
 <table id="tb-report-payment-class" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" data-options="
     toolbar:'#menubarPaymentClass',method:'post',rownumbers:'true',showFooter:'true'">
@@ -38,6 +38,7 @@
                 bookyear_id: {{ $requests['bookyear_id'] }}, 
                 class_id: {{ $requests['class_id'] }}, 
                 status: {{ $requests['status'] }}, 
+                period: {{ $requests['period'] }}
             },
         })
     })
@@ -53,7 +54,8 @@
                 schoolyear: "{{ $requests['schoolyear'] }}",
                 class: "{{ $requests['class'] }}",
                 payment: "{{ $requests['payment_name'] }}",
-                is_prospect: 0
+                is_prospect: 0,
+                period: {{ $requests['period'] }}
             }
             exportDocument("{{ url('finance/report/receipt/class/export-') }}" + document,payload,"Ekspor data Laporan ke "+ document.toUpperCase(),"{{ csrf_token() }}")
         }

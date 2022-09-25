@@ -201,8 +201,7 @@
         pagingGrid(dgReceiptTrans.datagrid('getPager').pagination())
         actionButtonReceiptTransVoluntary("{{ $ViewType }}",[])
         $("#tb-receipt-trans-voluntary-instalment").datagrid({
-            url: "{{ url('finance/receipt/data/voluntary') }}",
-            queryParams: { _token: "{{ csrf_token() }}" },
+            url: "{{ url('finance/receipt/data/voluntary') }}" + "?_token=" + "{{ csrf_token() }}" + "&is_prospect=" + {{ $payload['category_id'] == 2 ? 0 : 1 }} + "&student_id=0",
             onDblClickRow: function (index, row) {
                 if (sessionStorage.formTransaksi_Penerimaan == "active") {
                     $.messager.alert('Peringatan', 'Form sedang aktif, silahkan batalkan terlebih dahulu', 'error')

@@ -35,7 +35,7 @@
 						$totalPaymentRemain += $remain;
 					@endphp
 					<tr height="35">
-						<td colspan="4" bgcolor="#CCCFFF"><b>{{ $mandatory->getReceipt->name }}</b></td>
+						<td colspan="4" bgcolor="#CCCFFF"><b>{{ $mandatory->getReceipt->name . ' Periode ' . $mandatory->period }}</b></td>
 					</tr>
 					<tr height="25">
 						<td width="20%" bgcolor="#CCFFFF"><strong>Total Bayaran</strong></td>
@@ -50,7 +50,7 @@
 				        	Rp{{ number_format($receiptMajorLast[0]->total,2) }}<br/>
 				        	Tanggal: {{ $receiptMajorLast[0]->trans_date }}<br/>
 				        	Diskon: Rp{{ $receiptMajorLast[0]->discount_amount }}<br/>
-				        	No. Jurnal: {{ $receiptMajorLast[0]->getJournal->cash_no }}
+				        	No. Jurnal: <b>{{ $receiptMajorLast[0]->getPaymentMajor->getBookYear->book_year . $receiptMajorLast[0]->getJournal->cash_no }}</b>
 				        </td>
 				        <td bgcolor="#FFFFFF" align="left" valign="top" rowspan="3">{{ $mandatory->remark }}</td>
 				    </tr>

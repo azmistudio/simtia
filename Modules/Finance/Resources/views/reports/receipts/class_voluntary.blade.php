@@ -34,7 +34,8 @@
                 class_id: {{ $requests['class_id'] }}, 
                 department_id: {{ $requests['department_id'] }}, 
                 status: -2, 
-                is_prospect: 0
+                is_prospect: 0,
+                period: {{ date('mY') }}
             },
         })
     })
@@ -50,7 +51,8 @@
                 schoolyear: "{{ $requests['schoolyear'] }}",
                 class: "{{ $requests['class'] }}",
                 payment: "{{ $requests['payment_name'] }}",
-                is_prospect: 0
+                is_prospect: 0,
+                period: {{ date('mY') }}
             }
             exportDocument("{{ url('finance/report/receipt/class/export-') }}" + document,payload,"Ekspor data Laporan ke "+ document.toUpperCase(),"{{ csrf_token() }}")
         }

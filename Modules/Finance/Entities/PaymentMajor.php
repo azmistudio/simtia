@@ -26,6 +26,8 @@ class PaymentMajor extends Model
         'journal_id',
         'bookyear_id',
         'logged',
+        'period_month',
+        'period_year'
     ];
     
     protected static function newFactory()
@@ -46,6 +48,11 @@ class PaymentMajor extends Model
     public function getStudent()
     {
         return $this->hasOne('Modules\Academic\Entities\Students', 'id', 'student_id');
+    }
+
+    public function getProspectStudent()
+    {
+        return $this->hasOne('Modules\Academic\Entities\ProspectStudentView', 'id', 'prospect_student_id');
     }
 
     public function getReceipt()

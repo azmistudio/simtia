@@ -141,6 +141,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
         // query
         return ReceiptMajor::select(
                     'finance.receipt_majors.id',
+                    'finance.receipt_majors.major_id',
                     'finance.journals.bookyear_id',
                     'finance.journals.cash_no',
                     'finance.journals.journal_date',
@@ -168,11 +169,22 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
 
     public function totalInstalment($payment_major_id)
     {
-        return ReceiptMajor::select(DB::raw('SUM(total) AS total'), DB::raw('SUM(discount_amount) AS discount'))->where('major_id', $payment_major_id)->first();
+        return ReceiptMajor::select(DB::raw('SUM(total) AS total'), DB::raw('SUM(discount_amount) AS discount'))
+                ->where('major_id', $payment_major_id)
+                ->first();
+    }
+
+    public function totalInstalments($payment_major_id)
+    {
+        return ReceiptMajor::select('major_id', DB::raw('SUM(total) AS total'), DB::raw('SUM(discount_amount) AS discount'))
+                ->where('major_id', $payment_major_id)
+                ->groupBy('major_id')
+                ->get();
     }
 
     public function maxInstallment(Request $request)
     {
+        $period = sprintf('%06d', $request->period);
         $subQuery = ReceiptMajor::select('finance.payment_majors.student_id',DB::raw('COUNT(finance.receipt_majors.id) as total'))
                         ->join('finance.payment_majors','finance.payment_majors.id','=','finance.receipt_majors.major_id')
                         ->join('academic.students','academic.students.id','=','finance.payment_majors.student_id')
@@ -180,6 +192,9 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                         ->where('finance.receipt_majors.is_prospect',0)
                         ->where('finance.payment_majors.bookyear_id',$request->bookyear_id)
                         ->where('finance.payment_majors.category_id',1)
+                        ->where('finance.payment_majors.category_id',1)
+                        ->where('finance.payment_majors.period_month', substr($period, 0,2))
+                        ->where('finance.payment_majors.period_year', substr($period, 2,4))
                         ->where('academic.students.class_id',$request->class_id);
         if ($request->status > -1)
         {
@@ -191,7 +206,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
 
     public function dataPaymentClass(Request $request)
     {
-        $query = $this->paymentClass($request->bookyear_id, $request->class_id, $request->status)->get();
+        $query = $this->paymentClass($request->bookyear_id, $request->class_id, $request->status, $request->period)->get();
         //
         $data['payments'] = array();
         $totalPayment = 0;
@@ -207,15 +222,15 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                 'status' => $row->status == 'Lunas' ? '<b>'.$row->status.'</b>' : $row->status,
                 'payment' => 'Rp'.number_format($row->amount,2),
                 'remark' => $row->remark,
-                'pays' => $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['pays'],
-                'major' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'],2),
-                'discount' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status)['discount'],2),
-                'arrears' => 'Rp'.number_format($row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'],2),
+                'pays' => $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['pays'],
+                'major' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'],2),
+                'discount' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['discount'],2),
+                'arrears' => 'Rp'.number_format($row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'],2),
             );
             $totalPayment += $row->amount;
-            $totalMajor += $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'];
-            $totalDiscount += $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['discount'];
-            $totalArrear += $row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'];
+            $totalMajor += $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'];
+            $totalDiscount += $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['discount'];
+            $totalArrear += $row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'];
         }
         $result["total"] = $query->count();
         $result["rows"] = $data['payments'];
@@ -229,8 +244,9 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
         return $result;
     }
 
-    public function paymentClass($bookyear_id, $class_id, $is_paid)
+    public function paymentClass($bookyear_id, $class_id, $is_paid, $period)
     {
+        $period_pay = sprintf('%06d', $period);
         $query = PaymentMajor::select(
                         DB::raw('DISTINCT ON (finance.payment_majors.student_id) student_id'),
                         DB::raw('INITCAP(academic.students.name) as student'),
@@ -241,6 +257,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                             WHEN finance.payment_majors.is_paid = 2 THEN 'Gratis' END status"),
                         'finance.payment_majors.amount',
                         'finance.payment_majors.remark',
+                        'finance.payment_majors.id',
                         'academic.students.student_no',
                     )
                     ->join('academic.students','academic.students.id','=','finance.payment_majors.student_id')
@@ -248,6 +265,8 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                     ->where('finance.payment_majors.is_prospect',0)
                     ->where('finance.payment_majors.bookyear_id',$bookyear_id)
                     ->where('finance.payment_majors.category_id',1)
+                    ->where('finance.payment_majors.period_month', substr($period_pay, 0,2))
+                    ->where('finance.payment_majors.period_year', substr($period_pay, 2,4))
                     ->where('academic.students.class_id',$class_id);
         if ($is_paid > -1)
         {
@@ -256,7 +275,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
         return $query->orderBy('finance.payment_majors.student_id');
     }
 
-    public function listPayment($bookyear_id, $student_id, $is_paid)
+    public function listPayment($bookyear_id, $student_id, $is_paid, $major_id)
     {
         $query = ReceiptMajor::select(
                         'finance.payment_majors.student_id',
@@ -268,6 +287,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                     ->join('finance.payment_majors','finance.payment_majors.id','=','finance.receipt_majors.major_id')
                     ->where('finance.journals.bookyear_id', $bookyear_id)
                     ->where('finance.payment_majors.student_id', $student_id)
+                    ->where('finance.receipt_majors.major_id', $major_id)
                     ->where('finance.receipt_majors.is_prospect',0);
         if ($is_paid > -1)
         {
@@ -313,7 +333,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
 
     public function dataPaymentClassArrear(Request $request)
     {
-        $query = $this->paymentClassArrear($request->bookyear_id, $request->payment, $request->duration, $request->date_delay)->get();
+        $query = $this->paymentClassArrear($request->bookyear_id, $request->payment, $request->duration, $request->date_delay, $request->period)->get();
         //
         $data['payments'] = array();
         $totalPayment = 0;
@@ -326,18 +346,18 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                 'student_no' => Str::upper($row->student_no),
                 'student' => $row->student,
                 'class' => Str::upper($row->class_name),
-                'delayed' => $this->paymentClassDelay($request->bookyear_id, $request->payment, $request->duration, $request->date_delay, $row->student_id)->pluck('delay')->first(),
+                'delayed' => $this->paymentClassDelay($request->bookyear_id, $request->payment, $request->duration, $request->date_delay, $row->student_id, $request->period)->pluck('delay')->first(),
                 'payment' => 'Rp'.number_format($row->amount,2),
                 'remark' => $row->remark,
-                'pays' => $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['pays'],
-                'major' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'],2),
-                'discount' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status)['discount'],2),
-                'arrears' => 'Rp'.number_format($row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'],2),
+                'pays' => $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['pays'],
+                'major' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'],2),
+                'discount' => 'Rp'.number_format($this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['discount'],2),
+                'arrears' => 'Rp'.number_format($row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'],2),
             );
             $totalPayment += $row->amount;
-            $totalMajor += $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'];
-            $totalDiscount += $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['discount'];
-            $totalArrear += $row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status)['major'];
+            $totalMajor += $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'];
+            $totalDiscount += $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['discount'];
+            $totalArrear += $row->amount - $this->listPayment($request->bookyear_id, $row->student_id, $request->status, $row->id)['major'];
         }
         $result["total"] = $query->count();
         $result["rows"] = $data['payments'];
@@ -351,15 +371,17 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
         return $result;
     }
 
-    public function paymentClassArrear($bookyear_id, $receipt_type_id, $duration, $date_delay)
+    public function paymentClassArrear($bookyear_id, $receipt_type_id, $duration, $date_delay, $period)
     {
-        $query_major = $this->paymentClassDelay($bookyear_id, $receipt_type_id, $duration, $date_delay, 0)->get()->pluck('major_id')->toArray();
+        $query_major = $this->paymentClassDelay($bookyear_id, $receipt_type_id, $duration, $date_delay, 0, $period)
+                        ->get()->pluck('id')->toArray();
         return PaymentMajor::select(
                     DB::raw('DISTINCT ON (finance.payment_majors.student_id) student_id'),
                     DB::raw('INITCAP(academic.students.name) as student'),
                     DB::raw('INITCAP(academic.classes.class) as class_name'),
                     'finance.payment_majors.amount',
                     'finance.payment_majors.remark',
+                    'finance.payment_majors.id',
                     'academic.students.student_no',
                 )
                 ->join('academic.students','academic.students.id','=','finance.payment_majors.student_id')
@@ -368,22 +390,25 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                 ->orderBy('finance.payment_majors.student_id');
     }
 
-    public function paymentClassDelay($bookyear_id, $receipt_type_id, $duration, $date_delay, $student_id)
+    public function paymentClassDelay($bookyear_id, $receipt_type_id, $duration, $date_delay, $student_id, $period)
     {
-        $query = ReceiptMajor::select('finance.receipt_majors.major_id')
-                    ->selectRaw('((?::DATE) - MAX(finance.receipt_majors.trans_date)) as delay', [$date_delay])
+        $period_pay = sprintf('%06d', $period);
+        $query = PaymentMajor::select('finance.payment_majors.id')
+                    ->selectRaw('((?::DATE) - COALESCE(MAX(finance.receipt_majors.trans_date),MAX(finance.journals.journal_date))) as delay', [$date_delay])
                     ->selectRaw('COUNT(finance.receipt_majors.major_id) as count_trx')
-                    ->join('finance.payment_majors','finance.payment_majors.id','=','finance.receipt_majors.major_id')
+                    ->leftJoin('finance.receipt_majors','finance.receipt_majors.major_id','=','finance.payment_majors.id')
+                    ->join('finance.journals','finance.journals.id','=','finance.payment_majors.journal_id')
                     ->join('academic.students','academic.students.id','=','finance.payment_majors.student_id')
                     ->where('finance.payment_majors.is_paid',0)
                     ->where('finance.payment_majors.bookyear_id',$bookyear_id)
-                    ->where('finance.payment_majors.receipt_id',$receipt_type_id);
-        // 
+                    ->where('finance.payment_majors.receipt_id',$receipt_type_id)
+                    ->where('finance.payment_majors.period_month', substr($period_pay, 0,2))
+                    ->where('finance.payment_majors.period_year', substr($period_pay, 2,4));
         if ($student_id > 0)
         {
             $query = $query->where('finance.payment_majors.student_id', $student_id);
         }
-        return $query->groupBy('finance.receipt_majors.major_id')->havingRaw('((?::DATE) - MAX(finance.receipt_majors.trans_date)) >= ?', [$date_delay, $duration]);
+        return $query->groupBy('finance.payment_majors.id')->havingRaw('((?::DATE) - COALESCE(MAX(finance.receipt_majors.trans_date),MAX(finance.journals.journal_date))) >= ?', [$date_delay, $duration]);
     }
 
     public function dataPaymentProspectGroup(Request $request)
@@ -438,6 +463,7 @@ class ReceiptMajorEloquent implements ReceiptMajorRepository
                             WHEN finance.payment_majors.is_paid = 2 THEN 'Gratis' END status"),
                         'finance.payment_majors.amount',
                         'finance.payment_majors.remark',
+                        'finance.payment_majors.id',
                         'academic.prospect_students.registration_no',
                     )
                     ->join('finance.receipt_categories','finance.receipt_categories.id','=','finance.payment_majors.category_id')

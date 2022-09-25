@@ -58,19 +58,37 @@
                             <div class="mb-1">
                                 <input name="amount" class="easyui-numberbox" style="width:400px;height:22px;" data-options="label:'<b>*</b>Besar Total Pembayaran:',labelWidth:'175px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" value="0" />
                                 <span class="mr-2"></span>
-                                <label><i>besar total pembayaran yang harus dilunasi</i></label>
+                                <label class="mb-0"><i>besar total pembayaran yang harus dilunasi</i></label>
                             </div>
                             <div class="mb-1">
                                 <input name="instalment" class="easyui-numberbox" style="width:400px;height:22px;" data-options="label:'<b>*</b>Besar Cicilan:',labelWidth:'175px',min:0,precision:2,groupSeparator:'.',decimalSeparator:','" value="0" />
                                 <span class="mr-2"></span>
-                                <label><i>besar cicilan pembayaran yang dibayarkan ketika membayar</i></label>
+                                <label class="mb-0"><i>besar cicilan pembayaran yang dibayarkan ketika membayar</i></label>
+                            </div>
+                            <div id="AccountingPaymentMajorMonth" class="mb-1">
+                                <select name="period_month" class="easyui-combobox" style="width:330px;height:22px;" data-options="label:'<b>*</b>Periode Bayar:',labelWidth:'175px',labelPosition:'before',panelHeight:100">
+                                    <option value="01">Januari</option>
+                                    <option value="02">Pebruari</option>
+                                    <option value="03">Maret</option>
+                                    <option value="04">April</option>
+                                    <option value="05">Mei</option>
+                                    <option value="06">Juni</option>
+                                    <option value="07">Juli</option>
+                                    <option value="08">Agustus</option>
+                                    <option value="09">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">Nopember</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                                <span class="mr-2"></span>
+                                <input name="period_year" class="easyui-textbox" style="width:58px;height:22px;" data-options="readonly:'true'" value="{{ date('Y') }}" />
                             </div>
                             <div class="mb-1">
                                 <input name="first_instalment" class="easyui-checkbox" value="2" style="height:22px;" data-options="label:'Cicilan Pertama:',labelWidth:'175px',labelPosition:'before'" />
                                 <span class="mr-1"></span>
-                                <label>Set cicilan pertama Rp 0</label>
+                                <label class="mb-0">Set cicilan pertama Rp 0</label>
                                 <span class="mr-2"></span>
-                                <label style="margin-left:50px;"><i>set cicilan pertama Rp 0, supaya muncul di Laporan Tunggakan </i></label>
+                                <label class="mb-0" style="margin-left:50px;"><i>set cicilan pertama Rp 0, supaya muncul di Laporan Tunggakan </i></label>
                             </div>
                             <div class="mb-1" id="OptionClass">
                                 <select name="class[]" id="AccountingPaymentMajorClass" class="easyui-combogrid" style="width:400px;height:22px;" data-options="
@@ -92,7 +110,7 @@
                                 ">
                                 </select>
                                 <span class="mr-2"></span>
-                                <label><i>dapat dipilih lebih dari 1 kelas</i></label>
+                                <label class="mb-0"><i>dapat dipilih lebih dari 1 kelas</i></label>
                             </div>
                             <div class="mb-1" id="OptionGroup">
                                 <select name="group[]" id="AccountingPaymentMajorGroup" class="easyui-combogrid" style="width:400px;height:22px;" data-options="
@@ -113,7 +131,7 @@
                                 ">
                                 </select>
                                 <span class="mr-2"></span>
-                                <label><i>dapat dipilih lebih dari 1 kelompok</i></label>
+                                <label class="mb-0"><i>dapat dipilih lebih dari 1 kelompok</i></label>
                             </div>
                             <div class="well mt-3">
                                 <label class="mb-0"><i><b>Santri/calon santri yang sudah terdata besar pembayarannya, tidak akan di data ulang besar pembayarannya</b></i>.</label>
@@ -141,14 +159,17 @@
                     if (records[1] == "JTT") {
                         $("#OptionClass").removeClass("d-none")
                         $("#OptionGroup").addClass("d-none")
+                        $("#AccountingPaymentMajorMonth").removeClass("d-none")
                     } else {
                         $("#OptionClass").addClass("d-none")
                         $("#OptionGroup").removeClass("d-none")
+                        $("#AccountingPaymentMajorMonth").addClass("d-none")
                     }
                     payload = records[0]
                 } else {
                     $("#OptionGroup").addClass("d-none")
                     $("#OptionClass").addClass("d-none")
+                    $("#AccountingPaymentMajorMonth").addClass("d-none")
                     $("#id-payment-major-dept").val(-1)
                     $("#AccountingPaymentMajorDeptId").textbox("setValue", "")
                     $("#AccountingPaymentMajorReceiptId").combogrid("setValue", "")
@@ -175,6 +196,7 @@
         markPaymentMajor.innerText = "*"
         titlePaymentMajor.innerText = ""
         idPaymentMajor.value = "-1"
+        $("#AccountingPaymentMajorMonth").addClass("d-none")
         $("#OptionGroup").addClass("d-none")
         $("#OptionClass").addClass("d-none")
         $("#page-payment-major").waitMe("hide")

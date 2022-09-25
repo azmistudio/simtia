@@ -64,6 +64,11 @@
               <td style="width:1%;text-align:center;">:</td>
               <td>{{ $requests->class }}</td>
             </tr>
+            <tr>
+              <td style="width:15%;">Periode Bayar</td>
+              <td style="width:1%;text-align:center;">:</td>
+              <td>{{ $period }}</td>
+            </tr>
           </tbody>
         </table>
         <br/>
@@ -92,7 +97,7 @@
               <td class="text-center">{{ $pay->student_no }}</td>
               <td>{{ $pay->student }}</td>
               @php 
-                $receipts = $receiptMajorEloquent->listPayment($requests->bookyear_id, $pay->student_id, $requests->status); 
+                $receipts = $receiptMajorEloquent->listPayment($requests->bookyear_id, $pay->student_id, $requests->status, $pay->id); 
               @endphp
               @if (count($receipts['queries']) > 0)
               @foreach ($receipts['queries'] as $receipt) 
@@ -119,7 +124,7 @@
                 <td></td>
               @endfor
               @endif
-              <td class="text-center">{{ $receiptMajorEloquent->paymentClassDelay($requests->bookyear_id, $requests->payment_id, $requests->duration, $requests->date_delay, $pay->student_id)->pluck('delay')->first() }}</td>
+              <td class="text-center">{{ $receiptMajorEloquent->paymentClassDelay($requests->bookyear_id, $requests->payment_id, $requests->duration, $requests->date_delay, $pay->student_id, $requests->period)->pluck('delay')->first() }}</td>
               <td class="text-right">Rp{{ number_format($pay->amount,2) }}</td>
               <td class="text-right">Rp{{ number_format($receipts['major'],2) }}</td>
               <td class="text-right">Rp{{ number_format($receipts['discount'],2) }}</td>
