@@ -87,7 +87,6 @@ class ReportController extends Controller
             abort(404);
         }
         $start_date = BookYear::find($request->bookyear_id)->start_date;
-        $dates = explode('/', $start_date);
         $start_period = date("Ym", strtotime($start_date));
         $end_period = date("Ym", strtotime('+11 months', strtotime($start_date)));
         if (strlen($request->start) > 2 && strlen($request->end) > 2)

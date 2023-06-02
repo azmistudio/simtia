@@ -71,7 +71,7 @@
                     <a href="javascript:void(0)" class="easyui-linkbutton small-btn flist-box" onclick="$('#ff-receipt-trans-voluntary').form('reset');filterReceiptTransVoluntary({})">Batal</a>
                 </div>
             </form>
-            <table id="tb-receipt-trans-voluntary" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}" 
+            <table id="tb-receipt-trans-voluntary" class="easyui-datagrid" style="width:100%;height:{{ $GridHeight }}"
                 data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100]">
                 <thead>
                     <tr>
@@ -327,8 +327,8 @@
         return false
     }
     function printReceiptTransVoluntary() {
-        exportDocument("{{ url('finance/receipt/data/print') }}", { 
-            department_id: $("#id-receipt-trans-voluntary-dept").val(), 
+        exportDocument("{{ url('finance/receipt/data/print') }}", {
+            department_id: $("#id-receipt-trans-voluntary-dept").val(),
             student_id: $("#id-receipt-trans-voluntary-student").val(),
             is_prospect: {{ $payload['category_id'] == 2 ? 0 : 1 }},
             student_no: $("#AccountingReceiptTransVoluntaryStudentNo").textbox("getValue"),
@@ -342,11 +342,11 @@
         if (dg !== null) {
             $.messager.progress({ title: "Cetak Kuitansi Pembayaran", msg:'Mohon tunggu...' })
             var payload = {
-                _token: '{{ csrf_token() }}', 
-                receipt_id: dg.id, 
+                _token: '{{ csrf_token() }}',
+                receipt_id: dg.id,
                 is_prospect: {{ $payload['category_id'] == 2 ? 0 : 1 }},
                 student_id: $("#id-receipt-trans-voluntary-student").val(),
-                student_no: $("#AccountingReceiptTransVoluntaryStudentNo").textbox("getValue"),  
+                student_no: $("#AccountingReceiptTransVoluntaryStudentNo").textbox("getValue"),
                 student_name: $("#AccountingReceiptTransVoluntaryStudentName").textbox("getValue"),
                 class: $("#AccountingReceiptTransVoluntaryClass").textbox("getValue"),
                 category_id: {{ $payload['category_id'] }}

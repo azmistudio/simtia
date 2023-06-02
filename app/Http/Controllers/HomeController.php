@@ -39,12 +39,12 @@ class HomeController extends Controller
         $schoolyear = !is_null($q_schoolyear) ? $q_schoolyear->school_year : '-';
         $request->session()->put('schoolyear', $schoolyear);
         // get active semester
-        $q_semester = Semester::where('is_active', 1)->pluck('semester')->first();
-        $semester = !is_null($q_semester) ? $q_semester : '-';
+        $q_semester = Semester::select('semester')->where('is_active', 1)->get()->pluck('semester')->toArray();
+        $semester = !is_null($q_semester) ? implode(', ',$q_semester) : '-';
         $request->session()->put('semester', $semester);
         // check update
-        $this->checkUpdate();   
-        // 
+        $this->checkUpdate();
+        //
         $data['notification'] = Notification::where('user_id', auth()->user()->id)->where('is_read', 0)->count();
         $data['total_dept'] = Department::where('is_all', 0)->count();
         $data['department'] = $department->getDepartment;
@@ -60,7 +60,7 @@ class HomeController extends Controller
      */
     public function dashboard(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -68,7 +68,7 @@ class HomeController extends Controller
         $data['InnerHeight'] = $window[0];
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
-        
+
         return view('errors.under', $data);
     }
 
@@ -79,7 +79,7 @@ class HomeController extends Controller
      */
     public function manual(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -87,7 +87,7 @@ class HomeController extends Controller
         $data['InnerHeight'] = $window[0];
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
-        
+
         return view('pages.manual', $data);
     }
 
@@ -98,7 +98,7 @@ class HomeController extends Controller
      */
     public function about(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -106,7 +106,7 @@ class HomeController extends Controller
         $data['InnerHeight'] = $window[0];
         $data['InnerWidth'] = $window[1];
         $data['ViewType'] = $request->t;
-        // 
+        //
         $Parsedown = new Parsedown();
         $data['version'] = config('app.version');
         $data['release_desc'] =  $Parsedown->text($this->getConfigs('app_version', config('app.version'))->value);
@@ -127,7 +127,7 @@ class HomeController extends Controller
             $request = Http::get('http://api.flagodna.com/hijriyah/api/' . $datenow);
             $response = [ 'success' => true, 'message' => $request->json()[0]['tanggal_hijriyah'] . ' ' . $request->json()[0]['bulan_hijriyah'] . ' ' . $request->json()[0]['tahun_hijriyah'] ];
         } catch (ConnectException $e) {
-            $response = [ 'success' => false, 'message' => $e->getMessage() ];         
+            $response = [ 'success' => false, 'message' => $e->getMessage() ];
         }
         return response()->json($response);
     }

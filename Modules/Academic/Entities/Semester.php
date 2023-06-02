@@ -16,10 +16,11 @@ class Semester extends Model
         'department_id',
         'semester',
         'remark',
+        'grade_id',
         'is_active',
         'logged',
     ];
-    
+
     protected static function newFactory()
     {
         return \Modules\Academic\Database\factories\SemesterFactory::new();
@@ -43,5 +44,10 @@ class Semester extends Model
     public function getExam()
     {
         return $this->hasOne('Modules\Academic\Entities\Exam', 'semester_id', 'id');
+    }
+
+    public function getGrade()
+    {
+        return $this->hasOne('Modules\Academic\Entities\Grade', 'id', 'grade_id');
     }
 }

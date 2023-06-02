@@ -56,7 +56,7 @@ class AssessmentReportController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -75,7 +75,7 @@ class AssessmentReportController extends Controller
      */
     public function loadScore(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -93,10 +93,10 @@ class AssessmentReportController extends Controller
     public function store(ExamReportRequest $request)
     {
         $validated = $request->validated();
-        try 
+        try
         {
             // check number
-            for ($i=0; $i < count($request->students); $i++) 
+            for ($i=0; $i < count($request->students); $i++)
             {
                 if (!isset($request->students[$i]['value']))
                 {
@@ -107,14 +107,14 @@ class AssessmentReportController extends Controller
                     throw new Exception('Nilai Huruf wajib dipilih.', 1);
                 }
             }
-            // 
+            //
             $request->merge([
                 'value' => 1,
                 'logged' => auth()->user()->email,
             ]);
             // get assessment_id
             $q_assessment = LessonAssessment::select('id')->where('employee_id', $request->employee_id)->where('grade_id', $request->grade_id)->where('lesson_id', $request->lesson_id)->where('score_aspect_id', $request->score_aspect_id)->orderBy('id')->first();
-            if ($request->id < 1) 
+            if ($request->id < 1)
             {
                 $query = $this->examReportEloquent->create($request, $this->subject);
                 $q_kkm = ExamReportScoreInfo::upsert([
@@ -129,7 +129,7 @@ class AssessmentReportController extends Controller
                     ]
                 ],['exam_report_id','lesson_id','class_id','semester_id'],['value','updated_at']);
                 $q_kkm_id = DB::table('academic.exam_report_score_infos')->select('id')->where('lesson_id', $request->lesson_id)->where('class_id', $request->class_id)->where('semester_id', $request->semester_id)->first();
-                for ($i=0; $i < count($request->students); $i++) 
+                for ($i=0; $i < count($request->students); $i++)
                 {
                     DB::table('academic.exam_report_score_finals')->insert(
                         [
@@ -157,7 +157,7 @@ class AssessmentReportController extends Controller
                     ]
                 ],['exam_report_id','lesson_id','class_id','semester_id'],['value','updated_at']);
                 $q_kkm_id = DB::table('academic.exam_report_score_infos')->select('id')->where('lesson_id', $request->lesson_id)->where('class_id', $request->class_id)->where('semester_id', $request->semester_id)->first();
-                for ($i=0; $i < count($request->students); $i++) 
+                for ($i=0; $i < count($request->students); $i++)
                 {
                     DB::table('academic.exam_report_score_finals')
                         ->where('exam_report_id', $request->id)
@@ -208,7 +208,7 @@ class AssessmentReportController extends Controller
      */
     public function destroy($id)
     {
-        try 
+        try
         {
             $this->examReportEloquent->destroy($id, $this->subject);
             $response = $this->getResponse('destroy', '', $this->subject);
@@ -234,10 +234,10 @@ class AssessmentReportController extends Controller
     public function list(Request $request)
     {
         $exam_report_ids = ExamReport::select('id')->where('lesson_id', $request->lesson_id)->where('class_id', $request->class_id)->where('semester_id', $request->semester_id)->where('employee_id', $request->employee_id)->get();
-        if (count($exam_report_ids) > 0) 
+        if (count($exam_report_ids) > 0)
         {
-            foreach ($exam_report_ids as $val) 
-            { 
+            foreach ($exam_report_ids as $val)
+            {
                 $idArray[] = $val->id;
             }
             $query = $this->examReportEloquent->list($request, $idArray);
@@ -290,12 +290,12 @@ class AssessmentReportController extends Controller
                     {
                         if ($final->lesson_exam_id == $request->data[$i])
                         {
-                            foreach ($students as $key => $value) 
+                            foreach ($students as $key => $value)
                             {
                                 if ($final->student_id == $value['id'])
                                 {
                                     $students[$key][$final->code] = number_format($final->score,2);
-                                    $value = $this->getSumScore($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect, $final->student_id);
+                                    $value = $this->getSumScore($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect, $final->student_id, $request->semester_id);
                                     $students[$key]['value'] = number_format($value,2);
                                     $students[$key]['value_letter'] = $this->getLetterScore($request->employee_id, $request->grade_id, $request->lesson_id, $request->score_aspect, $value);
                                 }
@@ -304,19 +304,19 @@ class AssessmentReportController extends Controller
                     }
                 }
             }
-            foreach ($students as $key => $value) 
+            foreach ($students as $key => $value)
             {
                 if (count($q_report) > 0)
                 {
-                    foreach ($q_report as $report) 
+                    foreach ($q_report as $report)
                     {
                         if ($report->student_id == $value['id'])
                         {
                             $students[$key]['value'] = number_format($report->value,2);
                             $students[$key]['value_letter'] = $report->value_letter;
-                        } 
+                        }
                     }
-                } 
+                }
             }
         }
         $result["rows"] = $students;
@@ -376,7 +376,7 @@ class AssessmentReportController extends Controller
                         ->get();
         $i = 0;
         $array_col = array();
-        foreach ($q_assessment as $assessment) 
+        foreach ($q_assessment as $assessment)
         {
             $sheet->setCellValueByColumnAndRow($i + 4, 8, $assessment->getLessonExam->code.' ('.$assessment->value.')');
             $sheet->getColumnDimensionByColumn($i + 4)->setWidth(20);
@@ -409,7 +409,7 @@ class AssessmentReportController extends Controller
                             {
                                 $sheet->setCellValueByColumnAndRow($value[1], $baris, $score->{$col});
                             }
-                        } 
+                        }
                     }
                 }
                 $x++;
@@ -437,20 +437,21 @@ class AssessmentReportController extends Controller
         //
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake();
         $filename = date('Ymdhis') . '_' . $name . '.xlsx';
-        // 
+        //
         $writer = new Xlsx($spreadsheet);
         $writer->save('storage/downloads/'.$filename);
         echo $filename;
     }
 
-    // helpers 
+    // helpers
 
-    private function getSumScore($employee_id, $grade_id, $lesson_id, $score_aspect_id, $student_id)
+    private function getSumScore($employee_id, $grade_id, $lesson_id, $score_aspect_id, $student_id, $semester_id)
     {
         $score = ExamScoreFinal::select(DB::raw('SUM((academic.exam_score_finals.score * academic.lesson_assessments.value)) as total'))
                     ->join('academic.lesson_assessments','academic.lesson_assessments.id','=','academic.exam_score_finals.lesson_assessment_id')
                     ->where('academic.exam_score_finals.lesson_id', $lesson_id)
                     ->where('academic.exam_score_finals.student_id', $student_id)
+                    ->where('academic.exam_score_finals.semester_id', $semester_id)
                     ->where('academic.lesson_assessments.score_aspect_id', $score_aspect_id)
                     ->first()->total;
         $weight = LessonAssessment::where('employee_id', $employee_id)
@@ -458,6 +459,7 @@ class AssessmentReportController extends Controller
                     ->where('lesson_id', $lesson_id)
                     ->where('score_aspect_id', $score_aspect_id)
                     ->sum('value');
+
         return $score / $weight;
     }
 
@@ -465,7 +467,7 @@ class AssessmentReportController extends Controller
     {
         $grade = '';
         $query = $this->lessonGradingEloquent->show($employee_id, $grade_id, $lesson_id, $score_aspect_id)->sortBy('id')->where('grade','<>','');
-        foreach ($query as $val) 
+        foreach ($query as $val)
         {
             if ($value >= $val->min && $value <= $val->max)
             {

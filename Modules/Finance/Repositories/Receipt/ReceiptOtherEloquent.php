@@ -33,7 +33,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
         $payload = Arr::except($request->all(), ['created_at','_token']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $payload['id'], $subject, 'Ubah');
-        // 
+        //
         return ReceiptOther::where('id', $payload['id'])->update($payload);
     }
 
@@ -63,7 +63,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
         $query = $this->dataPayment();
         // result
         $data = array();
-        foreach ($query as $val) 
+        foreach ($query as $val)
         {
             $data[] = array(
                 'id' => $val->id,
@@ -73,7 +73,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
                 'total' => number_format($val->total, 2),
                 'remark' => $val->remark,
                 'logged' => $val->employee,
-            );            
+            );
         }
         $totals = $this->totalPayment();
         $footer[] = array(
@@ -107,7 +107,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
                 ->join('finance.journal_details','finance.journal_details.journal_id','=','finance.receipt_others.journal_id')
                 ->join('finance.codes','finance.codes.id','=','finance.journal_details.account_id')
                 ->where('finance.codes.category_id', 1)
-                ->orderBy('finance.receipt_others.id')
+                ->orderByDesc('finance.receipt_others.id')
                 ->get()->map(function($model){
                     $model['journal_date'] = $this->formatDate($model['journal_date'],'iso');
                     $model['cash_no'] = $this->getPrefixBookYear($model->bookyear_id) . $model->cash_no;
@@ -123,7 +123,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
     public function dataRecapTotal($bookyear_id, $department_id, $category, $start_date, $end_date, $employee_id)
     {
         $query = ReceiptOther::select(DB::raw('
-                        SUM(finance.receipt_others.total) as total_grand, 
+                        SUM(finance.receipt_others.total) as total_grand,
                         finance.receipt_types.name as receipt_type,
                         finance.receipt_others.department_id
                     '))
@@ -135,7 +135,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
                     ->where('finance.receipt_others.department_id', $department_id)
                     ->whereRaw('finance.receipt_others.trans_date::date >= ?', $this->formatDate($start_date,'sys'))
                     ->whereRaw('finance.receipt_others.trans_date::date <= ?', $this->formatDate($end_date,'sys'));
-        // 
+        //
         if ($employee_id > 0)
         {
             $query = $query->where('finance.journals.employee_id', $employee_id);
@@ -204,7 +204,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
         {
             $queryTrans = $queryTrans->where('finance.journals.employee_id', $employee_id);
         }
-        // 
+        //
         return array(
             'transaction' => $queryTrans->where('finance.receipt_types.id', $type_id)->first(),
             'subtotal' => $queryTrans->where('finance.receipt_types.category_id', $category->category_id)->first(),
@@ -257,7 +257,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
                     ->where('finance.receipt_others.bookyear_id', $request->bookyear_id)
                     ->whereRaw('finance.receipt_others.trans_date >= ?', $this->formatDate($request->start_date,'sys'))
                     ->whereRaw('finance.receipt_others.trans_date <= ?', $this->formatDate($request->end_date,'sys'));
-        
+
         $footer[] = array(
             'source' => 'Total',
             'total' => '<b>'.number_format($this->dataReceiptTotal($request->bookyear_id, $request->receipt_id, $request->department_id, $request->start_date, $request->end_date)->total, 2).'</b>',
@@ -324,42 +324,42 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
         return $result;
     }
 
-    private function logActivity(Request $request, $model_id, $subject, $action) 
+    private function logActivity(Request $request, $model_id, $subject, $action)
     {
         if ($action == 'Tambah')
         {
             $data = array(
-                'receipt_id' => $request->receipt_id, 
-                'journal_id' => $request->journal_id, 
-                'source' => $request->source, 
-                'trans_date' => $request->trans_date, 
-                'total' => $request->total, 
-                'employee' => $request->employee, 
-                'bookyear_id' => $request->bookyear_id, 
-                'department_id' => $request->department_id, 
+                'receipt_id' => $request->receipt_id,
+                'journal_id' => $request->journal_id,
+                'source' => $request->source,
+                'trans_date' => $request->trans_date,
+                'total' => $request->total,
+                'employee' => $request->employee,
+                'bookyear_id' => $request->bookyear_id,
+                'department_id' => $request->department_id,
             );
             $this->logTransaction('#', $action .' '. $subject, '{}', json_encode($data));
         } else {
             $query = ReceiptOther::find($model_id);
             $before = array(
-                'receipt_id' => $query->receipt_id, 
-                'journal_id' => $query->journal_id, 
-                'source' => $query->source, 
-                'trans_date' => $query->trans_date, 
-                'total' => $query->total, 
-                'employee' => $query->employee, 
-                'bookyear_id' => $query->bookyear_id, 
-                'department_id' => $query->department_id, 
+                'receipt_id' => $query->receipt_id,
+                'journal_id' => $query->journal_id,
+                'source' => $query->source,
+                'trans_date' => $query->trans_date,
+                'total' => $query->total,
+                'employee' => $query->employee,
+                'bookyear_id' => $query->bookyear_id,
+                'department_id' => $query->department_id,
             );
             $after = array(
-                'receipt_id' => $request->has('receipt_id') ? $request->receipt_id : $query->receipt_id, 
-                'journal_id' => $request->has('journal_id') ? $request->journal_id : $query->journal_id, 
-                'source' => $request->has('source') ? $request->source : $query->source, 
-                'trans_date' => $request->has('trans_date') ? $request->trans_date : $query->trans_date, 
-                'total' => $request->has('total') ? $request->total : $query->total, 
-                'employee' => $request->has('employee') ? $request->employee : $query->employee, 
-                'bookyear_id' => $request->has('bookyear_id') ? $request->bookyear_id : $query->bookyear_id, 
-                'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id, 
+                'receipt_id' => $request->has('receipt_id') ? $request->receipt_id : $query->receipt_id,
+                'journal_id' => $request->has('journal_id') ? $request->journal_id : $query->journal_id,
+                'source' => $request->has('source') ? $request->source : $query->source,
+                'trans_date' => $request->has('trans_date') ? $request->trans_date : $query->trans_date,
+                'total' => $request->has('total') ? $request->total : $query->total,
+                'employee' => $request->has('employee') ? $request->employee : $query->employee,
+                'bookyear_id' => $request->has('bookyear_id') ? $request->bookyear_id : $query->bookyear_id,
+                'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id,
             );
             if ($action == 'Ubah')
             {
@@ -367,7 +367,7 @@ class ReceiptOtherEloquent implements ReceiptOtherRepository
             } else {
                 $this->logTransaction('#', $action .' '. $subject, json_encode($before), '{}');
             }
-        } 
-    }   
-	
+        }
+    }
+
 }

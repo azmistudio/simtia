@@ -38,7 +38,7 @@ class ExamReportEloquent implements ExamReportRepository
 		$payload = Arr::only($request->all(), ['id','lesson_id','class_id','semester_id','employee_id','score_aspect_id','logged']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $payload['id'], $subject, 'Ubah');
-        // 
+        //
         return ExamReport::where('id', $payload['id'])->update($payload);
 	}
 
@@ -51,10 +51,10 @@ class ExamReportEloquent implements ExamReportRepository
             $query = $query->whereHas('getSemester', function($qry) {
                 $qry->where('department_id', auth()->user()->department_id);
             });
-        } 
+        }
         // filter
         $fdept = isset($request->params['fdept']) ? $request->params['fdept'] : '';
-        if ($fdept != '') 
+        if ($fdept != '')
         {
             $query = $query->whereHas('getSemester', function($qry) use ($fdept) {
                 $qry->where('department_id', $fdept);
@@ -111,7 +111,7 @@ class ExamReportEloquent implements ExamReportRepository
         $filters = json_decode($request->filterRules);
         if (count($filters) > 0)
         {
-            foreach ($filters as $val) 
+            foreach ($filters as $val)
             {
                 $query = $query->where($val->field, 'like', '%'.Str::lower($val->value).'%');
             }
@@ -148,6 +148,7 @@ class ExamReportEloquent implements ExamReportRepository
                 ->join('departments','departments.id','=','academic.semesters.department_id')
                 ->join('academic.grades','academic.grades.id','=','academic.classes.grade_id')
                 ->join('academic.schoolyears','academic.schoolyears.id','=','academic.classes.schoolyear_id')
+                ->where('academic.semesters.is_active',1)
                 ->groupBy(
                     'academic.exam_reports.lesson_id',
                     'academic.exam_reports.class_id',
@@ -300,11 +301,11 @@ class ExamReportEloquent implements ExamReportRepository
     public function reportLeggerLessonData($lesson_id, $class_id, $semester_id, $student_id, $score_aspect_id)
     {
         return ExamReportScoreInfo::select(
-                    'academic.exam_report_score_finals.value',                    
-                    'academic.exam_report_score_finals.value_letter',                    
-                    'academic.exam_report_score_finals.comment',                    
-                    'academic.exam_report_score_finals.student_id',                    
-                    'academic.lesson_assessments.score_aspect_id',                    
+                    'academic.exam_report_score_finals.value',
+                    'academic.exam_report_score_finals.value_letter',
+                    'academic.exam_report_score_finals.comment',
+                    'academic.exam_report_score_finals.student_id',
+                    'academic.lesson_assessments.score_aspect_id',
                     'academic.students.student_no',
                     DB::raw('INITCAP(academic.students.name) as student')
                 )
@@ -321,7 +322,7 @@ class ExamReportEloquent implements ExamReportRepository
                 ->get();
     }
 
-    // 
+    //
     public function reportLeggerStudents($schoolyear_id, $class_id)
     {
         $schoolyear = SchoolYear::select('is_active')->where('id', $schoolyear_id)->first();
@@ -397,7 +398,7 @@ class ExamReportEloquent implements ExamReportRepository
     {
         $query = ScoreAspect::get();
         $options = array();
-        foreach ($query as $index => $row) 
+        foreach ($query as $index => $row)
         {
             $options[$row->id] = $row->basis;
         }
@@ -416,34 +417,34 @@ class ExamReportEloquent implements ExamReportRepository
                 ->where('academic.lesson_assessments.score_aspect_id', $score_aspect_id)
                 ->first();
     }
-	
-	private function logActivity(Request $request, $model_id, $subject, $action) 
+
+	private function logActivity(Request $request, $model_id, $subject, $action)
 	{
 		if ($action == 'Tambah')
 		{
 			$data = array(
-				'lesson_id' => $request->lesson_id, 
-				'class_id' => $request->class_id, 
-				'semester_id' => $request->semester_id, 
-				'employee_id' => $request->employee_id, 
-				'score_aspect_id' => $request->score_aspect_id, 
+				'lesson_id' => $request->lesson_id,
+				'class_id' => $request->class_id,
+				'semester_id' => $request->semester_id,
+				'employee_id' => $request->employee_id,
+				'score_aspect_id' => $request->score_aspect_id,
 			);
 			$this->logTransaction('#', $action .' '. $subject, '{}', json_encode($data));
 		} else {
 			$query = ExamReport::find($model_id);
 			$before = array(
-				'lesson_id' => $query->lesson_id, 
-				'class_id' => $query->class_id, 
-				'semester_id' => $query->semester_id, 
-				'employee_id' => $query->employee_id, 
-				'score_aspect_id' => $query->score_aspect_id, 
+				'lesson_id' => $query->lesson_id,
+				'class_id' => $query->class_id,
+				'semester_id' => $query->semester_id,
+				'employee_id' => $query->employee_id,
+				'score_aspect_id' => $query->score_aspect_id,
 			);
 			$after = array(
-				'lesson_id' => $request->has('lesson_id') ? $request->lesson_id : $query->lesson_id, 
-				'class_id' => $request->has('class_id') ? $request->class_id : $query->class_id, 
-				'semester_id' => $request->has('semester_id') ? $request->semester_id : $query->semester_id, 
-				'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id, 
-				'score_aspect_id' => $request->has('score_aspect_id') ? $request->score_aspect_id : $query->score_aspect_id, 
+				'lesson_id' => $request->has('lesson_id') ? $request->lesson_id : $query->lesson_id,
+				'class_id' => $request->has('class_id') ? $request->class_id : $query->class_id,
+				'semester_id' => $request->has('semester_id') ? $request->semester_id : $query->semester_id,
+				'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id,
+				'score_aspect_id' => $request->has('score_aspect_id') ? $request->score_aspect_id : $query->score_aspect_id,
 			);
 			if ($action == 'Ubah')
 			{
@@ -451,6 +452,6 @@ class ExamReportEloquent implements ExamReportRepository
 			} else {
 		        $this->logTransaction('#', $action .' '. $subject, json_encode($before), '{}');
 			}
-		} 
+		}
 	}
 }

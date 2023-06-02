@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div data-options="region:'center'">
-                            <div id="menu-act-grade" class="panel-top"> 
+                            <div id="menu-act-grade" class="panel-top">
                                 <a id="newGrade" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Add'" onclick="newGrade()">Baru</a>
                                 <a id="editGrade" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Edit'" onclick="editGrade()">Ubah</a>
                                 <a id="saveGrade" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Save'" onclick="saveGrade()">Simpan</a>
@@ -56,7 +56,7 @@
                                     @if (auth()->user()->getDepartment->is_all != 1)
                                         <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:375px;height:22px;" data-options="label:'Departemen:',labelWidth:'125px',readonly:true" />
                                         <input type="hidden" name="department_id" value="{{ auth()->user()->department_id }}" />
-                                    @else 
+                                    @else
                                         <select name="department_id" id="GradeDeptId" class="easyui-combobox" style="width:375px;height:22px;" data-options="label:'<b>*</b>Departemen:',labelWidth:'125px',labelPosition:'before',panelHeight:125">
                                             @foreach ($depts as $dept)
                                             <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -92,7 +92,7 @@
                     <div class="easyui-layout" style="height:{{ $TabContentHeight }};width:{{ $WindowWidth }};">
                             <div data-options="region:'west',split:true,collapsible:true,title:'Daftar'" style="width:300px">
                                 <div class="p-1">
-                                    <table id="tb-ref-schoolyear" class="easyui-datagrid" style="width:100%;height:{{ $TabGridHeight }}" 
+                                    <table id="tb-ref-schoolyear" class="easyui-datagrid" style="width:100%;height:{{ $TabGridHeight }}"
                                         data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100],
                                             rowStyler:function (index, row) { if (row.is_active === 'Aktif') { return 'font-weight:600' } }">
                                         <thead>
@@ -105,7 +105,7 @@
                                 </div>
                             </div>
                             <div data-options="region:'center'">
-                                <div id="menu-act-schoolyear" class="panel-top"> 
+                                <div id="menu-act-schoolyear" class="panel-top">
                                     <a id="newSchoolYear" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Add'" onclick="newSchoolYear()">Baru</a>
                                     <a id="editSchoolYear" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Edit'" onclick="editSchoolYear()">Ubah</a>
                                     <a id="saveSchoolYear" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Save'" onclick="saveSchoolYear()">Simpan</a>
@@ -127,10 +127,10 @@
                                         <input name="school_year" id="SchoolYearId" class="easyui-numberspinner" style="width:200px;height:22px;" data-options="label:'<b>*</b>Tahun Ajaran:',labelWidth:'125px',labelPosition:'before',min:2020" />
                                     </div>
                                     <div class="mb-1">
-                                        <input name="start_date" class="easyui-datebox" style="width:235px;height:22px;" data-options="label:'<b>*</b>Tanggal Mulai:',labelWidth:'125px',labelPosition:'before',formatter:dateFormatter,parser:dateParser" />
+                                        <input name="date_start" class="easyui-datebox" style="width:235px;height:22px;" data-options="label:'<b>*</b>Tanggal Mulai:',labelWidth:'125px',labelPosition:'before',formatter:dateFormatter,parser:dateParser" />
                                     </div>
                                     <div class="mb-1">
-                                        <input name="end_date" class="easyui-datebox" style="width:235px;height:22px;" data-options="label:'<b>*</b>Tanggal Akhir:',labelWidth:'125px',labelPosition:'before',formatter:dateFormatter,parser:dateParser" />
+                                        <input name="date_end" class="easyui-datebox" style="width:235px;height:22px;" data-options="label:'<b>*</b>Tanggal Akhir:',labelWidth:'125px',labelPosition:'before',formatter:dateFormatter,parser:dateParser" />
                                     </div>
                                     <div class="mb-1">
                                         <input name="remark" class="easyui-textbox" style="width:375px;height:40px;" data-options="label:'Keterangan:',labelWidth:'125px',labelPosition:'before',multiline:true" />
@@ -158,7 +158,7 @@
                     <div class="easyui-layout" style="height:{{ $TabContentHeight }};width:{{ $WindowWidth }};">
                         <div data-options="region:'west',split:true,collapsible:true,title:'Daftar'" style="width:300px">
                             <div class="p-1">
-                                <table id="tb-ref-semester" class="easyui-datagrid" style="width:100%;height:{{ $TabGridHeight }}" 
+                                <table id="tb-ref-semester" class="easyui-datagrid" style="width:100%;height:{{ $TabGridHeight }}"
                                     data-options="singleSelect:true,method:'post',rownumbers:'true',pagination:'true',pageSize:50,pageList:[10,25,50,75,100],
                                             rowStyler:function (index, row) { if (row.is_active === 'Aktif') { return 'font-weight:600' } }">
                                     <thead>
@@ -171,7 +171,7 @@
                             </div>
                         </div>
                         <div data-options="region:'center'">
-                            <div id="menu-act-semester" class="panel-top"> 
+                            <div id="menu-act-semester" class="panel-top">
                                 <a id="newSemester" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Add'" onclick="newSemester()">Baru</a>
                                 <a id="editSemester" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Edit'" onclick="editSemester()">Ubah</a>
                                 <a id="saveSemester" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Save'" onclick="saveSemester()">Simpan</a>
@@ -188,7 +188,7 @@
                                     @if (auth()->user()->getDepartment->is_all != 1)
                                         <input value="{{ auth()->user()->getDepartment->name }}" class="easyui-textbox" style="width:375px;height:22px;" data-options="label:'Departemen:',labelWidth:'125px',readonly:true" />
                                         <input type="hidden" name="department_id" value="{{ auth()->user()->department_id }}" />
-                                    @else 
+                                    @else
                                         <select name="department_id" id="SemesterDeptId" class="easyui-combobox" style="width:375px;height:22px;" data-options="label:'<b>*</b>Departemen:',labelWidth:'125px',labelPosition:'before',panelHeight:125">
                                             @foreach ($depts as $dept)
                                             <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -205,11 +205,26 @@
                                 <div class="mb-1">
                                     <input name="remark" class="easyui-textbox" style="width:375px;height:50px;" data-options="label:'Keterangan:',labelWidth:'125px',labelPosition:'before',multiline:true" />
                                 </div>
-                                <div class="mb-5">
-                                    <input name="is_active" class="easyui-checkbox" value="2" style="height:22px;" data-options="label:'Non Aktif:',labelWidth:'125px',labelPosition:'before'" />
+                                <div class="mb-1">
+                                    <input name="is_active" id="SemesterIsActive" class="easyui-checkbox" value="2" style="height:22px;" data-options="label:'Non Aktif:',labelWidth:'125px',labelPosition:'before'" />
+                                </div>
+                                <div class="mb-1" id="SemesterGradeIdDiv">
+                                    <select name="grade_id" id="SemesterGradeId" class="easyui-combogrid" style="width:275px;height:22px;" data-options="
+                                        label:'<b>*</b>Tingkat:',
+                                        labelWidth:'125px',
+                                        panelWidth: 230,
+                                        idField: 'id',
+                                        textField: 'grade',
+                                        fitColumns:true,
+                                        columns: [[
+                                            {field:'department',title:'Departemen',width:150},
+                                            {field:'grade',title:'Tingkat',width:80},
+                                        ]],
+                                    ">
+                                    </select>
                                 </div>
                                 </form>
-                                <p class="well">
+                                <p class="well mt-5">
                                     <label style="font-weight:500">Penting:</label><br/>
                                     Menu ini mengatur setiap nama semester yang ada di departemen sekolah. Setiap pergantian semester, pengguna harus mengubah status aktif semester ini.
                                 </p>
@@ -244,7 +259,7 @@
                             </div>
                         </div>
                         <div data-options="region:'center'">
-                            <div id="menu-act-class" class="panel-top"> 
+                            <div id="menu-act-class" class="panel-top">
                                 <a id="newClass" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Add'" onclick="newClass()">Baru</a>
                                 <a id="editClass" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Edit'" onclick="editClass()">Ubah</a>
                                 <a id="saveClass" class="easyui-linkbutton action-btn" data-options="plain:true,iconCls:'ms-Icon ms-Icon--Save'" onclick="saveClass()">Simpan</a>
@@ -432,7 +447,27 @@
         $("#SemesterId").textbox("textbox").bind("keyup", function (e) {
             titleSemester.innerText = $(this).val()
         })
+        $("#SemesterIsActive").checkbox({
+            onChange: function(checked) {
+                if (checked) {
+                    $("#SemesterGradeIdDiv").css("display","none")
+                } else {
+                    $("#SemesterGradeIdDiv").css("display","block")
+                }
+            }
+        })
         $("#page-semester").waitMe({effect:"none"})
+        $("#SemesterGradeId").combogrid({
+            url: '{{ url('academic/grade/combo-grid') }}',
+            method: 'post',
+            mode:'remote',
+            queryParams: { _token: '{{ csrf_token() }}' },
+        })
+        $("#SemesterDeptId").combobox({
+            onChange: function(newVal,oldVal) {
+                $("#SemesterGradeId").combogrid("grid").datagrid("load",{_token: '{{ csrf_token() }}', department_id: newVal})
+            }
+        })
         // class
         sessionStorage.formRef_Akademik_Class = "init"
         var dgClass = $("#tb-ref-class")
@@ -620,6 +655,7 @@
         titleSemester.innerText = ""
         idSemester.value = "-1"
         $("#SemesterIdAll").checkbox("enable")
+        $("#SemesterGradeIdDiv").css("display","none")
         $("#page-semester").waitMe("hide")
     }
     function editSemester() {
@@ -653,6 +689,7 @@
         titleSemester.innerText = ""
         markSemester.innerText = ""
         idSemester.value = "-1"
+        $("#SemesterGradeIdDiv").css("display","block")
         $("#page-semester").waitMe({effect:"none"})
     }
     function actionButtonSemester(viewType, idxArray) {

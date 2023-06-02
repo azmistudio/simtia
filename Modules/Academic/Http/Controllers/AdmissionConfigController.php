@@ -30,7 +30,7 @@ class AdmissionConfigController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -52,9 +52,9 @@ class AdmissionConfigController extends Controller
         $validated = $request->validate([
             'admission_id' => 'required|int',
         ]);
-        try 
+        try
         {
-            if (count($request->configs) > 0) 
+            if (count($request->configs) > 0)
             {
                 $request->merge([
                     'donate_code_1' => $request->configs[0]['code'],
@@ -84,7 +84,7 @@ class AdmissionConfigController extends Controller
                     'logged' => auth()->user()->email,
                 ]);
             }
-            if ($request->id < 1) 
+            if ($request->id < 1)
             {
                 $admission = Admission::find($request->admission_id);
                 if ($admission->is_active != 1)
@@ -93,8 +93,7 @@ class AdmissionConfigController extends Controller
                 } else {
                     if ($request->has('is_clone'))
                     {
-                        $search[] = array('column' => 'id', 'action' => 'neq', 'query' => $request->admission_id);
-                        $admission_before = $this->configEloquent->show($search, true, 'desc', 'id');
+                        $admission_before = AdmissionConfig::where('id','<>',$request->admission_id)->first();
                         if (is_null($admission_before))
                         {
                             throw new Exception('Belum ada data konfigurasi yang dibuat', 1);
@@ -127,12 +126,12 @@ class AdmissionConfigController extends Controller
                             ]);
                         }
                     }
-                    $this->configEloquent->create($request, $this->subject); 
-                    $response = $this->getResponse('store', '', $this->subject);    
+                    $this->configEloquent->create($request, $this->subject);
+                    $response = $this->getResponse('store', '', $this->subject);
                 }
             } else {
                 $this->configEloquent->update($request, $this->subject);
-                $response = $this->getResponse('store', '', $this->subject);   
+                $response = $this->getResponse('store', '', $this->subject);
             }
         } catch (\Throwable $e) {
             $response = $this->getResponse('error', $e->getMessage(), 'Proses Penerimaan');
@@ -167,7 +166,7 @@ class AdmissionConfigController extends Controller
      */
     public function destroy($id)
     {
-        try 
+        try
         {
             $this->configEloquent->destroy($id, $this->subject);
             $response = $this->getResponse('destroy', '', $this->subject);

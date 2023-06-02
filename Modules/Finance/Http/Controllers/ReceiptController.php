@@ -43,12 +43,12 @@ class ReceiptController extends Controller
     private $subject = 'Data Transaksi Penerimaan';
 
     function __construct(
-        JournalEloquent $journalEloquent, 
-        ReceiptTypeEloquent $receiptTypeEloquent, 
-        ReceiptMajorEloquent $receiptMajorEloquent, 
-        ReceiptVoluntaryEloquent $receiptVoluntaryEloquent, 
-        ReceiptOtherEloquent $receiptOtherEloquent, 
-        PaymentMajorEloquent $paymentMajorEloquent, 
+        JournalEloquent $journalEloquent,
+        ReceiptTypeEloquent $receiptTypeEloquent,
+        ReceiptMajorEloquent $receiptMajorEloquent,
+        ReceiptVoluntaryEloquent $receiptVoluntaryEloquent,
+        ReceiptOtherEloquent $receiptOtherEloquent,
+        PaymentMajorEloquent $paymentMajorEloquent,
         CodeEloquent $codeEloquent
     )
     {
@@ -67,7 +67,7 @@ class ReceiptController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -93,7 +93,7 @@ class ReceiptController extends Controller
      */
     public function indexMandatory(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -115,7 +115,7 @@ class ReceiptController extends Controller
      */
     public function indexVoluntary(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -137,7 +137,7 @@ class ReceiptController extends Controller
      */
     public function indexOther(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -160,7 +160,7 @@ class ReceiptController extends Controller
      */
     public function store(Request $request)
     {
-        switch ($request->category_id) 
+        switch ($request->category_id)
         {
             case 2:
                 // SKR
@@ -175,7 +175,7 @@ class ReceiptController extends Controller
                     'journal_date' => 'required'
                 ]);
                 try {
-                    if ($request->id < 1) 
+                    if ($request->id < 1)
                     {
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
@@ -193,7 +193,7 @@ class ReceiptController extends Controller
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
-                            // increment number in bookyear                  
+                            // increment number in bookyear
                             BookYear::where('id', $request->bookyear_id)->increment('number');
                             // store receipt voluntary
                             $receiptVoluntaryRequest = new Request();
@@ -288,7 +288,7 @@ class ReceiptController extends Controller
                                             'uuid' => $uuid,
                                             'logged' => auth()->user()->email
                                         ]);
-                                    // 
+                                    //
                                     if ($cash_account_id != $request->cash_account)
                                     {
                                         // update journal detail
@@ -331,9 +331,9 @@ class ReceiptController extends Controller
                     'cash_account' => 'required',
                     'journal_date' => 'required'
                 ]);
-                try 
+                try
                 {
-                    if ($request->id < 1) 
+                    if ($request->id < 1)
                     {
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
@@ -383,8 +383,8 @@ class ReceiptController extends Controller
                                 if ($request->discount > 0)
                                 {
                                     $this->journalEloquent->createDetail($journal->id, $receipt_type->discount_account, $request->discount, 0, $uuid);
-                                } 
-                                // increment number in bookyear                  
+                                }
+                                // increment number in bookyear
                                 BookYear::where('id', $request->bookyear_id)->increment('number');
                                 // store to receipt major
                                 $receiptMajorRequest = new Request();
@@ -402,7 +402,7 @@ class ReceiptController extends Controller
                                 $this->receiptMajorEloquent->create($receiptMajorRequest, $this->subject .' Iuran Wajib Calon Santri');
                                 // update is_paid
                                 if ($is_paid > 0)
-                                {   
+                                {
                                     $paymentMajorRequest = new Request();
                                     $paymentMajorRequest->merge([
                                         'id' => $payment_majors->id,
@@ -410,7 +410,7 @@ class ReceiptController extends Controller
                                         'logged' => auth()->user()->email,
                                     ]);
                                     $this->paymentMajorEloquent->update($paymentMajorRequest, $this->subject .' Iuran Wajib Calon Santri');
-                                } 
+                                }
                             });
                             $response = $this->getResponse('store', '', $this->subject .' Iuran Wajib Calon Santri', $is_paid);
                         }
@@ -477,7 +477,7 @@ class ReceiptController extends Controller
                                     } else {
                                         $instalment_count = 0;
                                         $receipt_major = ReceiptMajor::where('major_id', $request->major_id)->orderBy('trans_date')->get();
-                                        foreach ($receipt_major as $val) 
+                                        foreach ($receipt_major as $val)
                                         {
                                             $instalment_count++;
                                             if ($val->id == $request->receipt_id)
@@ -505,7 +505,7 @@ class ReceiptController extends Controller
                                         ]);
                                         $this->receiptMajorEloquent->update($receiptMajorRequest, $this->subject .' Iuran Wajib Calon Santri');
                                         // get journal_id
-                                        $journal_id = ReceiptMajor::find($request->id)->journal_id;    
+                                        $journal_id = ReceiptMajor::find($request->id)->journal_id;
                                         // update journal
                                         Journal::where('id', $journal_id)->update([
                                             'journal_date' => $this->formatDate($request->journal_date,'sys'),
@@ -571,7 +571,7 @@ class ReceiptController extends Controller
                     }
                 } catch (\Throwable $e) {
                     $response = $this->getResponse('error', $e->getMessage(), $this->subject .' Iuran Wajib Calon Santri');
-                }  
+                }
                 break;
             case 4:
                 // CSSKR
@@ -586,7 +586,7 @@ class ReceiptController extends Controller
                     'journal_date' => 'required'
                 ]);
                 try {
-                    if ($request->id < 1) 
+                    if ($request->id < 1)
                     {
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
@@ -604,7 +604,7 @@ class ReceiptController extends Controller
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
-                            // increment number in bookyear                  
+                            // increment number in bookyear
                             BookYear::where('id', $request->bookyear_id)->increment('number');
                             // store receipt voluntary
                             $receiptVoluntaryRequest = new Request();
@@ -697,7 +697,7 @@ class ReceiptController extends Controller
                                             'uuid' => $uuid,
                                             'logged' => auth()->user()->email
                                         ]);
-                                    // 
+                                    //
                                     if ($cash_account_id != $request->cash_account)
                                     {
                                         // update journal detail
@@ -737,9 +737,9 @@ class ReceiptController extends Controller
                     'cash_account' => 'required',
                     'journal_date' => 'required'
                 ]);
-                try 
+                try
                 {
-                    if ($request->id < 1) 
+                    if ($request->id < 1)
                     {
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
@@ -755,8 +755,8 @@ class ReceiptController extends Controller
                             // store journal detail
                             $this->journalEloquent->createDetail($journal->id, $request->cash_account, $request->amount, 0, $uuid);
                             $this->journalEloquent->createDetail($journal->id, $receipt_type->receipt_account, 0, $request->amount, $uuid);
-                            // increment number in bookyear                  
-                            BookYear::where('id', $request->bookyear_id)->increment('number');                                 
+                            // increment number in bookyear
+                            BookYear::where('id', $request->bookyear_id)->increment('number');
                             // store to receipt other
                             $receiptOtherRequest = new Request();
                             $receiptOtherRequest->merge([
@@ -846,7 +846,7 @@ class ReceiptController extends Controller
                                             'uuid' => $uuid,
                                             'logged' => auth()->user()->email
                                         ]);
-                                    // 
+                                    //
                                     if ($cash_account_id != $request->cash_account)
                                     {
                                         // update journal detail
@@ -857,7 +857,7 @@ class ReceiptController extends Controller
                                                 'account_id' => $request->cash_account,
                                                 'logged' => auth()->user()->email
                                             ]);
-                                    }   
+                                    }
                                     JournalDetail::where('journal_id', $receipt_others->journal_id)
                                         ->where('account_id', $receipt_account_id)
                                         ->where('debit',0)
@@ -889,9 +889,9 @@ class ReceiptController extends Controller
                     'cash_account' => 'required|gt:0',
                     'journal_date' => 'required'
                 ]);
-                try 
+                try
                 {
-                    if ($request->id < 1) 
+                    if ($request->id < 1)
                     {
                         // get receipt type
                         $receipt_type = ReceiptType::find($request->receipt_id);
@@ -940,8 +940,8 @@ class ReceiptController extends Controller
                                 if ($request->discount > 0)
                                 {
                                     $this->journalEloquent->createDetail($journal->id, $receipt_type->discount_account, $request->discount, 0, $uuid);
-                                } 
-                                // increment number in bookyear                  
+                                }
+                                // increment number in bookyear
                                 BookYear::where('id', $request->bookyear_id)->increment('number');
                                 // store to receipt major
                                 $receiptMajorRequest = new Request();
@@ -960,7 +960,7 @@ class ReceiptController extends Controller
                                 $this->receiptMajorEloquent->create($receiptMajorRequest, $this->subject .' Iuran Wajib Santri');
                                 // update is_paid
                                 if ($is_paid > 0)
-                                {   
+                                {
                                     $paymentMajorRequest = new Request();
                                     $paymentMajorRequest->merge([
                                         'id' => $payment_majors->id,
@@ -968,7 +968,7 @@ class ReceiptController extends Controller
                                         'logged' => auth()->user()->email,
                                     ]);
                                     $this->paymentMajorEloquent->update($paymentMajorRequest, $this->subject .' Iuran Wajib Santri');
-                                } 
+                                }
                             });
                             $response = $this->getResponse('store', '', $this->subject .' Iuran Wajib Santri', $is_paid);
                         }
@@ -1035,7 +1035,7 @@ class ReceiptController extends Controller
                                     } else {
                                         $instalment_count = 0;
                                         $receipt_major = ReceiptMajor::where('major_id', $request->major_id)->orderBy('trans_date')->get();
-                                        foreach ($receipt_major as $val) 
+                                        foreach ($receipt_major as $val)
                                         {
                                             $instalment_count++;
                                             if ($val->id == $request->receipt_id)
@@ -1140,7 +1140,7 @@ class ReceiptController extends Controller
      */
     public function show($id, $category_id)
     {
-        switch ($category_id) 
+        switch ($category_id)
         {
             case 2:
                 return response()->json($this->receiptVoluntaryEloquent->show($id));
@@ -1202,7 +1202,7 @@ class ReceiptController extends Controller
                         ->where('category_id', $receipt_type->category_id)
                         ->where('receipt_id', $request->receipt_id)
                         ->where('student_id', $request->student_id)
-                        ->orderBy('period_month','desc')
+                        ->orderByDesc('id')
                         ->get()->map(function($model) {
                             $model['id'] = $model->id;
                             $model['text'] = $this->getMonthName($model->period_month) .' / '. $model->period_year;
@@ -1233,7 +1233,7 @@ class ReceiptController extends Controller
             $payment_majors = $payment_majors->first();
         }
         $journal = Journal::find($payment_majors->journal_id);
-        // 
+        //
         return response()->json(array(
             'payment_major_id' => $payment_majors->id,
             'amount' => $payment_majors->amount,
@@ -1253,7 +1253,7 @@ class ReceiptController extends Controller
         $payload = json_decode($request->data);
         $data['requests'] = $payload;
         $data['profile'] = $this->getInstituteProfile();
-        switch ($payload->category_id) 
+        switch ($payload->category_id)
         {
             case 2:
                 $data['categories'] = DB::table('finance.receipt_categories')->select(
@@ -1268,7 +1268,7 @@ class ReceiptController extends Controller
                                         ->first();
                 $data['bookyear'] = $this->getActiveBookYear();
                 $data['students'] = Students::find($payload->student_id);
-                $data['payments'] = $this->receiptVoluntaryEloquent->dataPayment($payload->is_prospect, $payload->student_id);  
+                $data['payments'] = $this->receiptVoluntaryEloquent->dataPayment($payload->is_prospect, $payload->student_id);
                 $data['total'] = $this->receiptVoluntaryEloquent->totalPayment($payload->is_prospect, $payload->student_id);
                 $view = View::make('finance::pages.receipts.receipt_voluntary_pdf', $data);
                 break;
@@ -1303,7 +1303,7 @@ class ReceiptController extends Controller
                                         ->where('finance.receipt_types.department_id', $payload->department_id)
                                         ->first();
                 $data['students'] = AdmissionProspect::find($payload->student_id);
-                $data['payments'] = $this->receiptVoluntaryEloquent->dataPayment($payload->is_prospect, $payload->student_id);  
+                $data['payments'] = $this->receiptVoluntaryEloquent->dataPayment($payload->is_prospect, $payload->student_id);
                 $data['total'] = $this->receiptVoluntaryEloquent->totalPayment($payload->is_prospect, $payload->student_id);
                 $data['bookyear'] = $this->getActiveBookYear();
                 $view = View::make('finance::pages.receipts.receipt_voluntary_pdf', $data);
@@ -1331,7 +1331,7 @@ class ReceiptController extends Controller
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake();
         $hashfile = md5(date('Ymdhis') . '_' . $name);
         $filename = date('Ymdhis') . '_' . $name . '.pdf';
-        // 
+        //
         Storage::disk('local')->put('public/tempo/'.$hashfile . '.html', $view->render());
         $this->pdfPortraits($hashfile, $filename);
         echo $filename;
@@ -1366,7 +1366,7 @@ class ReceiptController extends Controller
                                             $model['cash_no'] = $this->getPrefixBookYear($model->bookyear_id) . $model->cash_no;
                                             return $model;
                                         })[0];
-            $data['total'] = $this->receiptMajorEloquent->totalInstalment($data['receipt_majors']['major_id']);    
+            $data['total'] = $this->receiptMajorEloquent->totalInstalment($data['receipt_majors']['major_id']);
             $data['requests'] = $payload;
             $data['values'] = array(
                 'total' => 'Rp'.number_format($data['receipt_majors']['total'], 2),
@@ -1425,7 +1425,7 @@ class ReceiptController extends Controller
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject)->snake();
         $hashfile = md5(date('Ymdhis') . '_' . $name);
         $filename = date('Ymdhis') . '_' . $name . '.pdf';
-        // 
+        //
         Storage::disk('local')->put('public/tempo/'.$hashfile . '.html', $view->render());
         $this->pdfPortrait($hashfile, $filename);
         echo $filename;
@@ -1437,7 +1437,7 @@ class ReceiptController extends Controller
      */
     public function dataShow(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }

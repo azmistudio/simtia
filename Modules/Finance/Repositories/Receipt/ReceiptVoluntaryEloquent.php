@@ -34,7 +34,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         $payload = Arr::except($request->all(), ['created_at','_token']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $payload['id'], $subject, 'Ubah');
-        // 
+        //
         return ReceiptVoluntary::where('id', $payload['id'])->update($payload);
     }
 
@@ -59,12 +59,10 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
 
     public function data(Request $request)
     {
-        $sort = isset($request->sort) ? $request->sort : 'finance.receipt_majors.trans_date';
-        $order = isset($request->order) ? $request->order : 'asc';
         $query = $this->dataPayment($request->is_prospect, $request->student_id);
         // result
         $data = array();
-        foreach ($query as $val) 
+        foreach ($query as $val)
         {
             $data[] = array(
                 'id' => $val->id,
@@ -73,7 +71,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
                 'total' => number_format($val->total, 2),
                 'remark' => $val->remark,
                 'logged' => $val->employee,
-            );            
+            );
         }
         $totals = $this->totalPayment($request->is_prospect, $request->student_id);
         $footer[] = array(
@@ -111,7 +109,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         } else {
             $query = $query->where('prospect_student_id', $student_id);
         }
-        $query = $query->where('finance.codes.category_id', 1)->orderBy('finance.receipt_voluntaries.id')->get()->map(function($model){
+        $query = $query->where('finance.codes.category_id', 1)->orderByDesc('finance.receipt_voluntaries.id')->get()->map(function($model){
             $model['journal_date'] = $this->formatDate($model['journal_date'],'iso');
             $model['cash_no'] = $this->getPrefixBookYear($model->bookyear_id) . $model->cash_no;
             return $model;
@@ -139,7 +137,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
                     ->whereRaw('trans_date::date <= ?', $this->formatDate($request['end_date'],'sys'));
         $query = $request['is_prospect'] == 0 ? $query->where('student_id',$request['student_id']) : $query->where('prospect_student_id',$request['student_id']);
         return $query->get();
-    } 
+    }
 
     public function totalPaymentReceipt($receipt_id, $student_id, $is_prospect)
     {
@@ -164,7 +162,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         //
         $data['payments'] = array();
         $totalMajor = 0;
-        foreach ($query as $row) 
+        foreach ($query as $row)
         {
             $data["payments"][] = array(
                 'student_no' => $row->student_no,
@@ -215,7 +213,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
                     ->where('finance.receipt_voluntaries.bookyear_id', $bookyear_id)
                     ->where('finance.receipt_voluntaries.department_id', $department_id)
                     ->where('academic.students.class_id', $class_id);
-       
+
         $query = $query->orderBy('finance.receipt_voluntaries.trans_date')->get()->map(function($model){
             $model['tdate'] = $this->formatDate($model['trans_date'],'iso');
             return $model;
@@ -223,7 +221,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         $totalpay = 0;
         $i = 1;
         $result = '<table><tbody><tr>';
-        foreach ($query as $row) 
+        foreach ($query as $row)
         {
             $result .= '<td style="padding:5px 5px 5px 25px;text-align:right;width:105px;"><span style="display:flex;margin-left:-22px;margin-top:-5px;font-size:12px;"><b>#'.$i.'</b></span>Rp' . number_format($row->total) . '<hr style="margin:0.2rem 0 !important;" />' . $row->tdate . '</td>';
             $totalpay = $totalpay + $row->total;
@@ -260,7 +258,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         //
         $data['payments'] = array();
         $totalMajor = 0;
-        foreach ($query as $row) 
+        foreach ($query as $row)
         {
             $data["payments"][] = array(
                 'student_no' => $row->registration_no,
@@ -310,7 +308,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
                     ->where('finance.receipt_voluntaries.prospect_student_id', $prospect_student_id)
                     ->where('finance.receipt_voluntaries.department_id', $department_id)
                     ->where('academic.prospect_students.prospect_group_id',$prospect_group_id);
-       
+
         $query = $query->orderBy('finance.receipt_voluntaries.trans_date')->get()->map(function($model){
             $model['tdate'] = $this->formatDate($model['trans_date'],'iso');
             return $model;
@@ -318,7 +316,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         $totalpay = 0;
         $i = 1;
         $result = '<table><tbody><tr>';
-        foreach ($query as $row) 
+        foreach ($query as $row)
         {
             $result .= '<td style="padding:5px 5px 5px 25px;text-align:right;width:105px;"><span style="display:flex;margin-left:-22px;margin-top:-5px;font-size:12px;"><b>#'.$i.'</b></span>Rp' . number_format($row->total) . '<hr style="margin:0.2rem 0 !important;" />' . $row->tdate . '</td>';
             $totalpay = $totalpay + $row->total;
@@ -351,7 +349,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
     public function dataRecapTotal($bookyear_id, $department_id, $category, $start_date, $end_date, $employee_id)
     {
         $query = ReceiptVoluntary::select(DB::raw('
-                        SUM(finance.receipt_voluntaries.total) as total_grand, 
+                        SUM(finance.receipt_voluntaries.total) as total_grand,
                         finance.receipt_types.name as receipt_type,
                         finance.receipt_voluntaries.department_id
                     '))
@@ -363,7 +361,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
                     ->where('finance.receipt_voluntaries.department_id', $department_id)
                     ->whereRaw('finance.receipt_voluntaries.trans_date::date >= ?', $this->formatDate($start_date,'sys'))
                     ->whereRaw('finance.receipt_voluntaries.trans_date::date <= ?', $this->formatDate($end_date,'sys'));
-        // 
+        //
         if ($employee_id > 0)
         {
             $query = $query->where('finance.journals.employee_id', $employee_id);
@@ -432,7 +430,7 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         {
             $queryTrans = $queryTrans->where('finance.journals.employee_id', $employee_id);
         }
-        // 
+        //
         return array(
             'transaction' => $queryTrans->where('finance.receipt_types.id', $type_id)->first(),
             'subtotal' => $queryTrans->where('finance.receipt_types.category_id', $category->category_id)->first(),
@@ -494,48 +492,48 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
         return $result;
     }
 
-    private function logActivity(Request $request, $model_id, $subject, $action) 
+    private function logActivity(Request $request, $model_id, $subject, $action)
     {
         if ($action == 'Tambah')
         {
             $data = array(
-                'receipt_id' => $request->receipt_id, 
-                'journal_id' => $request->journal_id, 
-                'prospect_student_id' => $request->prospect_student_id, 
-                'student_id' => $request->student_id, 
-                'trans_date' => $request->trans_date, 
-                'total' => $request->total, 
-                'employee' => $request->employee, 
-                'is_prospect' => $request->is_prospect, 
-                'bookyear_id' => $request->bookyear_id, 
-                'department_id' => $request->department_id, 
+                'receipt_id' => $request->receipt_id,
+                'journal_id' => $request->journal_id,
+                'prospect_student_id' => $request->prospect_student_id,
+                'student_id' => $request->student_id,
+                'trans_date' => $request->trans_date,
+                'total' => $request->total,
+                'employee' => $request->employee,
+                'is_prospect' => $request->is_prospect,
+                'bookyear_id' => $request->bookyear_id,
+                'department_id' => $request->department_id,
             );
             $this->logTransaction('#', $action .' '. $subject, '{}', json_encode($data));
         } else {
             $query = ReceiptVoluntary::find($model_id);
             $before = array(
-                'receipt_id' => $query->receipt_id, 
-                'journal_id' => $query->journal_id, 
-                'prospect_student_id' => $query->prospect_student_id, 
-                'student_id' => $query->student_id, 
-                'trans_date' => $query->trans_date, 
-                'total' => $query->total, 
-                'employee' => $query->employee, 
-                'is_prospect' => $query->is_prospect, 
-                'bookyear_id' => $query->bookyear_id, 
-                'department_id' => $query->department_id, 
+                'receipt_id' => $query->receipt_id,
+                'journal_id' => $query->journal_id,
+                'prospect_student_id' => $query->prospect_student_id,
+                'student_id' => $query->student_id,
+                'trans_date' => $query->trans_date,
+                'total' => $query->total,
+                'employee' => $query->employee,
+                'is_prospect' => $query->is_prospect,
+                'bookyear_id' => $query->bookyear_id,
+                'department_id' => $query->department_id,
             );
             $after = array(
-                'receipt_id' => $request->has('receipt_id') ? $request->receipt_id : $query->receipt_id, 
-                'journal_id' => $request->has('journal_id') ? $request->journal_id : $query->journal_id, 
-                'prospect_student_id' => $request->has('prospect_student_id') ? $request->prospect_student_id : $query->prospect_student_id, 
-                'student_id' => $request->has('student_id') ? $request->student_id : $query->student_id, 
-                'trans_date' => $request->has('trans_date') ? $request->trans_date : $query->trans_date, 
-                'total' => $request->has('total') ? $request->total : $query->total, 
-                'employee' => $request->has('employee') ? $request->employee : $query->employee, 
-                'is_prospect' => $request->has('is_prospect') ? $request->is_prospect : $query->is_prospect, 
-                'bookyear_id' => $request->has('bookyear_id') ? $request->bookyear_id : $query->bookyear_id, 
-                'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id, 
+                'receipt_id' => $request->has('receipt_id') ? $request->receipt_id : $query->receipt_id,
+                'journal_id' => $request->has('journal_id') ? $request->journal_id : $query->journal_id,
+                'prospect_student_id' => $request->has('prospect_student_id') ? $request->prospect_student_id : $query->prospect_student_id,
+                'student_id' => $request->has('student_id') ? $request->student_id : $query->student_id,
+                'trans_date' => $request->has('trans_date') ? $request->trans_date : $query->trans_date,
+                'total' => $request->has('total') ? $request->total : $query->total,
+                'employee' => $request->has('employee') ? $request->employee : $query->employee,
+                'is_prospect' => $request->has('is_prospect') ? $request->is_prospect : $query->is_prospect,
+                'bookyear_id' => $request->has('bookyear_id') ? $request->bookyear_id : $query->bookyear_id,
+                'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id,
             );
             if ($action == 'Ubah')
             {
@@ -543,6 +541,6 @@ class ReceiptVoluntaryEloquent implements ReceiptVoluntaryRepository
             } else {
                 $this->logTransaction('#', $action .' '. $subject, json_encode($before), '{}');
             }
-        } 
-    }	
+        }
+    }
 }

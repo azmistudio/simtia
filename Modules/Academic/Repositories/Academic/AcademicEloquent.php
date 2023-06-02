@@ -17,6 +17,7 @@ use Modules\Academic\Entities\Semester;
 use Modules\Academic\Entities\Classes;
 use Modules\Academic\Entities\Students;
 use Carbon\Carbon;
+use Exception;
 
 class AcademicEloquent implements AcademicRepository
 {
@@ -29,8 +30,8 @@ class AcademicEloquent implements AcademicRepository
 	public function createGrade(Request $request, $subject)
 	{
 		$lastOrder = Grade::select('order')->orderByDesc('id')->limit(1)->first();
-        $newOrder = $lastOrder != null ? intval($lastOrder->order) + 1 : 1; 
-		// 
+        $newOrder = $lastOrder != null ? intval($lastOrder->order) + 1 : 1;
+		//
 		$payload = $request->all();
 		$payload['order'] = $newOrder;
 		$this->logActivity($request, 0, $subject, 'Tambah', 'grade');
@@ -52,7 +53,7 @@ class AcademicEloquent implements AcademicRepository
 		if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
-		} 
+		}
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
@@ -83,10 +84,16 @@ class AcademicEloquent implements AcademicRepository
 			$query = $query->whereHas('getDepartment', function($qry) {
 				$qry->where('department_id', auth()->user()->department_id);
 			});
-		} 
-	    // 
+		}
+        if ($request->has('department_id'))
+        {
+            $query = $query->whereHas('getDepartment', function($qry) use ($request) {
+				$qry->where('department_id', $request->department_id);
+			});
+        }
+	    //
     	$filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->whereHas('getDepartment', function($qry) use($filter) {
             	$qry->whereRaw('LOWER(name) like ?', ['%'.Str::lower($filter).'%']);
@@ -103,7 +110,7 @@ class AcademicEloquent implements AcademicRepository
 			                });
         return $result;
     }
-	
+
 	// school year
 	public function createSchoolYear(Request $request, $subject)
 	{
@@ -118,7 +125,7 @@ class AcademicEloquent implements AcademicRepository
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $request->id, $subject, 'Ubah', 'schoolyear');
         SchoolYear::where('id', $request->id)->update($payload);
-        // 
+        //
         $updated = SchoolYear::find($request->id);
         if ($updated->is_active <> $request->is_active)
         {
@@ -140,7 +147,7 @@ class AcademicEloquent implements AcademicRepository
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
-		} 
+		}
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
@@ -173,15 +180,15 @@ class AcademicEloquent implements AcademicRepository
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
-		} 
+		}
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('school_year', 'like', '%'.$filter.'%');
         }
         $is_active = isset($request->is_active) ? $request->is_active : '';
-        if ($is_active != '') 
+        if ($is_active != '')
         {
             $query = $query->where('is_active', $is_active);
         }
@@ -204,17 +211,21 @@ class AcademicEloquent implements AcademicRepository
 
 	public function updateSemester(Request $request, $subject)
 	{
+        // validate active semester
+        $old_status = Semester::find($request->id)->is_active;
+        if ($request->is_active == 1 && $old_status == 2)
+        {
+            $total_semester = Semester::where('department_id',$request->department_id)->count();
+            $total_active = Semester::where('department_id',$request->department_id)->where('is_active',1)->count();
+            if ($total_active >= ($total_semester / 2))
+            {
+                throw new Exception('Jumlah semester aktif maksimal ' . $total_semester / 2 . ' semester.', 1);
+            }
+        }
 		$payload = Arr::except($request->all(), ['created_at','_token']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $request->id, $subject, 'Ubah', 'semester');
         Semester::where('id', $request->id)->update($payload);
-        // 
-        if ($request->is_active == 1)
-        {
-            return Semester::where('id','<>',$request->id)->where('department_id', $request->department_id)->update(['is_active' => 2]);
-        } else {
-            return Semester::where('id','<>',$request->id)->where('department_id', $request->department_id)->orderByDesc('id')->limit(1)->update(['is_active' => 1]);
-        }
 	}
 
 	public function dataSemester(Request $request)
@@ -224,7 +235,7 @@ class AcademicEloquent implements AcademicRepository
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
-		} 
+		}
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
@@ -254,7 +265,7 @@ class AcademicEloquent implements AcademicRepository
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
 		}
-        // 
+        //
         $result["total"] = $query->count();
         $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
             $model['department'] = $model->getDepartment->name;
@@ -320,7 +331,7 @@ class AcademicEloquent implements AcademicRepository
 			$query = $query->whereHas('getGrade.getDepartment', function($qry) {
 				$qry->where('department_id', auth()->user()->department_id);
 			});
-		} 
+		}
         // result
         $result["total"] = $query->distinct()->count('id');
         $result["rows"] = $query->skip(($param['page'] - 1) * $param['rows'])->take($param['rows'])->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
@@ -361,12 +372,12 @@ class AcademicEloquent implements AcademicRepository
         $param = $this->gridRequest($request);
         // query
         $join_sub = Students::select('class_id')->where('is_active', 1);
-        $join_sub_sem = Semester::select('id','department_id','semester')->where('is_active', 1);
+        $join_sub_sem = Semester::select('id','department_id','semester','grade_id')->where('is_active', 1);
         $query = Classes::select(
 			            'academic.classes.id',
 			            'schoolyear_id',
-			            'grade_id',
-			            'class', 
+			            'academic.classes.grade_id',
+			            'class',
 			            DB::raw('departments.id as department_id'),
 			            DB::raw('schoolyear_id as school_year'),
 			            DB::raw('UPPER(departments.name) as department'),
@@ -382,12 +393,12 @@ class AcademicEloquent implements AcademicRepository
 			        ->join('academic.schoolyears','academic.schoolyears.id','=','academic.classes.schoolyear_id')
 			        ->join('academic.grades','academic.grades.id','=','academic.classes.grade_id')
 			        ->join('departments','departments.id','=','academic.grades.department_id')
-			        ->leftJoinSub($join_sub_sem, 'semesters', function ($join) {
-			            $join->on('departments.id', '=', 'semesters.department_id');
+			        ->joinSub($join_sub_sem, 'semesters', function ($join) {
+			            $join->on('classes.grade_id', '=', 'semesters.grade_id');
 			        })
 			        ->where('academic.classes.is_active', 1)
-			        ->groupBy('academic.classes.id','schoolyear_id','grade_id','class','departments.id','departments.name','semesters.semester','academic.schoolyears.start_date','academic.schoolyears.end_date', 'semesters.id');
-        
+			        ->groupBy('academic.classes.id','schoolyear_id','academic.classes.grade_id','class','departments.id','departments.name','semesters.semester','academic.schoolyears.start_date','academic.schoolyears.end_date', 'semesters.id');
+
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->whereHas('getGrade.getDepartment', function($qry) {
@@ -396,21 +407,21 @@ class AcademicEloquent implements AcademicRepository
 		}
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('class', $filter);
         }
         $fclass_not = isset($request->fclass_not) ? $request->fclass_not : '';
         $fschoolyear_not = isset($request->fschoolyear_not) ? $request->fschoolyear_not : '';
         $fgrade_not = isset($request->fgrade_not) ? $request->fgrade_not : '';
-        if ($fclass_not != '' && $fschoolyear_not != '' && $fgrade_not != '') 
+        if ($fclass_not != '' && $fschoolyear_not != '' && $fgrade_not != '')
         {
             $schoolyear = SchoolYear::select('end_date')->where('id', $fschoolyear_not)->first();
             $schoolyears = SchoolYear::select('id')->whereDate('start_date','>=',$schoolyear->end_date)->get();
             $schoolyears_params = array();
             if (!empty($schoolyears))
             {
-                foreach ($schoolyears as $schoolyear) 
+                foreach ($schoolyears as $schoolyear)
                 {
                     $schoolyears_params[] = $schoolyear->id;
                 }
@@ -422,14 +433,14 @@ class AcademicEloquent implements AcademicRepository
         $fclass_yes = isset($request->fclass_yes) ? $request->fclass_yes : '';
         $fschoolyear_yes = isset($request->fschoolyear_yes) ? $request->fschoolyear_yes : '';
         $fgrade_yes = isset($request->fgrade_yes) ? $request->fgrade_yes : '';
-        if ($fclass_yes != '' && $fschoolyear_yes != '' && $fgrade_yes != '') 
+        if ($fclass_yes != '' && $fschoolyear_yes != '' && $fgrade_yes != '')
         {
             $schoolyear = SchoolYear::select('end_date')->where('id', $fschoolyear_yes)->first();
             $schoolyears = SchoolYear::select('id')->whereDate('start_date','>',$schoolyear->end_date)->get();
             $schoolyears_params = array();
             if (!empty($schoolyears))
             {
-                foreach ($schoolyears as $schoolyear) 
+                foreach ($schoolyears as $schoolyear)
                 {
                     $schoolyears_params[] = $schoolyear->id;
                 }
@@ -439,14 +450,14 @@ class AcademicEloquent implements AcademicRepository
             }
         }
         $fdept_not = isset($request->fdept_not) ? $request->fdept_not : '';
-        if ($fdept_not != '' && $fschoolyear_not != '') 
+        if ($fdept_not != '' && $fschoolyear_not != '')
         {
             $schoolyear = SchoolYear::select('end_date')->where('id', $fschoolyear_not)->first();
             $schoolyears = SchoolYear::select('id')->whereDate('start_date','>',$schoolyear->end_date)->get();
             $schoolyears_params = array();
             if (!empty($schoolyears))
             {
-                foreach ($schoolyears as $schoolyear) 
+                foreach ($schoolyears as $schoolyear)
                 {
                     $schoolyears_params[] = $schoolyear->id;
                 }
@@ -475,7 +486,7 @@ class AcademicEloquent implements AcademicRepository
 		}
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('class', $filter);
         }
@@ -539,7 +550,7 @@ class AcademicEloquent implements AcademicRepository
                     ->groupBy('id','schoolyear_id','grade_id','class');
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('class', $filter);
         }
@@ -574,10 +585,10 @@ class AcademicEloquent implements AcademicRepository
         if (auth()->user()->getDepartment->is_all != 1)
 		{
 			$query = $query->where('department_id', auth()->user()->department_id);
-		} 
+		}
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('class', $filter);
         }
@@ -593,7 +604,11 @@ class AcademicEloquent implements AcademicRepository
 
     public function comboboxClass($grade_id, $schoolyear_id)
     {
-        return Classes::selectRaw('id, UPPER(class) AS text')->where('grade_id', $grade_id)->where('schoolyear_id', $schoolyear_id)->where('is_active', 1)->orderBy('id')->get();
+        return Classes::selectRaw('id, UPPER(class) AS text')
+                ->where('grade_id', $grade_id)
+                ->where('schoolyear_id', $schoolyear_id)
+                ->where('is_active', 1)
+                ->orderBy('id')->get();
     }
 
     public function comboGridClassOnly(Request $request)
@@ -606,10 +621,10 @@ class AcademicEloquent implements AcademicRepository
 			$query = $query->whereHas('getGrade', function($qry) {
 				$qry->where('department_id', auth()->user()->department_id);
 			});
-		} 
+		}
         // filter
         $filter = isset($request->q) ? $request->q : '';
-        if ($filter != '') 
+        if ($filter != '')
         {
             $query = $query->where('class', $filter);
         }
@@ -631,44 +646,44 @@ class AcademicEloquent implements AcademicRepository
         return $result;
     }
 
-	private function logActivity(Request $request, $model_id, $subject, $action, $entity) 
+	private function logActivity(Request $request, $model_id, $subject, $action, $entity)
 	{
 		if ($action == 'Tambah')
 		{
 			switch ($entity) {
 				case 'schoolyear':
 					$data = array(
-						'school_year' => $request->school_year, 
-						'start_date' => $request->start_date, 
-						'end_date' => $request->end_date, 
-						'department_id' => $request->department_id, 
-						'is_active' => $request->is_active, 
+						'school_year' => $request->school_year,
+						'start_date' => $request->start_date,
+						'end_date' => $request->end_date,
+						'department_id' => $request->department_id,
+						'is_active' => $request->is_active,
 					);
 					break;
 
 				case 'semester':
 					$data = array(
-						'semester' => $request->semester, 
-						'department_id' => $request->department_id, 
-						'is_active' => $request->is_active, 
+						'semester' => $request->semester,
+						'department_id' => $request->department_id,
+						'is_active' => $request->is_active,
 					);
 					break;
 
 				case 'class':
 					$data = array(
-						'grade_id' => $request->grade_id, 
-						'schoolyear_id' => $request->schoolyear_id, 
-						'class' => $request->class, 
-						'employee_id' => $request->employee_id, 
-						'is_active' => $request->is_active, 
+						'grade_id' => $request->grade_id,
+						'schoolyear_id' => $request->schoolyear_id,
+						'class' => $request->class,
+						'employee_id' => $request->employee_id,
+						'is_active' => $request->is_active,
 					);
 					break;
-				
+
 				default:
 					$data = array(
-						'grade' => $request->grade, 
-						'department_id' => $request->department_id, 
-						'is_active' => $request->is_active, 
+						'grade' => $request->grade,
+						'department_id' => $request->department_id,
+						'is_active' => $request->is_active,
 					);
 					break;
 			}
@@ -678,64 +693,64 @@ class AcademicEloquent implements AcademicRepository
 				case 'schoolyear':
 					$query = SchoolYear::find($model_id);
 					$before = array(
-						'school_year' => $query->school_year, 
-						'start_date' => $query->start_date, 
-						'end_date' => $query->end_date, 
-						'department_id' => $query->department_id, 
-						'is_active' => $query->is_active, 
+						'school_year' => $query->school_year,
+						'start_date' => $query->start_date,
+						'end_date' => $query->end_date,
+						'department_id' => $query->department_id,
+						'is_active' => $query->is_active,
 					);
 					$after = array(
-						'school_year' => $request->has('school_year') ? $request->school_year : $query->school_year, 
-						'start_date' => $request->has('start_date') ? $request->start_date : $query->start_date, 
-						'end_date' => $request->has('end_date') ? $request->end_date : $query->end_date, 
-						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id, 
-						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active, 
+						'school_year' => $request->has('school_year') ? $request->school_year : $query->school_year,
+						'start_date' => $request->has('start_date') ? $request->start_date : $query->start_date,
+						'end_date' => $request->has('end_date') ? $request->end_date : $query->end_date,
+						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id,
+						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active,
 					);
 					break;
 
 				case 'semester':
 					$query = Semester::find($model_id);
 					$before = array(
-						'semester' => $query->semester, 
-						'department_id' => $query->department_id, 
-						'is_active' => $query->is_active, 
+						'semester' => $query->semester,
+						'department_id' => $query->department_id,
+						'is_active' => $query->is_active,
 					);
 					$after = array(
-						'semester' => $request->has('semester') ? $request->semester : $query->semester, 
-						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id, 
-						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active, 
+						'semester' => $request->has('semester') ? $request->semester : $query->semester,
+						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id,
+						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active,
 					);
 					break;
 
 				case 'class':
 					$query = Classes::find($model_id);
 					$before = array(
-						'grade_id' => $query->grade_id, 
-						'schoolyear_id' => $query->schoolyear_id, 
-						'class' => $query->class, 
-						'employee_id' => $query->employee_id, 
-						'is_active' => $query->is_active, 
+						'grade_id' => $query->grade_id,
+						'schoolyear_id' => $query->schoolyear_id,
+						'class' => $query->class,
+						'employee_id' => $query->employee_id,
+						'is_active' => $query->is_active,
 					);
 					$after = array(
-						'grade_id' => $request->has('grade_id') ? $request->grade_id : $query->grade_id, 
-						'schoolyear_id' => $request->has('schoolyear_id') ? $request->schoolyear_id : $query->schoolyear_id, 
-						'class' => $request->has('class') ? $request->class : $query->class, 
-						'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id, 
-						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active, 
+						'grade_id' => $request->has('grade_id') ? $request->grade_id : $query->grade_id,
+						'schoolyear_id' => $request->has('schoolyear_id') ? $request->schoolyear_id : $query->schoolyear_id,
+						'class' => $request->has('class') ? $request->class : $query->class,
+						'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id,
+						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active,
 					);
 					break;
-				
+
 				default:
 					$query = Grade::find($model_id);
 					$before = array(
-						'grade' => $query->grade, 
-						'department_id' => $query->department_id, 
-						'is_active' => $query->is_active, 
+						'grade' => $query->grade,
+						'department_id' => $query->department_id,
+						'is_active' => $query->is_active,
 					);
 					$after = array(
-						'grade' => $request->has('grade') ? $request->grade : $query->grade, 
-						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id, 
-						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active, 
+						'grade' => $request->has('grade') ? $request->grade : $query->grade,
+						'department_id' => $request->has('department_id') ? $request->department_id : $query->department_id,
+						'is_active' => $request->has('is_active') ? $request->is_active : $query->is_active,
 					);
 					break;
 			}
@@ -745,6 +760,6 @@ class AcademicEloquent implements AcademicRepository
 			} else {
 		        $this->logTransaction('#', $action .' '. $subject, json_encode($before), '{}');
 			}
-		} 
+		}
 	}
 }

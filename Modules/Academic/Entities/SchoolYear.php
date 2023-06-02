@@ -22,7 +22,7 @@ class SchoolYear extends Model
         'is_active',
         'logged',
     ];
-    
+
     protected static function newFactory()
     {
         return \Modules\Academic\Database\factories\SchoolYearFactory::new();

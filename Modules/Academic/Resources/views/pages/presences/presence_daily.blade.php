@@ -34,8 +34,9 @@
                         columns: [[
                             {field:'department',title:'Departemen',width:150},
                             {field:'school_year',title:'Thn. Ajaran',width:100,align:'center'},
-                            {field:'grade',title:'Tingkat',width:80,align:'center'},
+                            {field:'grade',title:'Tingkat',width:65,align:'center'},
                             {field:'class',title:'Kelas',width:120},
+                            {field:'semester',title:'Semester',width:80,align:'center'},
                             {field:'capacity',title:'Kapasitas/Terisi',width:120},
                         ]],
                     ">
@@ -103,8 +104,9 @@
                                     columns: [[
                                         {field:'department',title:'Departemen',width:150},
                                         {field:'school_year',title:'Thn. Ajaran',width:100,align:'center'},
-                                        {field:'grade',title:'Tingkat',width:80,align:'center'},
+                                        {field:'grade',title:'Tingkat',width:65,align:'center'},
                                         {field:'class',title:'Kelas',width:120},
+                                        {field:'semester',title:'Semester',width:80,align:'center'},
                                         {field:'capacity',title:'Kapasitas/Terisi',width:120},
                                     ]],
                                 ">
@@ -135,7 +137,7 @@
                                 <a href="javascript:void(0)" class="easyui-linkbutton small-btn" onclick="bulkSet()" style="width:80px;height:22px;">Terapkan</a>
                             </div>
                             <div class="mb-1">
-                                <table id="tb-presence-daily-form" class="easyui-datagrid" style="width:100%;height:{{ $SubGridHeight }}" 
+                                <table id="tb-presence-daily-form" class="easyui-datagrid" style="width:100%;height:{{ $SubGridHeight }}"
                                     data-options="method:'post',rownumbers:'true', queryParams: { _token: '{{ csrf_token() }}' }">
                                     <thead>
                                         <tr>

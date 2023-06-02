@@ -141,7 +141,7 @@
         })
         $("#form-admission-config-main").form({
             onLoadSuccess: function(data) {
-                $('#tb-admission-config-form').datagrid({ 
+                $('#tb-admission-config-form').datagrid({
                     data: [
                         {config:'Sumbangan #1', code:data.donate_code_1, name: data.donate_name_1},
                         {config:'Sumbangan #2', code:data.donate_code_2, name: data.donate_name_2},
@@ -168,7 +168,7 @@
         clearPreview("photo-admission-config","preview-img-admission-config")
         idAdmissionConfig.value = "-1"
         $('#tb-admission-config-form').datagrid({ data: initDataAdmissionConfig })
-        $("#AdmissionConfigId").combogrid("enable")
+        $("#AdmissionConfigId").combogrid("readonly",false)
         $("#AdmissionConfigClone").checkbox("enable")
         $("#page-admission-config-main").waitMe("hide")
     }

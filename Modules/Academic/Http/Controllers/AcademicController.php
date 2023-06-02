@@ -47,7 +47,7 @@ class AcademicController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -76,7 +76,7 @@ class AcademicController extends Controller
             'department_id' => 'required|int',
             'grade' => 'required',
         ]);
-        try 
+        try
         {
             $request->merge([
                 'remark' => Str::lower($request->remark),
@@ -85,9 +85,9 @@ class AcademicController extends Controller
             ]);
             if ($request->id < 1)
             {
-                if ($request->has('is_all')) 
+                if ($request->has('is_all'))
                 {
-                    foreach ($this->listDepartment() as $dept) 
+                    foreach ($this->listDepartment() as $dept)
                     {
                         $request->merge([
                             'department_id' => $dept->id
@@ -125,7 +125,7 @@ class AcademicController extends Controller
      */
     public function destroyGrade($id)
     {
-        try 
+        try
         {
             $this->academicEloquent->destroyGrade($id, $this->subject_grade);
             $response = $this->getResponse('destroy', '', $this->subject_grade);
@@ -160,7 +160,7 @@ class AcademicController extends Controller
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject_grade)->snake();
         $hashfile = md5(date('Ymdhis') . '_' . $name);
         $filename = date('Ymdhis') . '_' . $name . '.pdf';
-        // 
+        //
         Storage::disk('local')->put('public/tempo/'.$hashfile . '.html', $view->render());
         $this->pdfPortrait($hashfile, $filename);
         echo $filename;
@@ -194,12 +194,12 @@ class AcademicController extends Controller
     public function storeSchoolYear(SchoolYearRequest $request)
     {
         $validated = $request->validated();
-        try 
+        try
         {
             $request->merge([
                 'school_year' => $request->school_year .'/'. ($request->school_year + 1),
-                'start_date' => $this->formatDate($request->start_date, 'sys'),
-                'end_date' => $this->formatDate($request->end_date, 'sys'),
+                'start_date' => $this->formatDate($request->date_start, 'sys'),
+                'end_date' => $this->formatDate($request->date_start, 'sys'),
                 'is_active' => $request->is_active ?: 1,
                 'logged' => auth()->user()->email,
             ]);
@@ -209,7 +209,7 @@ class AcademicController extends Controller
             {
                 throw new Exception('Tahun Ajaran tidak sesuai dengan Tahun Tanggal Mulai.', 1);
             } else {
-                if ($request->id < 1) 
+                if ($request->id < 1)
                 {
                     $this->academicEloquent->createSchoolYear($request, $this->subject_schoolyear);
                 } else {
@@ -231,7 +231,12 @@ class AcademicController extends Controller
      */
     public function showSchoolYear($id)
     {
-        return response()->json(SchoolYear::find($id));
+        $schoolyear = SchoolYear::where('id',$id)->get()->map(function($model){
+            $model['date_start'] = $model->start_date->format('d/m/Y');
+            $model['date_end'] = $model->end_date->format('d/m/Y');
+            return $model;
+        })[0];
+        return response()->json($schoolyear);
     }
 
     /**
@@ -241,7 +246,7 @@ class AcademicController extends Controller
      */
     public function destroySchoolYear($id)
     {
-        try 
+        try
         {
             $this->academicEloquent->destroySchoolYear($id, $this->subject_schoolyear);
             $response = $this->getResponse('destroy', '', $this->subject_schoolyear);
@@ -277,7 +282,7 @@ class AcademicController extends Controller
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject_schoolyear)->snake();
         $hashfile = md5(date('Ymdhis') . '_' . $name);
         $filename = date('Ymdhis') . '_' . $name . '.pdf';
-        // 
+        //
         Storage::disk('local')->put('public/tempo/'.$hashfile . '.html', $view->render());
         $this->pdfPortrait($hashfile, $filename);
         echo $filename;
@@ -315,18 +320,18 @@ class AcademicController extends Controller
             'department_id' => 'required|int',
             'semester' => 'required',
         ]);
-        try 
+        try
         {
             $request->merge([
                 'semester' => Str::lower($request->semester),
                 'is_active' => $request->is_active ?: 1,
                 'logged' => auth()->user()->email,
             ]);
-            if ($request->id < 1) 
+            if ($request->id < 1)
             {
-                if ($request->has('is_all')) 
+                if ($request->has('is_all'))
                 {
-                    foreach ($this->listDepartment() as $dept) 
+                    foreach ($this->listDepartment() as $dept)
                     {
                         $request->merge([
                             'department_id' => $dept->id
@@ -365,7 +370,7 @@ class AcademicController extends Controller
      */
     public function destroySemester($id)
     {
-        try 
+        try
         {
             $this->academicEloquent->destroySemester($id, $this->subject_semester);
             $response = $this->getResponse('destroy', '', $this->subject_semester);
@@ -393,6 +398,7 @@ class AcademicController extends Controller
         $idArray = collect(json_decode($request->data))->pluck('id')->toArray();
         $query['models'] = Semester::whereIn('id', $idArray)->orderBy('id')->get()->map(function ($model) {
             $model['is_active'] = $this->getActive()[$model->is_active];
+            $model['grade'] = !is_null($model->grade_id) ? $model->getGrade->grade : '-';
             return $model;
         });
         //
@@ -435,38 +441,38 @@ class AcademicController extends Controller
     {
         //
         $validated = $request->validated();
-        try 
+        try
         {
             $request->merge([
                 'class' => Str::lower($request->class),
                 'is_active' => $request->is_active ?: 1,
                 'logged' => auth()->user()->email,
             ]);
-            if ($request->id < 1) 
+            if ($request->id < 1)
             {
                 $schoolyear = SchoolYear::find($request->schoolyear_id);
                 $periods = explode('/', $schoolyear->school_year);
                 $period_before = intval($periods[0]) - 1 .'/'. intval($periods[1]) - 1;
-                $classes = Classes::where('grade_id', $request->grade_id)
-                            ->whereHas('getSchoolYear', function($qry) use ($period_before) {
-                                $qry->where('school_year', strval($period_before))->where('is_active',2);
-                            })
-                            ->whereHas('getGrade', function ($qry) use ($request) {
-                                $qry->where('department_id', $request->department_id);
-                            })
-                            ->get();
+                //
                 if ($request->has('is_copy'))
                 {
-                    foreach ($classes as $class) 
+                    $classes = Classes::where('schoolyear_id','<>',$request->schoolyear_id)
+                                ->whereHas('getGrade', function ($qry) use ($request) {
+                                    $qry->where('department_id', $request->department_id);
+                                })->get();
+                    //
+                    foreach ($classes as $class)
                     {
                         if (!isset($classes))
                         {
                             throw new Exception('Periode kelas sebelumnya belum ada.', 1);
                         } else {
+
                             $request->merge([
                                 'class' => Str::lower($class->class),
                                 'employee_id' => $class->employee_id,
                                 'capacity' => $class->capacity,
+                                'is_active' => 2,
                             ]);
                             $this->academicEloquent->createClass($request, $this->subject_class);
                             $response = $this->getResponse('store', '', $this->subject_class);
@@ -504,7 +510,7 @@ class AcademicController extends Controller
      */
     public function destroyClass($id)
     {
-        try 
+        try
         {
             $this->academicEloquent->destroyClass($id, $this->subject_class);
             $response = $this->getResponse('destroy', '', $this->subject_class);
@@ -536,7 +542,7 @@ class AcademicController extends Controller
         $name = Str::lower(config('app.name')) .'_'. Str::of($this->subject_class)->snake();
         $hashfile = md5(date('Ymdhis') . '_' . $name);
         $filename = date('Ymdhis') . '_' . $name . '.pdf';
-        // 
+        //
         Storage::disk('local')->put('public/tempo/'.$hashfile . '.html', $view->render());
         $this->pdfPortrait($hashfile, $filename);
         echo $filename;

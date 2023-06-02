@@ -33,7 +33,7 @@ class ExamEloquent implements ExamRepository
 		$payload = Arr::except($request->all(), ['assessment_id','student_no','name','score','remark','start','end','students','created_at','_token']);
         $payload['updated_at'] = Carbon::now()->timezone('Asia/Jakarta');
         $this->logActivity($request, $payload['id'], $subject, 'Ubah');
-        // 
+        //
         return Exam::where('id', $payload['id'])->update($payload);
 	}
 
@@ -46,7 +46,7 @@ class ExamEloquent implements ExamRepository
             $query = $query->whereHas('getSemester', function($qry) {
                 $qry->where('department_id', auth()->user()->department_id);
             });
-        } 
+        }
         // filter
         $class = isset($request->params['fclass']) ? $request->params['fclass'] : '';
         if ($class != '')
@@ -133,6 +133,7 @@ class ExamEloquent implements ExamRepository
     		        ->join('academic.schoolyears','academic.schoolyears.id','=','academic.classes.schoolyear_id')
     		        ->join('academic.lessons','academic.lessons.id','=','academic.exams.lesson_id')
     		        ->join('departments','departments.id','=','academic.lessons.department_id')
+                    ->where('academic.semesters.is_active',1)
     		        ->groupBy(
     		            'academic.exams.lesson_id',
     		            'academic.exams.class_id',
@@ -154,7 +155,7 @@ class ExamEloquent implements ExamRepository
             $query = $query->whereHas('getSemester', function($qry) {
                 $qry->where('department_id', auth()->user()->department_id);
             });
-        } 
+        }
         // result
         $result["total"] = $query->count();
         $result["rows"] = $query->orderBy($param['sort'], $param['sort_by'])->get()->map(function ($model) {
@@ -180,7 +181,7 @@ class ExamEloquent implements ExamRepository
         $query_rows = DB::select("SELECT academic.fn_pivotcode_exams('academic.exams_view','student_id','code','score',".$request->assessment_id.'::int8'.",".$request->class_id.'::int8'.",".$request->semester_id.'::int8'.",'numeric')");
         $rows = DB::select($query_rows[0]->fn_pivotcode_exams);
         // total
-        $total = collect(DB::select($query_rows[0]->fn_pivotcode_exams)); 
+        $total = collect(DB::select($query_rows[0]->fn_pivotcode_exams));
         // footer
         $query_footer = DB::select("SELECT academic.fn_pivotcode_exams_avg('academic.exams_view','student_id','code','score',".$request->assessment_id.'::int8'.",".$request->class_id.'::int8'.",".$request->semester_id.'::int8'.",'numeric')");
         $footer = DB::select($query_footer[0]->fn_pivotcode_exams_avg);
@@ -246,8 +247,8 @@ class ExamEloquent implements ExamRepository
 
         $result = array();
         $num_score = 0;
-        $avg_score = 0; 
-        foreach ($query as $row) 
+        $avg_score = 0;
+        foreach ($query as $row)
         {
             $avg_class = $this->getAvgClass($class_id, $row->id, $semester_id)[0];
             $num_score += $row->score;
@@ -330,7 +331,7 @@ class ExamEloquent implements ExamRepository
     }
 
     // helpers
-    
+
     function getLessonPlan($id)
     {
         if ($id > 0)
@@ -339,56 +340,56 @@ class ExamEloquent implements ExamRepository
         } else {
             return 'Tanpa RPP';
         }
-    } 
-	
-	private function logActivity(Request $request, $model_id, $subject, $action) 
+    }
+
+	private function logActivity(Request $request, $model_id, $subject, $action)
 	{
 		if ($action == 'Tambah')
 		{
 			$data = array(
-				'teacher_id' => $request->teacher_id, 
-				'lesson_id' => $request->lesson_id, 
-				'class_id' => $request->class_id, 
-				'semester_id' => $request->semester_id, 
-				'employee_id' => $request->employee_id, 
-				'status_id' => $request->status_id, 
-				'score_aspect_id' => $request->score_aspect_id, 
-				'lesson_exam_id' => $request->lesson_exam_id, 
-				'date' => $request->date, 
-				'lesson_assessment_id' => $request->lesson_assessment_id, 
-				'lesson_plan_id' => $request->lesson_plan_id, 
-				'code' => $request->code, 
+				'teacher_id' => $request->teacher_id,
+				'lesson_id' => $request->lesson_id,
+				'class_id' => $request->class_id,
+				'semester_id' => $request->semester_id,
+				'employee_id' => $request->employee_id,
+				'status_id' => $request->status_id,
+				'score_aspect_id' => $request->score_aspect_id,
+				'lesson_exam_id' => $request->lesson_exam_id,
+				'date' => $request->date,
+				'lesson_assessment_id' => $request->lesson_assessment_id,
+				'lesson_plan_id' => $request->lesson_plan_id,
+				'code' => $request->code,
 			);
 			$this->logTransaction('#', $action .' '. $subject, '{}', json_encode($data));
 		} else {
 			$query = Exam::find($model_id);
 			$before = array(
-				'teacher_id' => $query->teacher_id, 
-				'lesson_id' => $query->lesson_id, 
-				'class_id' => $query->class_id, 
-				'semester_id' => $query->semester_id, 
-				'employee_id' => $query->employee_id, 
-				'status_id' => $query->status_id, 
-				'score_aspect_id' => $query->score_aspect_id, 
-				'lesson_exam_id' => $query->lesson_exam_id, 
-				'date' => $query->date, 
-				'lesson_assessment_id' => $query->lesson_assessment_id, 
-				'lesson_plan_id' => $query->lesson_plan_id, 
-				'code' => $query->code, 
+				'teacher_id' => $query->teacher_id,
+				'lesson_id' => $query->lesson_id,
+				'class_id' => $query->class_id,
+				'semester_id' => $query->semester_id,
+				'employee_id' => $query->employee_id,
+				'status_id' => $query->status_id,
+				'score_aspect_id' => $query->score_aspect_id,
+				'lesson_exam_id' => $query->lesson_exam_id,
+				'date' => $query->date,
+				'lesson_assessment_id' => $query->lesson_assessment_id,
+				'lesson_plan_id' => $query->lesson_plan_id,
+				'code' => $query->code,
 			);
 			$after = array(
-				'teacher_id' => $request->has('teacher_id') ? $request->teacher_id : $query->teacher_id, 
-				'lesson_id' => $request->has('lesson_id') ? $request->lesson_id : $query->lesson_id, 
-				'class_id' => $request->has('class_id') ? $request->class_id : $query->class_id, 
-				'semester_id' => $request->has('semester_id') ? $request->semester_id : $query->semester_id, 
-				'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id, 
-				'status_id' => $request->has('status_id') ? $request->status_id : $query->status_id, 
-				'score_aspect_id' => $request->has('score_aspect_id') ? $request->score_aspect_id : $query->score_aspect_id, 
-				'lesson_exam_id' => $request->has('lesson_exam_id') ? $request->lesson_exam_id : $query->lesson_exam_id, 
-				'date' => $request->has('date') ? $request->date : $query->date, 
-				'lesson_assessment_id' => $request->has('lesson_assessment_id') ? $request->lesson_assessment_id : $query->lesson_assessment_id, 
-				'lesson_plan_id' => $request->has('lesson_plan_id') ? $request->lesson_plan_id : $query->lesson_plan_id, 
-				'code' => $request->has('code') ? $request->code : $query->code, 
+				'teacher_id' => $request->has('teacher_id') ? $request->teacher_id : $query->teacher_id,
+				'lesson_id' => $request->has('lesson_id') ? $request->lesson_id : $query->lesson_id,
+				'class_id' => $request->has('class_id') ? $request->class_id : $query->class_id,
+				'semester_id' => $request->has('semester_id') ? $request->semester_id : $query->semester_id,
+				'employee_id' => $request->has('employee_id') ? $request->employee_id : $query->employee_id,
+				'status_id' => $request->has('status_id') ? $request->status_id : $query->status_id,
+				'score_aspect_id' => $request->has('score_aspect_id') ? $request->score_aspect_id : $query->score_aspect_id,
+				'lesson_exam_id' => $request->has('lesson_exam_id') ? $request->lesson_exam_id : $query->lesson_exam_id,
+				'date' => $request->has('date') ? $request->date : $query->date,
+				'lesson_assessment_id' => $request->has('lesson_assessment_id') ? $request->lesson_assessment_id : $query->lesson_assessment_id,
+				'lesson_plan_id' => $request->has('lesson_plan_id') ? $request->lesson_plan_id : $query->lesson_plan_id,
+				'code' => $request->has('code') ? $request->code : $query->code,
 			);
 			if ($action == 'Ubah')
 			{
@@ -396,6 +397,6 @@ class ExamEloquent implements ExamRepository
 			} else {
 		        $this->logTransaction('#', $action .' '. $subject, json_encode($before), '{}');
 			}
-		} 
+		}
 	}
 }

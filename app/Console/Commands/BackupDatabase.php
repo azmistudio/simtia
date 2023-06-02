@@ -74,7 +74,7 @@ class BackupDatabase extends Command
                 return $pg_password.' -U "${:username}" -h localhost -p "${:port}" -n "${:schema}" -a '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
                 break;
             case 'all':
-                $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a '.$exclude_table_public.' '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
+                return $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a '.$exclude_table_public.' '.$exclude_table_finance.' "${:database}" >> "${:output}"';                
                 break;
             default:
                 return $pg_password.' -U "${:username}" -h localhost -p "${:port}" '.$include_schema_all.' -a "${:database}" >> "${:output}"';                

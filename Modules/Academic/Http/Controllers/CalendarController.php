@@ -41,7 +41,7 @@ class CalendarController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) 
+        if (!$request->ajax())
         {
             abort(404);
         }
@@ -58,14 +58,14 @@ class CalendarController extends Controller
             $calendars = $calendars->whereHas('getSchoolYear', function($qry) {
                 $qry = $qry->where('department_id', auth()->user()->department_id);
             });
-        } 
+        }
         $data['calendars'] = $calendars->get()->map(function($model){
             $model['period'] = $model->getSchoolYear->start_date->format('d/m/Y') .' s.d '. $model->getSchoolYear->end_date->format('d/m/Y');
             $model['department'] = $model->getSchoolYear->getDepartment->name;
             $model['school_year'] = $model->getSchoolYear->school_year;
             return $model;
         });
-        $data['schoolyears'] = $schoolyears->get(); 
+        $data['schoolyears'] = $schoolyears->get();
         $data['depts'] = $this->listDepartment();
         return view('academic::pages.calendars.calendar', $data);
     }
@@ -81,7 +81,7 @@ class CalendarController extends Controller
             'schoolyear_id' => 'required|string',
             'description' => 'required|string',
         ]);
-        try 
+        try
         {
             $schoolyears = explode('-', $request->schoolyear_id);
             $request->merge([
@@ -89,7 +89,7 @@ class CalendarController extends Controller
                 'is_active' => $request->is_active ?: 1,
                 'logged' => auth()->user()->email,
             ]);
-            if ($request->id < 1) 
+            if ($request->id < 1)
             {
                 $this->calendarEloquent->create($request, $this->subject);
             } else {
@@ -109,7 +109,7 @@ class CalendarController extends Controller
      */
     public function destroy($id)
     {
-        try 
+        try
         {
             $this->calendarEloquent->destroy($id, $this->subject);
             $response = $this->getResponse('destroy', '', $this->subject);
@@ -156,12 +156,12 @@ class CalendarController extends Controller
     {
         $validated = $request->validated();
         $calendars = explode('-', $request->calendar_id);
-        try 
+        try
         {
             $check_period = Calendar::find($calendars[0]);
-            if ( 
-                strtotime($this->formatDate($request->start,'sys')) < strtotime($check_period->getSchoolYear->start_date) || 
-                strtotime($this->formatDate($request->end,'sys')) > strtotime($check_period->getSchoolYear->end_date) 
+            if (
+                strtotime($this->formatDate($request->start,'sys')) < strtotime($check_period->getSchoolYear->start_date) ||
+                strtotime($this->formatDate($request->end,'sys')) > strtotime($check_period->getSchoolYear->end_date)
             )
             {
                 throw new Exception('Periode Tanggal Mulai & Tanggal Akhir harus sesuai Periode Kalender Akademik.', 1);
@@ -173,7 +173,7 @@ class CalendarController extends Controller
                     'end' => $this->formatDate($request->end,'sys'),
                     'logged' => auth()->user()->email,
                 ]);
-                if ($request->id < 1) 
+                if ($request->id < 1)
                 {
                     $this->calendarActivityEloquent->create($request, $this->subject_activity);
                 } else {
@@ -209,7 +209,7 @@ class CalendarController extends Controller
      */
     public function destroyActivity($id)
     {
-        try 
+        try
         {
             $this->calendarActivityEloquent->destroy($id, $this->subject);
             $response = $this->getResponse('destroy', '', $this->subject);
